@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package geth contains the simplified mobile APIs to go-esc.
+// Package gesc contains the simplified mobile APIs to go-esc.
 //
 // The scope of this package is *not* to allow writing a custom ESC client
 // with pieces plucked from go-esc, rather to allow writing native dapps on

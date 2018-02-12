@@ -62,26 +62,26 @@ import (
 )
 
 var (
-	// Files that end up in the geth*.zip archive.
-	gethArchiveFiles = []string{
-		"COPYING",
-		executablePath("geth"),
-	}
+	// // Files that end up in the geth*.zip archive.
+	// gethArchiveFiles = []string{
+	// 	"COPYING",
+	// 	executablePath("geth"),
+	// }
 
-	// Files that end up in the geth*.zip archive.
+	// Files that end up in the gesc*.zip archive.
 	gescArchiveFiles = []string{
 		"COPYING",
 		executablePath("gesc"),
 	}
 
-	// Files that end up in the geth-alltools*.zip archive.
+	// Files that end up in the gesc-alltools*.zip archive.
 	allToolsArchiveFiles = []string{
 		"COPYING",
 		executablePath("abigen"),
 		executablePath("bootnode"),
 		executablePath("evm"),
 		executablePath("gesc"),
-		executablePath("geth"),
+//		executablePath("geth"),
 		executablePath("puppeth"),
 		executablePath("rlpdump"),
 		executablePath("swarm"),
@@ -106,10 +106,10 @@ var (
 			Name:        "gesc",
 			Description: "Ethersocial CLI client.",
 		},
-		{
-			Name:        "geth",
-			Description: "ESC CLI client.",
-		},
+		// {
+		// 	Name:        "geth",
+		// 	Description: "ESC CLI client.",
+		// },
 		{
 			Name:        "puppeth",
 			Description: "ESC private network manager.",
@@ -367,17 +367,21 @@ func doArchive(cmdline []string) {
 	var (
 		env      = build.Env()
 		base     = archiveBasename(*arch, env)
-		geth     = "geth-" + base + ext
-		alltools = "geth-alltools-" + base + ext
+		gesc     = "gesc-" + base + ext
+		alltools = "gesc-alltools-" + base + ext
+		// geth     = "geth-" + base + ext
+		// alltools = "geth-alltools-" + base + ext		
 	)
 	maybeSkipArchive(env)
-	if err := build.WriteArchive(geth, gethArchiveFiles); err != nil {
-		log.Fatal(err)
+//	if err := build.WriteArchive(geth, gethArchiveFiles); err != nil {
+	if err := build.WriteArchive(gesc, gethArchiveFiles); err != nil {
+			log.Fatal(err)
 	}
 	if err := build.WriteArchive(alltools, allToolsArchiveFiles); err != nil {
 		log.Fatal(err)
 	}
-	for _, archive := range []string{geth, alltools} {
+	for _, archive := range []string{gesc, alltools} {
+//		for _, archive := range []string{geth, alltools} {
 		if err := archiveUpload(archive, *upload, *signer); err != nil {
 			log.Fatal(err)
 		}
@@ -504,7 +508,8 @@ func makeWorkdir(wdflag string) string {
 	if wdflag != "" {
 		err = os.MkdirAll(wdflag, 0744)
 	} else {
-		wdflag, err = ioutil.TempDir("", "geth-build-")
+//		wdflag, err = ioutil.TempDir("", "geth-build-")
+		wdflag, err = ioutil.TempDir("", "gesc-build-")
 	}
 	if err != nil {
 		log.Fatal(err)
@@ -539,7 +544,7 @@ type debExecutable struct {
 func newDebMetadata(distro, author string, env build.Environment, t time.Time) debMetadata {
 	if author == "" {
 		// No signing key, use default author.
-		author = "ESC Builds <fjl@ethereum.org>"
+		author = "ESC Builds <support@ethersocial.org>"
 	}
 	return debMetadata{
 		Env:         env,
@@ -653,28 +658,33 @@ func doWindowsInstaller(cmdline []string) {
 	var (
 		devTools []string
 		allTools []string
-		gethTool string
+		gescTool string
+//		gethTool string
 	)
 	for _, file := range allToolsArchiveFiles {
 		if file == "COPYING" { // license, copied later
 			continue
 		}
 		allTools = append(allTools, filepath.Base(file))
-		if filepath.Base(file) == "geth.exe" {
-			gethTool = file
+		if filepath.Base(file) == "gesc.exe" {
+			gescTool = file
+			//			if filepath.Base(file) == "geth.exe" {
+				// gethTool = file
 		} else {
 			devTools = append(devTools, file)
 		}
 	}
 
 	// Render NSIS scripts: Installer NSIS contains two installer sections,
-	// first section contains the geth binary, second section holds the dev tools.
+	// first section contains the gesc binary, second section holds the dev tools.
 	templateData := map[string]interface{}{
 		"License":  "COPYING",
-		"Geth":     gethTool,
+		"Gesc":     gescTool,
+//		"Geth":     gethTool,
 		"DevTools": devTools,
 	}
-	build.Render("build/nsis.geth.nsi", filepath.Join(*workdir, "geth.nsi"), 0644, nil)
+//	build.Render("build/nsis.geth.nsi", filepath.Join(*workdir, "geth.nsi"), 0644, nil)
+	build.Render("build/nsis.gesc.nsi", filepath.Join(*workdir, "gesc.nsi"), 0644, nil)
 	build.Render("build/nsis.install.nsh", filepath.Join(*workdir, "install.nsh"), 0644, templateData)
 	build.Render("build/nsis.uninstall.nsh", filepath.Join(*workdir, "uninstall.nsh"), 0644, allTools)
 	build.Render("build/nsis.pathupdate.nsh", filepath.Join(*workdir, "PathUpdate.nsh"), 0644, nil)
@@ -689,14 +699,16 @@ func doWindowsInstaller(cmdline []string) {
 	if env.Commit != "" {
 		version[2] += "-" + env.Commit[:8]
 	}
-	installer, _ := filepath.Abs("geth-" + archiveBasename(*arch, env) + ".exe")
+//	installer, _ := filepath.Abs("geth-" + archiveBasename(*arch, env) + ".exe")
+	installer, _ := filepath.Abs("gesc-" + archiveBasename(*arch, env) + ".exe")
 	build.MustRunCommand("makensis.exe",
 		"/DOUTPUTFILE="+installer,
 		"/DMAJORVERSION="+version[0],
 		"/DMINORVERSION="+version[1],
 		"/DBUILDVERSION="+version[2],
 		"/DARCH="+*arch,
-		filepath.Join(*workdir, "geth.nsi"),
+//		filepath.Join(*workdir, "geth.nsi"),
+		filepath.Join(*workdir, "gesc.nsi"),
 	)
 
 	// Sign and publish installer.
@@ -731,7 +743,8 @@ func doAndroidArchive(cmdline []string) {
 
 	if *local {
 		// If we're building locally, copy bundle to build dir and skip Maven
-		os.Rename("geth.aar", filepath.Join(GOBIN, "geth.aar"))
+//		os.Rename("geth.aar", filepath.Join(GOBIN, "geth.aar"))
+		os.Rename("gesc.aar", filepath.Join(GOBIN, "gesc.aar"))
 		return
 	}
 	meta := newMavenMetadata(env)
@@ -741,8 +754,10 @@ func doAndroidArchive(cmdline []string) {
 	maybeSkipArchive(env)
 
 	// Sign and upload the archive to Azure
-	archive := "geth-" + archiveBasename("android", env) + ".aar"
-	os.Rename("geth.aar", archive)
+	// archive := "geth-" + archiveBasename("android", env) + ".aar"
+	// os.Rename("geth.aar", archive)
+	archive := "gesc-" + archiveBasename("android", env) + ".aar"
+	os.Rename("gesc.aar", archive)
 
 	if err := archiveUpload(archive, *upload, *signer); err != nil {
 		log.Fatal(err)
@@ -826,7 +841,8 @@ func newMavenMetadata(env build.Environment) mavenMetadata {
 	}
 	return mavenMetadata{
 		Version:      version,
-		Package:      "geth-" + version,
+//		Package:      "geth-" + version,
+		Package:      "gesc-" + version,
 		Develop:      isUnstableBuild(env),
 		Contributors: contribs,
 	}
@@ -855,7 +871,8 @@ func doXCodeFramework(cmdline []string) {
 		build.MustRun(bind)
 		return
 	}
-	archive := "geth-" + archiveBasename("ios", env)
+//	archive := "geth-" + archiveBasename("ios", env)
+	archive := "gesc-" + archiveBasename("ios", env)
 	if err := os.Mkdir(archive, os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
@@ -873,8 +890,10 @@ func doXCodeFramework(cmdline []string) {
 	// Prepare and upload a PodSpec to CocoaPods
 	if *deploy != "" {
 		meta := newPodMetadata(env, archive)
-		build.Render("build/pod.podspec", "Geth.podspec", 0755, meta)
-		build.MustRunCommand("pod", *deploy, "push", "Geth.podspec", "--allow-warnings", "--verbose")
+		// build.Render("build/pod.podspec", "Geth.podspec", 0755, meta)
+		// build.MustRunCommand("pod", *deploy, "push", "Geth.podspec", "--allow-warnings", "--verbose")
+		build.Render("build/pod.podspec", "Gesc.podspec", 0755, meta)
+		build.MustRunCommand("pod", *deploy, "push", "Gesc.podspec", "--allow-warnings", "--verbose")
 	}
 }
 
