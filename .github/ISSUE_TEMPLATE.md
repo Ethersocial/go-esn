@@ -6,7 +6,7 @@ For general questions please use the gitter channel or the ESC stack exchange at
 
 #### System information
 
-Geth version: `geth version`
+Gesc version: `gesc version`
 OS & Version: Windows/Linux/OSX
 Commit hash : (if `develop`)
 

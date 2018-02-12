@@ -23,9 +23,9 @@ dependencies:
 
 test:
   override:
-    # Build Geth and move into a known folder
-    - make geth
-    - cp ./build/bin/geth $HOME/geth
+    # Build Gesc and move into a known folder
+    - make gesc
+    - cp ./build/bin/gesc $HOME/gesc
 
     # Run hive and move all generated logs into the public artifacts folder
     - (cd ~/.go_workspace/src/github.com/karalabe/hive && hive --docker-noshell --client=go-esc:local --override=$HOME/gesc --test=. --sim=.)

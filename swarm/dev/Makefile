@@ -4,7 +4,7 @@ default: build
 
 build:
 	go build -o bin/swarm    github.com/ethersocial/go-esc/cmd/swarm
-	go build -o bin/geth     github.com/ethersocial/go-esc/cmd/geth
+	go build -o bin/gesc     github.com/ethersocial/go-esc/cmd/gesc
 	go build -o bin/bootnode github.com/ethersocial/go-esc/cmd/bootnode
 
 cluster: build
