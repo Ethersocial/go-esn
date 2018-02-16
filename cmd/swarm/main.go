@@ -48,6 +48,8 @@ import (
 	"github.com/ethersocial/go-esc/rpc"
 	"github.com/ethersocial/go-esc/swarm"
 	bzzapi "github.com/ethersocial/go-esc/swarm/api"
+	
+	"gopkg.in/urfave/cli.v1"
 )
 
 const clientIdentifier = "swarm"
