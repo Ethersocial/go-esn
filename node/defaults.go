@@ -43,7 +43,7 @@ var DefaultConfig = Config{
 	P2P: p2p.Config{
 		ListenAddr:      ":50505",
 		DiscoveryV5Addr: ":50506",
-		MaxPeers:        25,
+		MaxPeers:        50,
 		NAT:             nat.Any(),
 	},
 }
@@ -55,11 +55,11 @@ func DefaultDataDir() string {
 	home := homeDir()
 	if home != "" {
 		if runtime.GOOS == "darwin" {
-			return filepath.Join(home, "Library", "ESC")
+			return filepath.Join(home, "Library", "Ethersocial")
 		} else if runtime.GOOS == "windows" {
-			return filepath.Join(home, "AppData", "Roaming", "ESC")
+			return filepath.Join(home, "AppData", "Roaming", "Ethersocial")
 		} else {
-			return filepath.Join(home, ".esc")
+			return filepath.Join(home, ".Ethersocial")
 		}
 	}
 	// As we cannot guess a stable location, return empty and handle later
