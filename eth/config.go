@@ -31,7 +31,7 @@ import (
 	"github.com/ethersocial/go-esc/params"
 )
 
-// DefaultConfig contains default settings for use on the ESC main net.
+// DefaultConfig contains default settings for use on the Ethereum main net.
 var DefaultConfig = Config{
 	SyncMode:             downloader.FastSync,
 	EthashCacheDir:       "ethash",
@@ -69,7 +69,7 @@ func init() {
 
 type Config struct {
 	// The genesis block, which is inserted if the database is empty.
-	// If nil, the ESC main net block is used.
+	// If nil, the Ethereum main net block is used.
 	Genesis *core.Genesis `toml:",omitempty"`
 
 	// Protocol options

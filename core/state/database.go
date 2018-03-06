@@ -52,7 +52,7 @@ type Database interface {
 	CopyTrie(Trie) Trie
 }
 
-// Trie is a ESC Merkle Trie.
+// Trie is a Ethereum Merkle Trie.
 type Trie interface {
 	TryGet(key []byte) ([]byte, error)
 	TryUpdate(key, value []byte) error

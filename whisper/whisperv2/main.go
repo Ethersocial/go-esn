@@ -47,7 +47,7 @@ func main() {
 	name := common.MakeName("whisper-go", "1.0")
 	shh := whisper.New()
 
-	// Create an ESC peer to communicate through
+	// Create an Ethereum peer to communicate through
 	server := p2p.Server{
 		PrivateKey: key,
 		MaxPeers:   10,
@@ -56,9 +56,9 @@ func main() {
 		ListenAddr: ":30300",
 		NAT:        nat.Any(),
 	}
-	fmt.Println("Starting ESC peer...")
+	fmt.Println("Starting Ethereum peer...")
 	if err := server.Start(); err != nil {
-		fmt.Printf("Failed to start ESC peer: %v.\n", err)
+		fmt.Printf("Failed to start Ethereum peer: %v.\n", err)
 		os.Exit(1)
 	}
 

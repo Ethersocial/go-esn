@@ -29,7 +29,7 @@ import (
 )
 
 const (
-	// bloomServiceThreads is the number of goroutines used globally by an ESC
+	// bloomServiceThreads is the number of goroutines used globally by an Ethereum
 	// instance to service bloombits lookups for all running filters.
 	bloomServiceThreads = 16
 
@@ -89,7 +89,7 @@ const (
 )
 
 // BloomIndexer implements a core.ChainIndexer, building up a rotated bloom bits index
-// for the ESC header bloom filters, permitting blazing fast filtering.
+// for the Ethereum header bloom filters, permitting blazing fast filtering.
 type BloomIndexer struct {
 	size uint64 // section size to generate bloombits for
 

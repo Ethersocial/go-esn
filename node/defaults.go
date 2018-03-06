@@ -59,7 +59,7 @@ func DefaultDataDir() string {
 		} else if runtime.GOOS == "windows" {
 			return filepath.Join(home, "AppData", "Roaming", "Ethersocial")
 		} else {
-			return filepath.Join(home, ".Ethersocial")
+			return filepath.Join(home, ".ethersocial")
 		}
 	}
 	// As we cannot guess a stable location, return empty and handle later

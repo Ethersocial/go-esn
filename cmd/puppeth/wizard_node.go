@@ -146,7 +146,7 @@ func (w *wizard) deployNode(boot bool) {
 	}
 	// Try to deploy the full node on the host
 	if out, err := deployNode(client, w.network, w.conf.bootFull, w.conf.bootLight, infos); err != nil {
-		log.Error("Failed to deploy ESC node container", "err", err)
+		log.Error("Failed to deploy Ethereum node container", "err", err)
 		if len(out) > 0 {
 			fmt.Printf("%s\n", out)
 		}

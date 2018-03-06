@@ -92,15 +92,15 @@ var (
 	debExecutables = []debExecutable{
 		{
 			Name:        "abigen",
-			Description: "Source code generator to convert ESC contract definitions into easy to use, compile-time type-safe Go packages.",
+			Description: "Source code generator to convert Ethereum contract definitions into easy to use, compile-time type-safe Go packages.",
 		},
 		{
 			Name:        "bootnode",
-			Description: "ESC bootnode.",
+			Description: "Ethereum bootnode.",
 		},
 		{
 			Name:        "evm",
-			Description: "Developer utility version of the EVM (ESC Virtual Machine) that is capable of running bytecode snippets within a configurable environment and execution mode.",
+			Description: "Developer utility version of the EVM (Ethereum Virtual Machine) that is capable of running bytecode snippets within a configurable environment and execution mode.",
 		},
 		{
 			Name:        "gesc",
@@ -108,11 +108,11 @@ var (
 		},
 		{
 			Name:        "geth",
-			Description: "ESC CLI client.",
+			Description: "Ethereum CLI client.",
 		},
 		{
 			Name:        "puppeth",
-			Description: "ESC private network manager.",
+			Description: "Ethereum private network manager.",
 		},
 		{
 			Name:        "rlpdump",
@@ -120,11 +120,11 @@ var (
 		},
 		{
 			Name:        "swarm",
-			Description: "ESC Swarm daemon and tools",
+			Description: "Ethereum Swarm daemon and tools",
 		},
 		{
 			Name:        "wnode",
-			Description: "ESC Whisper diagnostic tool",
+			Description: "Ethereum Whisper diagnostic tool",
 		},
 	}
 
@@ -539,7 +539,7 @@ type debExecutable struct {
 func newDebMetadata(distro, author string, env build.Environment, t time.Time) debMetadata {
 	if author == "" {
 		// No signing key, use default author.
-		author = "ESC Builds <fjl@ethereum.org>"
+		author = "Ethereum Builds <fjl@ethereum.org>"
 	}
 	return debMetadata{
 		Env:         env,

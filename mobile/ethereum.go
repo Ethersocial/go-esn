@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-// Contains all the wrappers from the go-esc root package.
+// Contains all the wrappers from the go-ethereum root package.
 
 package geth
 
@@ -73,7 +73,7 @@ func (msg *CallMsg) SetTo(address *Address) {
 }
 
 // SyncProgress gives progress indications when the node is synchronising with
-// the ESC network.
+// the Ethereum network.
 type SyncProgress struct {
 	progress ethereum.SyncProgress
 }

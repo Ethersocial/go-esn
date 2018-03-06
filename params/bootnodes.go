@@ -17,16 +17,16 @@
 package params
 
 // MainnetBootnodes are the enode URLs of the P2P bootstrap nodes running on
-// the main ESC network.
+// the main Ethereum network.
 var MainnetBootnodes = []string{
-	// ESC Foundation Go Bootnodes
+	// Ethereum Foundation Go Bootnodes
 	"enode://f2c298eee215cefa930b5280e665a38b2706be3120c302b9fcb48dc7d3ceba3a3e7bac354dccbbcbc3bfd177882b0d5498f36833dfcd5674225adb19dd04ec3a@52.231.74.146:50505", // genNode1
 	"enode://7769cf0bdb7edd8dd95e590b46f950b9bd9625d681ec6123b31d3be58f1f1e0531d9811ccd9c1ad5d52a73999c6da2131943ca02666e238b1f265a1cc64dcae7@52.231.35.75:50505",  // genNode2
 	"enode://1aded60f7986b8bccce5f3c20596724ab087af2dfa618f83a9ec385a4a34230e197a5c7a53db19a50b0eba6d5a08f0e02484587084c4bb2a8ecda43c0d337838@52.231.30.39:50505",  // genNode3
 	"enode://f2c298eee215cefa930b5280e665a38b2706be3120c302b9fcb48dc7d3ceba3a3e7bac354dccbbcbc3bfd177882b0d5498f36833dfcd5674225adb19dd04ec3a@52.231.74.146:50505", // AU
 	"enode://f2c298eee215cefa930b5280e665a38b2706be3120c302b9fcb48dc7d3ceba3a3e7bac354dccbbcbc3bfd177882b0d5498f36833dfcd5674225adb19dd04ec3a@52.231.74.146:50505", // SG
 
-	// ESC Foundation Cpp Bootnodes
+	// Ethereum Foundation Cpp Bootnodes
 	"enode://f2c298eee215cefa930b5280e665a38b2706be3120c302b9fcb48dc7d3ceba3a3e7bac354dccbbcbc3bfd177882b0d5498f36833dfcd5674225adb19dd04ec3a@52.231.74.146:50505", // DE
 }
 

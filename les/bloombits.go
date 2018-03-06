@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	// bloomServiceThreads is the number of goroutines used globally by an ESC
+	// bloomServiceThreads is the number of goroutines used globally by an Ethereum
 	// instance to service bloombits lookups for all running filters.
 	bloomServiceThreads = 16
 

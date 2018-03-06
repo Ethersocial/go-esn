@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-// Contains a wrapper for the ESC client.
+// Contains a wrapper for the Ethereum client.
 
 package geth
 
@@ -25,7 +25,7 @@ import (
 	"github.com/ethersocial/go-esc/ethclient"
 )
 
-// EthereumClient provides access to the ESC APIs.
+// EthereumClient provides access to the Ethereum APIs.
 type EthereumClient struct {
 	client *ethclient.Client
 }

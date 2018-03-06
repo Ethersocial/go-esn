@@ -316,7 +316,7 @@ message GetAddress {
 }
 
 /**
- * Request: Ask device for ESC address corresponding to address_n path
+ * Request: Ask device for Ethereum address corresponding to address_n path
  * @next PassphraseRequest
  * @next EthereumAddress
  * @next Failure
@@ -335,11 +335,11 @@ message Address {
 }
 
 /**
- * Response: Contains an ESC address derived from device private seed
+ * Response: Contains an Ethereum address derived from device private seed
  * @prev EthereumGetAddress
  */
 message EthereumAddress {
-	required bytes address = 1;		// Coin address as an ESC 160 bit hash
+	required bytes address = 1;		// Coin address as an Ethereum 160 bit hash
 }
 
 /**
@@ -679,7 +679,7 @@ message EthereumTxAck {
 }
 
 ////////////////////////////////////////
-// ESC: Message signing messages //
+// Ethereum: Message signing messages //
 ////////////////////////////////////////
 
 /**

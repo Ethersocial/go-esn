@@ -64,7 +64,7 @@ func Sign(hash []byte, prv *ecdsa.PrivateKey) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Convert to ESC signature format with 'recovery id' v at the end.
+	// Convert to Ethereum signature format with 'recovery id' v at the end.
 	v := sig[0] - 27
 	copy(sig, sig[1:])
 	sig[64] = v
