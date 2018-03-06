@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of go-esc.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-esc is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-esc is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-esc. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -324,7 +324,7 @@ try! node?.start();
 										<br/>
 										<p>Puppeth is distributed as part of the <a href="https://geth.ethereum.org/downloads/" target="about:blank">Geth &amp; Tools</a> bundles, but can also be installed separately via:<pre>go get github.com/ethersocial/go-esc/cmd/puppeth</pre></p>
 										<br/>
-										<p><em>Copyright 2017. The go-esc Authors.</em></p>
+										<p><em>Copyright 2017. The go-ethereum Authors.</em></p>
 									</div>
 									<div style="display: inline-block; vertical-align: bottom; width: 217px;">
 										<img src="puppeth.png" style="height: 256px; margin: 16px 16px 16px 16px"></img>
