@@ -34,7 +34,7 @@ import (
 	"github.com/ethersocial/go-esn/p2p"
 	"github.com/ethersocial/go-esn/p2p/nat"
 	"github.com/ethersocial/go-esn/params"
-	whisper "github.com/ethersocial/go-esn/whisper/whisperv5"
+	whisper "github.com/ethersocial/go-esn/whisper/whisperv6"
 )
 
 // NodeConfig represents the collection of configuration values to fine tune the Geth

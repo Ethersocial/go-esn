@@ -32,7 +32,7 @@ import (
 	"github.com/ethersocial/go-esn/eth"
 	"github.com/ethersocial/go-esn/node"
 	"github.com/ethersocial/go-esn/params"
-	whisper "github.com/ethersocial/go-esn/whisper/whisperv5"
+	whisper "github.com/ethersocial/go-esn/whisper/whisperv6"
 	"github.com/naoina/toml"
 )
 

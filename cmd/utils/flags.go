@@ -55,7 +55,7 @@ import (
 	"github.com/ethersocial/go-esn/p2p/nat"
 	"github.com/ethersocial/go-esn/p2p/netutil"
 	"github.com/ethersocial/go-esn/params"
-	whisper "github.com/ethersocial/go-esn/whisper/whisperv5"
+	whisper "github.com/ethersocial/go-esn/whisper/whisperv6"
 	"gopkg.in/urfave/cli.v1"
 )
 
