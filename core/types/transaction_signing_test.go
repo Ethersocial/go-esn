@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package types
 
@@ -20,9 +20,9 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/rlp"
 )
 
 func TestEIP155Signing(t *testing.T) {
@@ -30,7 +30,7 @@ func TestEIP155Signing(t *testing.T) {
 	addr := crypto.PubkeyToAddress(key.PublicKey)
 
 	signer := NewEIP155Signer(big.NewInt(18))
-	tx, err := SignTx(NewTransaction(0, addr, new(big.Int), new(big.Int), new(big.Int), nil), signer, key)
+	tx, err := SignTx(NewTransaction(0, addr, new(big.Int), 0, new(big.Int), nil), signer, key)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,7 +49,7 @@ func TestEIP155ChainId(t *testing.T) {
 	addr := crypto.PubkeyToAddress(key.PublicKey)
 
 	signer := NewEIP155Signer(big.NewInt(18))
-	tx, err := SignTx(NewTransaction(0, addr, new(big.Int), new(big.Int), new(big.Int), nil), signer, key)
+	tx, err := SignTx(NewTransaction(0, addr, new(big.Int), 0, new(big.Int), nil), signer, key)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -61,7 +61,7 @@ func TestEIP155ChainId(t *testing.T) {
 		t.Error("expected chainId to be", signer.chainId, "got", tx.ChainId())
 	}
 
-	tx = NewTransaction(0, addr, new(big.Int), new(big.Int), new(big.Int), nil)
+	tx = NewTransaction(0, addr, new(big.Int), 0, new(big.Int), nil)
 	tx, err = SignTx(tx, HomesteadSigner{}, key)
 	if err != nil {
 		t.Fatal(err)
@@ -118,7 +118,7 @@ func TestEIP155SigningVitalik(t *testing.T) {
 func TestChainId(t *testing.T) {
 	key, _ := defaultTestKey()
 
-	tx := NewTransaction(0, common.Address{}, new(big.Int), new(big.Int), new(big.Int), nil)
+	tx := NewTransaction(0, common.Address{}, new(big.Int), 0, new(big.Int), nil)
 
 	var err error
 	tx, err = SignTx(tx, NewEIP155Signer(big.NewInt(1)), key)

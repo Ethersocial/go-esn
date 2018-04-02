@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 // +build linux darwin freebsd
 
@@ -27,8 +27,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ethersocial/go-esc/swarm/api"
-	"github.com/ethersocial/go-esc/swarm/storage"
+	"github.com/ethersocial/go-esn/swarm/api"
+	"github.com/ethersocial/go-esn/swarm/storage"
 )
 
 type fileInfo struct {
@@ -95,7 +95,7 @@ func mountDir(t *testing.T, api *api.Api, files map[string]fileInfo, bzzHash str
 	}
 
 	// Test listMounts
-	if found == false {
+	if !found {
 		t.Fatalf("Error getting mounts information for %v: %v", mountDir, err)
 	}
 
@@ -185,10 +185,8 @@ func isDirEmpty(name string) bool {
 	defer f.Close()
 
 	_, err = f.Readdirnames(1)
-	if err == io.EOF {
-		return true
-	}
-	return false
+
+	return err == io.EOF
 }
 
 type testAPI struct {
@@ -388,7 +386,7 @@ func (ta *testAPI) seekInMultiChunkFile(t *testing.T) {
 	d.Read(contents)
 	finfo := files["1.txt"]
 
-	if bytes.Compare(finfo.contents[:6024][5000:], contents) != 0 {
+	if !bytes.Equal(finfo.contents[:6024][5000:], contents) {
 		t.Fatalf("File seek contents mismatch")
 	}
 	d.Close()

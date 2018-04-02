@@ -1,35 +1,36 @@
-// Copyright 2015 The go-esc Authors
-// This file is part of go-esc.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-esc is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-esc is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-esc. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
-// bootnode runs a bootstrap node for the ESC Discovery Protocol.
+// bootnode runs a bootstrap node for the Ethereum Discovery Protocol.
 package main
 
 import (
 	"crypto/ecdsa"
 	"flag"
 	"fmt"
+	"net"
 	"os"
 
-	"github.com/ethersocial/go-esc/cmd/utils"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/p2p/discover"
-	"github.com/ethersocial/go-esc/p2p/discv5"
-	"github.com/ethersocial/go-esc/p2p/nat"
-	"github.com/ethersocial/go-esc/p2p/netutil"
+	"github.com/ethersocial/go-esn/cmd/utils"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/discv5"
+	"github.com/ethersocial/go-esn/p2p/nat"
+	"github.com/ethersocial/go-esn/p2p/netutil"
 )
 
 func main() {
@@ -96,12 +97,37 @@ func main() {
 		}
 	}
 
+	addr, err := net.ResolveUDPAddr("udp", *listenAddr)
+	if err != nil {
+		utils.Fatalf("-ResolveUDPAddr: %v", err)
+	}
+	conn, err := net.ListenUDP("udp", addr)
+	if err != nil {
+		utils.Fatalf("-ListenUDP: %v", err)
+	}
+
+	realaddr := conn.LocalAddr().(*net.UDPAddr)
+	if natm != nil {
+		if !realaddr.IP.IsLoopback() {
+			go nat.Map(natm, nil, "udp", realaddr.Port, realaddr.Port, "ethereum discovery")
+		}
+		// TODO: react to external IP changes over time.
+		if ext, err := natm.ExternalIP(); err == nil {
+			realaddr = &net.UDPAddr{IP: ext, Port: realaddr.Port}
+		}
+	}
+
 	if *runv5 {
-		if _, err := discv5.ListenUDP(nodeKey, *listenAddr, natm, "", restrictList); err != nil {
+		if _, err := discv5.ListenUDP(nodeKey, conn, realaddr, "", restrictList); err != nil {
 			utils.Fatalf("%v", err)
 		}
 	} else {
-		if _, err := discover.ListenUDP(nodeKey, *listenAddr, natm, "", restrictList); err != nil {
+		cfg := discover.Config{
+			PrivateKey:   nodeKey,
+			AnnounceAddr: realaddr,
+			NetRestrict:  restrictList,
+		}
+		if _, err := discover.ListenUDP(conn, cfg); err != nil {
 			utils.Fatalf("%v", err)
 		}
 	}

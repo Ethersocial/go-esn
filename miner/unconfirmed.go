@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package miner
 
@@ -20,9 +20,9 @@ import (
 	"container/ring"
 	"sync"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/log"
 )
 
 // headerRetriever is used by the unconfirmed block set to verify whether a previously
@@ -42,7 +42,7 @@ type unconfirmedBlock struct {
 // unconfirmedBlocks implements a data structure to maintain locally mined blocks
 // have have not yet reached enough maturity to guarantee chain inclusion. It is
 // used by the miner to provide logs to the user when a previously mined block
-// has a high enough guarantee to not be reorged out of te canonical chain.
+// has a high enough guarantee to not be reorged out of the canonical chain.
 type unconfirmedBlocks struct {
 	chain  headerRetriever // Blockchain to verify canonical status through
 	depth  uint            // Depth after which to discard previous blocks

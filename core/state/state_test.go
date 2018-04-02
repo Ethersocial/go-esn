@@ -1,18 +1,18 @@
-// Copyright 2014 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2014 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package state
 
@@ -21,9 +21,9 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/ethdb"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/ethdb"
 	checker "gopkg.in/check.v1"
 )
 
@@ -48,7 +48,7 @@ func (s *StateSuite) TestDump(c *checker.C) {
 	// write some of them to the trie
 	s.state.updateStateObject(obj1)
 	s.state.updateStateObject(obj2)
-	s.state.CommitTo(s.db, false)
+	s.state.Commit(false)
 
 	// check that dump contains the state objects that are in trie
 	got := string(s.state.Dump())
@@ -97,7 +97,7 @@ func (s *StateSuite) TestNull(c *checker.C) {
 	//value := common.FromHex("0x823140710bf13990e4500136726d8b55")
 	var value common.Hash
 	s.state.SetState(address, common.Hash{}, value)
-	s.state.CommitTo(s.db, false)
+	s.state.Commit(false)
 	value = s.state.GetState(address, common.Hash{})
 	if !common.EmptyHash(value) {
 		c.Errorf("expected empty hash. got %x", value)
@@ -155,7 +155,7 @@ func TestSnapshot2(t *testing.T) {
 	so0.deleted = false
 	state.setStateObject(so0)
 
-	root, _ := state.CommitTo(db, false)
+	root, _ := state.Commit(false)
 	state.Reset(root)
 
 	// and one with deleted == true

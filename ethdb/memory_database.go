@@ -1,18 +1,18 @@
-// Copyright 2014 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2014 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package ethdb
 
@@ -20,7 +20,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esn/common"
 )
 
 /*
@@ -34,6 +34,12 @@ type MemDatabase struct {
 func NewMemDatabase() (*MemDatabase, error) {
 	return &MemDatabase{
 		db: make(map[string][]byte),
+	}, nil
+}
+
+func NewMemDatabaseWithCap(size int) (*MemDatabase, error) {
+	return &MemDatabase{
+		db: make(map[string][]byte, size),
 	}, nil
 }
 
@@ -74,14 +80,6 @@ func (db *MemDatabase) Keys() [][]byte {
 	return keys
 }
 
-/*
-func (db *MemDatabase) GetKeys() []*common.Key {
-	data, _ := db.Get([]byte("KeyRing"))
-
-	return []*common.Key{common.NewKeyFromBytes(data)}
-}
-*/
-
 func (db *MemDatabase) Delete(key []byte) error {
 	db.lock.Lock()
 	defer db.lock.Unlock()
@@ -95,6 +93,8 @@ func (db *MemDatabase) Close() {}
 func (db *MemDatabase) NewBatch() Batch {
 	return &memBatch{db: db}
 }
+
+func (db *MemDatabase) Len() int { return len(db.db) }
 
 type kv struct{ k, v []byte }
 
@@ -122,4 +122,9 @@ func (b *memBatch) Write() error {
 
 func (b *memBatch) ValueSize() int {
 	return b.size
+}
+
+func (b *memBatch) Reset() {
+	b.writes = b.writes[:0]
+	b.size = 0
 }

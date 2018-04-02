@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 // Package ethstats implements the network stats reporting service.
 package ethstats
@@ -30,17 +30,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/mclock"
-	"github.com/ethersocial/go-esc/consensus"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/eth"
-	"github.com/ethersocial/go-esc/event"
-	"github.com/ethersocial/go-esc/les"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/mclock"
+	"github.com/ethersocial/go-esn/consensus"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/eth"
+	"github.com/ethersocial/go-esn/event"
+	"github.com/ethersocial/go-esn/les"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/rpc"
 	"golang.org/x/net/websocket"
 )
 
@@ -66,12 +66,12 @@ type blockChain interface {
 	SubscribeChainHeadEvent(ch chan<- core.ChainHeadEvent) event.Subscription
 }
 
-// Service implements an ESC netstats reporting daemon that pushes local
+// Service implements an Ethereum netstats reporting daemon that pushes local
 // chain statistics up to a monitoring server.
 type Service struct {
 	server *p2p.Server        // Peer-to-peer server to retrieve networking infos
-	eth    *eth.Ethereum      // Full ESC service if monitoring a full node
-	les    *les.LightEthereum // Light ESC service if monitoring a light node
+	eth    *eth.Ethereum      // Full Ethereum service if monitoring a full node
+	les    *les.LightEthereum // Light Ethereum service if monitoring a light node
 	engine consensus.Engine   // Consensus engine to retrieve variadic block fields
 
 	node string // Name of the node to display on the monitoring page
@@ -193,7 +193,6 @@ func (s *Service) loop() {
 			}
 		}
 		close(quitCh)
-		return
 	}()
 	// Loop reporting until termination
 	for {
@@ -375,10 +374,10 @@ func (s *Service) login(conn *websocket.Conn) error {
 
 	var network, protocol string
 	if info := infos.Protocols["eth"]; info != nil {
-		network = fmt.Sprintf("%d", info.(*eth.EthNodeInfo).Network)
+		network = fmt.Sprintf("%d", info.(*eth.NodeInfo).Network)
 		protocol = fmt.Sprintf("eth/%d", eth.ProtocolVersions[0])
 	} else {
-		network = fmt.Sprintf("%d", infos.Protocols["les"].(*eth.EthNodeInfo).Network)
+		network = fmt.Sprintf("%d", infos.Protocols["les"].(*les.NodeInfo).Network)
 		protocol = fmt.Sprintf("les/%d", les.ClientProtocolVersions[0])
 	}
 	auth := &authMsg{
@@ -474,8 +473,8 @@ type blockStats struct {
 	ParentHash common.Hash    `json:"parentHash"`
 	Timestamp  *big.Int       `json:"timestamp"`
 	Miner      common.Address `json:"miner"`
-	GasUsed    *big.Int       `json:"gasUsed"`
-	GasLimit   *big.Int       `json:"gasLimit"`
+	GasUsed    uint64         `json:"gasUsed"`
+	GasLimit   uint64         `json:"gasLimit"`
 	Diff       string         `json:"difficulty"`
 	TotalDiff  string         `json:"totalDifficulty"`
 	Txs        []txStats      `json:"transactions"`
@@ -560,8 +559,8 @@ func (s *Service) assembleBlockStats(block *types.Block) *blockStats {
 		ParentHash: header.ParentHash,
 		Timestamp:  header.Time,
 		Miner:      author,
-		GasUsed:    new(big.Int).Set(header.GasUsed),
-		GasLimit:   new(big.Int).Set(header.GasLimit),
+		GasUsed:    header.GasUsed,
+		GasLimit:   header.GasLimit,
 		Diff:       header.Difficulty.String(),
 		TotalDiff:  td.String(),
 		Txs:        txs,
@@ -614,6 +613,7 @@ func (s *Service) reportHistory(conn *websocket.Conn, list []uint64) error {
 		}
 		// Ran out of blocks, cut the report short and send
 		history = history[len(history)-i:]
+		break
 	}
 	// Assemble the history report and send it to the server
 	if len(history) > 0 {

@@ -1,18 +1,18 @@
-// Copyright 2014 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2014 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package vm
 
@@ -20,10 +20,8 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/math"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/params"
+	"github.com/ethersocial/go-esn/common/math"
+	"github.com/ethersocial/go-esn/params"
 )
 
 // Config are the configuration options for the Interpreter
@@ -49,7 +47,7 @@ type Config struct {
 	JumpTable [256]operation
 }
 
-// Interpreter is used to run ESC based contracts and will utilise the
+// Interpreter is used to run Ethereum based contracts and will utilise the
 // passed evmironment to query external sources for state information.
 // The Interpreter will run the byte code VM or JIT VM based on the passed
 // configuration.
@@ -107,9 +105,9 @@ func (in *Interpreter) enforceRestrictions(op OpCode, operation operation, stack
 // the return byte-slice and an error if one occurred.
 //
 // It's important to note that any errors returned by the interpreter should be
-// considered a revert-and-consume-all-gas operation. No error specific checks
-// should be handled to reduce complexity and errors further down the in.
-func (in *Interpreter) Run(snapshot int, contract *Contract, input []byte) (ret []byte, err error) {
+// considered a revert-and-consume-all-gas operation except for
+// errExecutionReverted which means revert-and-keep-gas-left.
+func (in *Interpreter) Run(contract *Contract, input []byte) (ret []byte, err error) {
 	// Increment the call depth which is restricted to 1024
 	in.evm.depth++
 	defer func() { in.evm.depth-- }()
@@ -123,11 +121,6 @@ func (in *Interpreter) Run(snapshot int, contract *Contract, input []byte) (ret 
 		return nil, nil
 	}
 
-	codehash := contract.CodeHash // codehash is used when doing jump dest caching
-	if codehash == (common.Hash{}) {
-		codehash = crypto.Keccak256Hash(contract.Code)
-	}
-
 	var (
 		op    OpCode        // current opcode
 		mem   = NewMemory() // bound memory
@@ -138,39 +131,36 @@ func (in *Interpreter) Run(snapshot int, contract *Contract, input []byte) (ret 
 		pc   = uint64(0) // program counter
 		cost uint64
 		// copies used by tracer
-		stackCopy = newstack() // stackCopy needed for Tracer since stack is mutated by 63/64 gas rule
-		pcCopy    uint64       // needed for the deferred Tracer
-		gasCopy   uint64       // for Tracer to log gas remaining before execution
-		logged    bool         // deferred Tracer should ignore already logged steps
+		pcCopy  uint64 // needed for the deferred Tracer
+		gasCopy uint64 // for Tracer to log gas remaining before execution
+		logged  bool   // deferred Tracer should ignore already logged steps
 	)
 	contract.Input = input
 
-	defer func() {
-		if err != nil && !logged && in.cfg.Debug {
-			in.cfg.Tracer.CaptureState(in.evm, pcCopy, op, gasCopy, cost, mem, stackCopy, contract, in.evm.depth, err)
-		}
-	}()
-
+	if in.cfg.Debug {
+		defer func() {
+			if err != nil {
+				if !logged {
+					in.cfg.Tracer.CaptureState(in.evm, pcCopy, op, gasCopy, cost, mem, stack, contract, in.evm.depth, err)
+				} else {
+					in.cfg.Tracer.CaptureFault(in.evm, pcCopy, op, gasCopy, cost, mem, stack, contract, in.evm.depth, err)
+				}
+			}
+		}()
+	}
 	// The Interpreter main run loop (contextual). This loop runs until either an
 	// explicit STOP, RETURN or SELFDESTRUCT is executed, an error occurred during
 	// the execution of one of the operations or until the done flag is set by the
 	// parent context.
 	for atomic.LoadInt32(&in.evm.abort) == 0 {
-		// Get the memory location of pc
-		op = contract.GetOp(pc)
-
 		if in.cfg.Debug {
-			logged = false
-			pcCopy = pc
-			gasCopy = contract.Gas
-			stackCopy = newstack()
-			for _, val := range stack.data {
-				stackCopy.push(val)
-			}
+			// Capture pre-execution values for tracing.
+			logged, pcCopy, gasCopy = false, pc, contract.Gas
 		}
 
-		// Get the operation from the jump table matching the opcode and validate the
-		// stack and make sure there enough stack items available to perform the operation
+		// Get the operation from the jump table and validate the stack to ensure there are
+		// enough stack items available to perform the operation.
+		op = contract.GetOp(pc)
 		operation := in.cfg.JumpTable[op]
 		if !operation.valid {
 			return nil, fmt.Errorf("invalid opcode 0x%x", int(op))
@@ -211,7 +201,7 @@ func (in *Interpreter) Run(snapshot int, contract *Contract, input []byte) (ret 
 		}
 
 		if in.cfg.Debug {
-			in.cfg.Tracer.CaptureState(in.evm, pc, op, gasCopy, cost, mem, stackCopy, contract, in.evm.depth, err)
+			in.cfg.Tracer.CaptureState(in.evm, pc, op, gasCopy, cost, mem, stack, contract, in.evm.depth, err)
 			logged = true
 		}
 

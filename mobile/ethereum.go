@@ -1,29 +1,28 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-// Contains all the wrappers from the go-esc root package.
+// Contains all the wrappers from the go-ethereum root package.
 
 package geth
 
 import (
 	"errors"
-	"math/big"
 
-	ethereum "github.com/ethersocial/go-esc"
-	"github.com/ethersocial/go-esc/common"
+	ethereum "github.com/ethersocial/go-esn"
+	"github.com/ethersocial/go-esn/common"
 )
 
 // Subscription represents an event subscription where events are
@@ -49,7 +48,7 @@ func NewCallMsg() *CallMsg {
 }
 
 func (msg *CallMsg) GetFrom() *Address    { return &Address{msg.msg.From} }
-func (msg *CallMsg) GetGas() int64        { return msg.msg.Gas.Int64() }
+func (msg *CallMsg) GetGas() int64        { return int64(msg.msg.Gas) }
 func (msg *CallMsg) GetGasPrice() *BigInt { return &BigInt{msg.msg.GasPrice} }
 func (msg *CallMsg) GetValue() *BigInt    { return &BigInt{msg.msg.Value} }
 func (msg *CallMsg) GetData() []byte      { return msg.msg.Data }
@@ -61,7 +60,7 @@ func (msg *CallMsg) GetTo() *Address {
 }
 
 func (msg *CallMsg) SetFrom(address *Address)  { msg.msg.From = address.address }
-func (msg *CallMsg) SetGas(gas int64)          { msg.msg.Gas = big.NewInt(gas) }
+func (msg *CallMsg) SetGas(gas int64)          { msg.msg.Gas = uint64(gas) }
 func (msg *CallMsg) SetGasPrice(price *BigInt) { msg.msg.GasPrice = price.bigint }
 func (msg *CallMsg) SetValue(value *BigInt)    { msg.msg.Value = value.bigint }
 func (msg *CallMsg) SetData(data []byte)       { msg.msg.Data = common.CopyBytes(data) }
@@ -73,7 +72,7 @@ func (msg *CallMsg) SetTo(address *Address) {
 }
 
 // SyncProgress gives progress indications when the node is synchronising with
-// the ESC network.
+// the Ethereum network.
 type SyncProgress struct {
 	progress ethereum.SyncProgress
 }

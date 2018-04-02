@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 // Contains all the wrappers from the node package to support client side node
 // management on mobile platforms.
@@ -24,22 +24,22 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/eth"
-	"github.com/ethersocial/go-esc/eth/downloader"
-	"github.com/ethersocial/go-esc/ethclient"
-	"github.com/ethersocial/go-esc/ethstats"
-	"github.com/ethersocial/go-esc/les"
-	"github.com/ethersocial/go-esc/node"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/p2p/nat"
-	"github.com/ethersocial/go-esc/params"
-	whisper "github.com/ethersocial/go-esc/whisper/whisperv5"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/eth"
+	"github.com/ethersocial/go-esn/eth/downloader"
+	"github.com/ethersocial/go-esn/ethclient"
+	"github.com/ethersocial/go-esn/ethstats"
+	"github.com/ethersocial/go-esn/les"
+	"github.com/ethersocial/go-esn/node"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/p2p/nat"
+	"github.com/ethersocial/go-esn/params"
+	whisper "github.com/ethersocial/go-esn/whisper/whisperv5"
 )
 
 // NodeConfig represents the collection of configuration values to fine tune the Geth
 // node embedded into a mobile process. The available values are a subset of the
-// entire API provided by go-esc to reduce the maintenance surface and dev
+// entire API provided by go-ethereum to reduce the maintenance surface and dev
 // complexity.
 type NodeConfig struct {
 	// Bootstrap nodes used to establish connectivity with the rest of the network.
@@ -49,10 +49,10 @@ type NodeConfig struct {
 	// set to zero, then only the configured static and trusted peers can connect.
 	MaxPeers int
 
-	// EthereumEnabled specifies whether the node should run the ESC protocol.
+	// EthereumEnabled specifies whether the node should run the Ethereum protocol.
 	EthereumEnabled bool
 
-	// EthereumNetworkID is the network identifier used by the ESC protocol to
+	// EthereumNetworkID is the network identifier used by the Ethereum protocol to
 	// decide if remote peers should be accepted or not.
 	EthereumNetworkID int64 // uint64 in truth, but Java can't handle that...
 
@@ -78,7 +78,7 @@ type NodeConfig struct {
 // or some fields are missing from the user's specified list.
 var defaultNodeConfig = &NodeConfig{
 	BootstrapNodes:        FoundationBootnodes(),
-	MaxPeers:              50,
+	MaxPeers:              25,
 	EthereumEnabled:       true,
 	EthereumNetworkID:     1,
 	EthereumDatabaseCache: 16,
@@ -90,7 +90,7 @@ func NewNodeConfig() *NodeConfig {
 	return &config
 }
 
-// Node represents a Geth ESC node instance.
+// Node represents a Geth Ethereum node instance.
 type Node struct {
 	node *node.Node
 }
@@ -116,7 +116,6 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 		P2P: p2p.Config{
 			NoDiscovery:      true,
 			DiscoveryV5:      true,
-			DiscoveryV5Addr:  ":0",
 			BootstrapNodesV5: config.BootstrapNodes.nodes,
 			ListenAddr:       ":0",
 			NAT:              nat.Any(),
@@ -143,7 +142,7 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 			}
 		}
 	}
-	// Register the ESC protocol if requested
+	// Register the Ethereum protocol if requested
 	if config.EthereumEnabled {
 		ethConf := eth.DefaultConfig
 		ethConf.Genesis = genesis
@@ -189,7 +188,7 @@ func (n *Node) Stop() error {
 	return n.node.Stop()
 }
 
-// GetEthereumClient retrieves a client to access the ESC subsystem.
+// GetEthereumClient retrieves a client to access the Ethereum subsystem.
 func (n *Node) GetEthereumClient() (client *EthereumClient, _ error) {
 	rpc, err := n.node.Attach()
 	if err != nil {

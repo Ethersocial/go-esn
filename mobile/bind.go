@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 // Contains all the wrappers from the bind package.
 
@@ -22,10 +22,10 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/ethersocial/go-esc/accounts/abi"
-	"github.com/ethersocial/go-esc/accounts/abi/bind"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/types"
+	"github.com/ethersocial/go-esn/accounts/abi"
+	"github.com/ethersocial/go-esn/accounts/abi/bind"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/types"
 )
 
 // Signer is an interaface defining the callback when a contract requires a
@@ -68,7 +68,7 @@ func (opts *CallOpts) SetGasLimit(limit int64)     { /* TODO(karalabe) */ }
 func (opts *CallOpts) SetContext(context *Context) { opts.opts.Context = context.context }
 
 // TransactOpts is the collection of authorization data required to create a
-// valid ESC transaction.
+// valid Ethereum transaction.
 type TransactOpts struct {
 	opts bind.TransactOpts
 }
@@ -77,7 +77,7 @@ func (opts *TransactOpts) GetFrom() *Address    { return &Address{opts.opts.From
 func (opts *TransactOpts) GetNonce() int64      { return opts.opts.Nonce.Int64() }
 func (opts *TransactOpts) GetValue() *BigInt    { return &BigInt{opts.opts.Value} }
 func (opts *TransactOpts) GetGasPrice() *BigInt { return &BigInt{opts.opts.GasPrice} }
-func (opts *TransactOpts) GetGasLimit() int64   { return opts.opts.GasLimit.Int64() }
+func (opts *TransactOpts) GetGasLimit() int64   { return int64(opts.opts.GasLimit) }
 
 // GetSigner cannot be reliably implemented without identity preservation (https://github.com/golang/go/issues/16876)
 // func (opts *TransactOpts) GetSigner() Signer { return &signer{opts.opts.Signer} }
@@ -99,11 +99,11 @@ func (opts *TransactOpts) SetSigner(s Signer) {
 }
 func (opts *TransactOpts) SetValue(value *BigInt)      { opts.opts.Value = value.bigint }
 func (opts *TransactOpts) SetGasPrice(price *BigInt)   { opts.opts.GasPrice = price.bigint }
-func (opts *TransactOpts) SetGasLimit(limit int64)     { opts.opts.GasLimit = big.NewInt(limit) }
+func (opts *TransactOpts) SetGasLimit(limit int64)     { opts.opts.GasLimit = uint64(limit) }
 func (opts *TransactOpts) SetContext(context *Context) { opts.opts.Context = context.context }
 
 // BoundContract is the base wrapper object that reflects a contract on the
-// ESC network. It contains a collection of methods that are used by the
+// Ethereum network. It contains a collection of methods that are used by the
 // higher level contract bindings to operate.
 type BoundContract struct {
 	contract *bind.BoundContract
@@ -111,7 +111,7 @@ type BoundContract struct {
 	deployer *types.Transaction
 }
 
-// DeployContract deploys a contract onto the ESC blockchain and binds the
+// DeployContract deploys a contract onto the Ethereum blockchain and binds the
 // deployment address with a wrapper.
 func DeployContract(opts *TransactOpts, abiJSON string, bytecode []byte, client *EthereumClient, args *Interfaces) (contract *BoundContract, _ error) {
 	// Deploy the contract to the network
@@ -138,7 +138,7 @@ func BindContract(address *Address, abiJSON string, client *EthereumClient) (con
 		return nil, err
 	}
 	return &BoundContract{
-		contract: bind.NewBoundContract(address.address, parsed, client.client, client.client),
+		contract: bind.NewBoundContract(address.address, parsed, client.client, client.client, client.client),
 		address:  address.address,
 	}, nil
 }

@@ -1,20 +1,20 @@
-// Copyright 2014 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2014 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package state provides a caching layer atop the ESC state trie.
+// Package state provides a caching layer atop the Ethereum state trie.
 package state
 
 import (
@@ -23,18 +23,26 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/rlp"
-	"github.com/ethersocial/go-esc/trie"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/rlp"
+	"github.com/ethersocial/go-esn/trie"
 )
 
 type revision struct {
 	id           int
 	journalIndex int
 }
+
+var (
+	// emptyState is the known hash of an empty state trie entry.
+	emptyState = crypto.Keccak256Hash(nil)
+
+	// emptyCode is the known hash of the empty EVM bytecode.
+	emptyCode = crypto.Keccak256Hash(nil)
+)
 
 // StateDBs within the ethereum protocol are used to store anything
 // within the merkle trie. StateDBs take care of caching and storing
@@ -57,7 +65,7 @@ type StateDB struct {
 	dbErr error
 
 	// The refund counter, also used by state transitioning.
-	refund *big.Int
+	refund uint64
 
 	thash, bhash common.Hash
 	txIndex      int
@@ -86,7 +94,6 @@ func New(root common.Hash, db Database) (*StateDB, error) {
 		trie:              tr,
 		stateObjects:      make(map[common.Address]*stateObject),
 		stateObjectsDirty: make(map[common.Address]struct{}),
-		refund:            new(big.Int),
 		logs:              make(map[common.Hash][]*types.Log),
 		preimages:         make(map[common.Hash][]byte),
 	}, nil
@@ -161,9 +168,9 @@ func (self *StateDB) Preimages() map[common.Hash][]byte {
 	return self.preimages
 }
 
-func (self *StateDB) AddRefund(gas *big.Int) {
-	self.journal = append(self.journal, refundChange{prev: new(big.Int).Set(self.refund)})
-	self.refund.Add(self.refund, gas)
+func (self *StateDB) AddRefund(gas uint64) {
+	self.journal = append(self.journal, refundChange{prev: self.refund})
+	self.refund += gas
 }
 
 // Exist reports whether the given account address exists in the state.
@@ -234,6 +241,11 @@ func (self *StateDB) GetState(a common.Address, b common.Hash) common.Hash {
 		return stateObject.GetState(self.db, b)
 	}
 	return common.Hash{}
+}
+
+// Database retrieves the low level database supporting the lower level trie ops.
+func (self *StateDB) Database() Database {
+	return self.db
 }
 
 // StorageTrie returns the storage trie of an account.
@@ -453,10 +465,10 @@ func (self *StateDB) Copy() *StateDB {
 	// Copy all the basic fields, initialize the memory ones
 	state := &StateDB{
 		db:                self.db,
-		trie:              self.trie,
+		trie:              self.db.CopyTrie(self.trie),
 		stateObjects:      make(map[common.Address]*stateObject, len(self.stateObjectsDirty)),
 		stateObjectsDirty: make(map[common.Address]struct{}, len(self.stateObjectsDirty)),
-		refund:            new(big.Int).Set(self.refund),
+		refund:            self.refund,
 		logs:              make(map[common.Hash][]*types.Log, len(self.logs)),
 		logSize:           self.logSize,
 		preimages:         make(map[common.Hash][]byte),
@@ -506,9 +518,7 @@ func (self *StateDB) RevertToSnapshot(revid int) {
 }
 
 // GetRefund returns the current value of the refund counter.
-// The return value must not be modified by the caller and will become
-// invalid at the next call to AddRefund.
-func (self *StateDB) GetRefund() *big.Int {
+func (self *StateDB) GetRefund() uint64 {
 	return self.refund
 }
 
@@ -568,11 +578,11 @@ func (s *StateDB) DeleteSuicides() {
 func (s *StateDB) clearJournalAndRefund() {
 	s.journal = nil
 	s.validRevisions = s.validRevisions[:0]
-	s.refund = new(big.Int)
+	s.refund = 0
 }
 
-// CommitTo writes the state to the given database.
-func (s *StateDB) CommitTo(dbw trie.DatabaseWriter, deleteEmptyObjects bool) (root common.Hash, err error) {
+// Commit writes the state to the underlying in-memory trie database.
+func (s *StateDB) Commit(deleteEmptyObjects bool) (root common.Hash, err error) {
 	defer s.clearJournalAndRefund()
 
 	// Commit objects to the trie.
@@ -586,13 +596,11 @@ func (s *StateDB) CommitTo(dbw trie.DatabaseWriter, deleteEmptyObjects bool) (ro
 		case isDirty:
 			// Write any contract code associated with the state object
 			if stateObject.code != nil && stateObject.dirtyCode {
-				if err := dbw.Put(stateObject.CodeHash(), stateObject.code); err != nil {
-					return common.Hash{}, err
-				}
+				s.db.TrieDB().Insert(common.BytesToHash(stateObject.CodeHash()), stateObject.code)
 				stateObject.dirtyCode = false
 			}
 			// Write any storage changes in the state object to its storage trie.
-			if err := stateObject.CommitTrie(s.db, dbw); err != nil {
+			if err := stateObject.CommitTrie(s.db); err != nil {
 				return common.Hash{}, err
 			}
 			// Update the object in the main account trie.
@@ -601,7 +609,20 @@ func (s *StateDB) CommitTo(dbw trie.DatabaseWriter, deleteEmptyObjects bool) (ro
 		delete(s.stateObjectsDirty, addr)
 	}
 	// Write trie changes.
-	root, err = s.trie.CommitTo(dbw)
+	root, err = s.trie.Commit(func(leaf []byte, parent common.Hash) error {
+		var account Account
+		if err := rlp.DecodeBytes(leaf, &account); err != nil {
+			return nil
+		}
+		if account.Root != emptyState {
+			s.db.TrieDB().Reference(account.Root, parent)
+		}
+		code := common.BytesToHash(account.CodeHash)
+		if code != emptyCode {
+			s.db.TrieDB().Reference(code, parent)
+		}
+		return nil
+	})
 	log.Debug("Trie cache stats after commit", "misses", trie.CacheMisses(), "unloads", trie.CacheUnloads())
 	return root, err
 }

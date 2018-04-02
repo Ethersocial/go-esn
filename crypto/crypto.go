@@ -1,18 +1,18 @@
-// Copyright 2014 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2014 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package crypto
 
@@ -28,10 +28,10 @@ import (
 	"math/big"
 	"os"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/math"
-	"github.com/ethersocial/go-esc/crypto/sha3"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/math"
+	"github.com/ethersocial/go-esn/crypto/sha3"
+	"github.com/ethersocial/go-esn/rlp"
 )
 
 var (
@@ -79,7 +79,7 @@ func ToECDSA(d []byte) (*ecdsa.PrivateKey, error) {
 	return toECDSA(d, true)
 }
 
-// ToECDSAUnsafe blidly converts a binary blob to a private key. It should almost
+// ToECDSAUnsafe blindly converts a binary blob to a private key. It should almost
 // never be used unless you are sure the input is valid and want to avoid hitting
 // errors due to bad origin encoding (0 prefixes cut off).
 func ToECDSAUnsafe(d []byte) *ecdsa.PrivateKey {
@@ -97,7 +97,20 @@ func toECDSA(d []byte, strict bool) (*ecdsa.PrivateKey, error) {
 		return nil, fmt.Errorf("invalid length, need %d bits", priv.Params().BitSize)
 	}
 	priv.D = new(big.Int).SetBytes(d)
+
+	// The priv.D must < N
+	if priv.D.Cmp(secp256k1_N) >= 0 {
+		return nil, fmt.Errorf("invalid private key, >=N")
+	}
+	// The priv.D must not be zero or negative.
+	if priv.D.Sign() <= 0 {
+		return nil, fmt.Errorf("invalid private key, zero or negative")
+	}
+
 	priv.PublicKey.X, priv.PublicKey.Y = priv.PublicKey.Curve.ScalarBaseMult(d)
+	if priv.PublicKey.X == nil {
+		return nil, errors.New("invalid private key")
+	}
 	return priv, nil
 }
 

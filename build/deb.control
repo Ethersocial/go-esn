@@ -5,8 +5,8 @@ Maintainer: {{.Author}}
 Build-Depends: debhelper (>= 8.0.0), golang-1.9
 Standards-Version: 3.9.5
 Homepage: https://ethereum.org
-Vcs-Git: git://github.com/ethersocial/go-esc.git
-Vcs-Browser: https://github.com/ethersocial/go-esc
+Vcs-Git: git://github.com/ethersocial/go-esn.git
+Vcs-Browser: https://github.com/ethersocial/go-esn
 
 Package: {{.Name}}
 Architecture: any

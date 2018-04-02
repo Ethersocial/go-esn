@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package core
 
@@ -22,9 +22,9 @@ import (
 	"math/big"
 	"sort"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/log"
 )
 
 // nonceHeap is a heap.Interface implementation over 64bit unsigned integers for
@@ -224,7 +224,7 @@ type txList struct {
 	txs    *txSortedMap // Heap indexed sorted hash map of the transactions
 
 	costcap *big.Int // Price of the highest costing transaction (reset only if exceeds balance)
-	gascap  *big.Int // Gas limit of the highest spending transaction (reset only if exceeds block limit)
+	gascap  uint64   // Gas limit of the highest spending transaction (reset only if exceeds block limit)
 }
 
 // newTxList create a new transaction list for maintaining nonce-indexable fast,
@@ -234,7 +234,6 @@ func newTxList(strict bool) *txList {
 		strict:  strict,
 		txs:     newTxSortedMap(),
 		costcap: new(big.Int),
-		gascap:  new(big.Int),
 	}
 }
 
@@ -266,7 +265,7 @@ func (l *txList) Add(tx *types.Transaction, priceBump uint64) (bool, *types.Tran
 	if cost := tx.Cost(); l.costcap.Cmp(cost) < 0 {
 		l.costcap = cost
 	}
-	if gas := tx.Gas(); l.gascap.Cmp(gas) < 0 {
+	if gas := tx.Gas(); l.gascap < gas {
 		l.gascap = gas
 	}
 	return true, old
@@ -288,16 +287,16 @@ func (l *txList) Forward(threshold uint64) types.Transactions {
 // a point in calculating all the costs or if the balance covers all. If the threshold
 // is lower than the costgas cap, the caps will be reset to a new high after removing
 // the newly invalidated transactions.
-func (l *txList) Filter(costLimit, gasLimit *big.Int) (types.Transactions, types.Transactions) {
+func (l *txList) Filter(costLimit *big.Int, gasLimit uint64) (types.Transactions, types.Transactions) {
 	// If all transactions are below the threshold, short circuit
-	if l.costcap.Cmp(costLimit) <= 0 && l.gascap.Cmp(gasLimit) <= 0 {
+	if l.costcap.Cmp(costLimit) <= 0 && l.gascap <= gasLimit {
 		return nil, nil
 	}
 	l.costcap = new(big.Int).Set(costLimit) // Lower the caps to the thresholds
-	l.gascap = new(big.Int).Set(gasLimit)
+	l.gascap = gasLimit
 
 	// Filter out all the transactions above the account's funds
-	removed := l.txs.Filter(func(tx *types.Transaction) bool { return tx.Cost().Cmp(costLimit) > 0 || tx.Gas().Cmp(gasLimit) > 0 })
+	removed := l.txs.Filter(func(tx *types.Transaction) bool { return tx.Cost().Cmp(costLimit) > 0 || tx.Gas() > gasLimit })
 
 	// If the list was strict, filter anything above the lowest nonce
 	var invalids types.Transactions

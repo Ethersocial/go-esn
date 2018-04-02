@@ -1,18 +1,18 @@
-// Copyright 2015 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package eth
 
@@ -21,11 +21,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/eth/downloader"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/p2p/discover"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/eth/downloader"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/p2p/discover"
 )
 
 const (
@@ -189,17 +189,12 @@ func (pm *ProtocolManager) synchronise(peer *peer) {
 		mode = downloader.FastSync
 	}
 	// Run the sync cycle, and disable fast sync if we've went past the pivot block
-	err := pm.downloader.Synchronise(peer.id, pHead, pTd, mode)
-
-	if atomic.LoadUint32(&pm.fastSync) == 1 {
-		// Disable fast sync if we indeed have something in our chain
-		if pm.blockchain.CurrentBlock().NumberU64() > 0 {
-			log.Info("Fast sync complete, auto disabling")
-			atomic.StoreUint32(&pm.fastSync, 0)
-		}
-	}
-	if err != nil {
+	if err := pm.downloader.Synchronise(peer.id, pHead, pTd, mode); err != nil {
 		return
+	}
+	if atomic.LoadUint32(&pm.fastSync) == 1 {
+		log.Info("Fast sync complete, auto disabling")
+		atomic.StoreUint32(&pm.fastSync, 0)
 	}
 	atomic.StoreUint32(&pm.acceptTxs, 1) // Mark initial sync done
 	if head := pm.blockchain.CurrentBlock(); head.NumberU64() > 0 {

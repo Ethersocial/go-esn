@@ -1,18 +1,18 @@
-// Copyright 2015 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package tests
 
@@ -22,12 +22,12 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/hexutil"
-	"github.com/ethersocial/go-esc/common/math"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/params"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/hexutil"
+	"github.com/ethersocial/go-esn/common/math"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/params"
+	"github.com/ethersocial/go-esn/rlp"
 )
 
 // TransactionTest checks RLP decoding and sender derivation of transactions.
@@ -46,7 +46,7 @@ type ttJSON struct {
 
 type ttTransaction struct {
 	Data     []byte         `gencodec:"required"`
-	GasLimit *big.Int       `gencodec:"required"`
+	GasLimit uint64         `gencodec:"required"`
 	GasPrice *big.Int       `gencodec:"required"`
 	Nonce    uint64         `gencodec:"required"`
 	Value    *big.Int       `gencodec:"required"`
@@ -58,7 +58,7 @@ type ttTransaction struct {
 
 type ttTransactionMarshaling struct {
 	Data     hexutil.Bytes
-	GasLimit *math.HexOrDecimal256
+	GasLimit math.HexOrDecimal64
 	GasPrice *math.HexOrDecimal256
 	Nonce    math.HexOrDecimal64
 	Value    *math.HexOrDecimal256
@@ -100,8 +100,8 @@ func (tt *ttTransaction) verify(signer types.Signer, tx *types.Transaction) erro
 	if !bytes.Equal(tx.Data(), tt.Data) {
 		return fmt.Errorf("Tx input data mismatch: got %x want %x", tx.Data(), tt.Data)
 	}
-	if tx.Gas().Cmp(tt.GasLimit) != 0 {
-		return fmt.Errorf("GasLimit mismatch: got %v, want %v", tx.Gas(), tt.GasLimit)
+	if tx.Gas() != tt.GasLimit {
+		return fmt.Errorf("GasLimit mismatch: got %d, want %d", tx.Gas(), tt.GasLimit)
 	}
 	if tx.GasPrice().Cmp(tt.GasPrice) != 0 {
 		return fmt.Errorf("GasPrice mismatch: got %v, want %v", tx.GasPrice(), tt.GasPrice)

@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package storage
 
@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethersocial/go-esc/crypto/sha3"
+	"github.com/ethersocial/go-esn/crypto/sha3"
 )
 
 /*
@@ -60,7 +60,7 @@ func (self *chunkerTester) Split(chunker Splitter, data io.Reader, size int64, c
 			for {
 				select {
 				case <-timeout:
-					return errors.New(("Split timeout error"))
+					return errors.New("Split timeout error")
 				case <-quitC:
 					return nil
 				case chunk := <-chunkC:
@@ -77,7 +77,7 @@ func (self *chunkerTester) Split(chunker Splitter, data io.Reader, size int64, c
 
 	key, err = chunker.Split(data, size, chunkC, swg, nil)
 	if err != nil && expectedError == nil {
-		err = errors.New(fmt.Sprintf("Split error: %v", err))
+		err = fmt.Errorf("Split error: %v", err)
 	}
 
 	if chunkC != nil {
@@ -97,7 +97,7 @@ func (self *chunkerTester) Append(chunker Splitter, rootKey Key, data io.Reader,
 			for {
 				select {
 				case <-timeout:
-					return errors.New(("Append timeout error"))
+					return errors.New("Append timeout error")
 				case <-quitC:
 					return nil
 				case chunk := <-chunkC:
@@ -123,7 +123,7 @@ func (self *chunkerTester) Append(chunker Splitter, rootKey Key, data io.Reader,
 
 	key, err = chunker.Append(rootKey, data, chunkC, swg, nil)
 	if err != nil && expectedError == nil {
-		err = errors.New(fmt.Sprintf("Append error: %v", err))
+		err = fmt.Errorf("Append error: %v", err)
 	}
 
 	if chunkC != nil {
@@ -146,7 +146,7 @@ func (self *chunkerTester) Join(chunker Chunker, key Key, c int, chunkC chan *Ch
 		for {
 			select {
 			case <-timeout:
-				return errors.New(("Join timeout error"))
+				return errors.New("Join timeout error")
 			case chunk, ok := <-chunkC:
 				if !ok {
 					close(quitC)
@@ -155,7 +155,7 @@ func (self *chunkerTester) Join(chunker Chunker, key Key, c int, chunkC chan *Ch
 				// this just mocks the behaviour of a chunk store retrieval
 				stored, success := self.chunks[chunk.Key.String()]
 				if !success {
-					return errors.New(("Not found"))
+					return errors.New("Not found")
 				}
 				chunk.SData = stored.SData
 				chunk.Size = int64(binary.LittleEndian.Uint64(chunk.SData[0:8]))

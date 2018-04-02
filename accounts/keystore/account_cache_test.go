@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package keystore
 
@@ -29,8 +29,8 @@ import (
 
 	"github.com/cespare/cp"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/ethersocial/go-esc/accounts"
-	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esn/accounts"
+	"github.com/ethersocial/go-esn/common"
 )
 
 var (
@@ -59,7 +59,7 @@ func TestWatchNewFile(t *testing.T) {
 
 	// Ensure the watcher is started before adding any files.
 	ks.Accounts()
-	time.Sleep(200 * time.Millisecond)
+	time.Sleep(1000 * time.Millisecond)
 
 	// Move in the files.
 	wantAccounts := make([]accounts.Account, len(cachetestAccounts))
@@ -349,6 +349,9 @@ func TestUpdatedKeyfileContents(t *testing.T) {
 		return
 	}
 
+	// needed so that modTime of `file` is different to its current value after forceCopyFile
+	time.Sleep(1000 * time.Millisecond)
+
 	// Now replace file contents
 	if err := forceCopyFile(file, cachetestAccounts[1].URL.Path); err != nil {
 		t.Fatal(err)
@@ -362,6 +365,9 @@ func TestUpdatedKeyfileContents(t *testing.T) {
 		return
 	}
 
+	// needed so that modTime of `file` is different to its current value after forceCopyFile
+	time.Sleep(1000 * time.Millisecond)
+
 	// Now replace file contents again
 	if err := forceCopyFile(file, cachetestAccounts[2].URL.Path); err != nil {
 		t.Fatal(err)
@@ -374,6 +380,10 @@ func TestUpdatedKeyfileContents(t *testing.T) {
 		t.Error(err)
 		return
 	}
+
+	// needed so that modTime of `file` is different to its current value after ioutil.WriteFile
+	time.Sleep(1000 * time.Millisecond)
+
 	// Now replace file contents with crap
 	if err := ioutil.WriteFile(file, []byte("foo"), 0644); err != nil {
 		t.Fatal(err)

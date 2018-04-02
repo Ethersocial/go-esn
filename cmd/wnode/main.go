@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of go-esc.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-esc is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-esc is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-esc. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 // This is a simple Whisper node. It could be used as a stand-alone bootstrap node.
 // Also, could be used for different test and diagnostics purposes.
@@ -34,16 +34,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethersocial/go-esc/cmd/utils"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/console"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/p2p/discover"
-	"github.com/ethersocial/go-esc/p2p/nat"
-	"github.com/ethersocial/go-esc/whisper/mailserver"
-	whisper "github.com/ethersocial/go-esc/whisper/whisperv5"
+	"github.com/ethersocial/go-esn/cmd/utils"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/console"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/nat"
+	"github.com/ethersocial/go-esn/whisper/mailserver"
+	whisper "github.com/ethersocial/go-esn/whisper/whisperv6"
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -61,15 +61,17 @@ var (
 
 // encryption
 var (
-	symKey     []byte
-	pub        *ecdsa.PublicKey
-	asymKey    *ecdsa.PrivateKey
-	nodeid     *ecdsa.PrivateKey
-	topic      whisper.TopicType
-	asymKeyID  string
-	filterID   string
-	symPass    string
-	msPassword string
+	symKey  []byte
+	pub     *ecdsa.PublicKey
+	asymKey *ecdsa.PrivateKey
+	nodeid  *ecdsa.PrivateKey
+	topic   whisper.TopicType
+
+	asymKeyID    string
+	asymFilterID string
+	symFilterID  string
+	symPass      string
+	msPassword   string
 )
 
 // cmd arguments
@@ -263,7 +265,7 @@ func initialize() {
 		Config: p2p.Config{
 			PrivateKey:     nodeid,
 			MaxPeers:       maxPeers,
-			Name:           common.MakeName("wnode", "5.0"),
+			Name:           common.MakeName("wnode", "6.0"),
 			Protocols:      shh.Protocols(),
 			ListenAddr:     *argIP,
 			NAT:            nat.Any(),
@@ -363,13 +365,22 @@ func configureNode() {
 		}
 	}
 
-	filter := whisper.Filter{
+	symFilter := whisper.Filter{
 		KeySym:   symKey,
+		Topics:   [][]byte{topic[:]},
+		AllowP2P: p2pAccept,
+	}
+	symFilterID, err = shh.Subscribe(&symFilter)
+	if err != nil {
+		utils.Fatalf("Failed to install filter: %s", err)
+	}
+
+	asymFilter := whisper.Filter{
 		KeyAsym:  asymKey,
 		Topics:   [][]byte{topic[:]},
 		AllowP2P: p2pAccept,
 	}
-	filterID, err = shh.Subscribe(&filter)
+	asymFilterID, err = shh.Subscribe(&asymFilter)
 	if err != nil {
 		utils.Fatalf("Failed to install filter: %s", err)
 	}
@@ -522,9 +533,14 @@ func sendMsg(payload []byte) common.Hash {
 }
 
 func messageLoop() {
-	f := shh.GetFilter(filterID)
-	if f == nil {
-		utils.Fatalf("filter is not installed")
+	sf := shh.GetFilter(symFilterID)
+	if sf == nil {
+		utils.Fatalf("symmetric filter is not installed")
+	}
+
+	af := shh.GetFilter(asymFilterID)
+	if af == nil {
+		utils.Fatalf("asymmetric filter is not installed")
 	}
 
 	ticker := time.NewTicker(time.Millisecond * 50)
@@ -532,7 +548,16 @@ func messageLoop() {
 	for {
 		select {
 		case <-ticker.C:
-			messages := f.Retrieve()
+			messages := sf.Retrieve()
+			for _, msg := range messages {
+				if *fileExMode || len(msg.Payload) > 2048 {
+					writeMessageToFile(*argSaveDir, msg)
+				} else {
+					printMessageInfo(msg)
+				}
+			}
+
+			messages = af.Retrieve()
 			for _, msg := range messages {
 				if *fileExMode || len(msg.Payload) > 2048 {
 					writeMessageToFile(*argSaveDir, msg)
@@ -601,7 +626,7 @@ func requestExpiredMessagesLoop() {
 	if err != nil {
 		utils.Fatalf("Failed to save symmetric key for mail request: %s", err)
 	}
-	peerID = extractIdFromEnode(*argEnode)
+	peerID = extractIDFromEnode(*argEnode)
 	shh.AllowP2PMessagesFromPeer(peerID)
 
 	for {
@@ -631,7 +656,7 @@ func requestExpiredMessagesLoop() {
 		params.PoW = *argServerPoW
 		params.Payload = data
 		params.KeySym = key
-		params.Src = nodeid
+		params.Src = asymKey
 		params.WorkTime = 5
 
 		msg, err := whisper.NewSentMessage(&params)
@@ -652,7 +677,7 @@ func requestExpiredMessagesLoop() {
 	}
 }
 
-func extractIdFromEnode(s string) []byte {
+func extractIDFromEnode(s string) []byte {
 	n, err := discover.ParseNode(s)
 	if err != nil {
 		utils.Fatalf("Failed to parse enode: %s", err)

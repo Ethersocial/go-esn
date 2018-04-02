@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of go-esc.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-esc is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-esc is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-esc. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -27,12 +27,13 @@ import (
 	"time"
 
 	"github.com/docker/docker/pkg/reexec"
-	"github.com/ethersocial/go-esc/accounts/keystore"
-	"github.com/ethersocial/go-esc/internal/cmdtest"
-	"github.com/ethersocial/go-esc/node"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/rpc"
-	"github.com/ethersocial/go-esc/swarm"
+	"github.com/ethersocial/go-esn/accounts"
+	"github.com/ethersocial/go-esn/accounts/keystore"
+	"github.com/ethersocial/go-esn/internal/cmdtest"
+	"github.com/ethersocial/go-esn/node"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/rpc"
+	"github.com/ethersocial/go-esn/swarm"
 )
 
 func init() {
@@ -156,9 +157,9 @@ type testNode struct {
 
 const testPassphrase = "swarm-test-passphrase"
 
-func newTestNode(t *testing.T, dir string) *testNode {
+func getTestAccount(t *testing.T, dir string) (conf *node.Config, account accounts.Account) {
 	// create key
-	conf := &node.Config{
+	conf = &node.Config{
 		DataDir: dir,
 		IPCPath: "bzzd.ipc",
 		NoUSB:   true,
@@ -167,17 +168,23 @@ func newTestNode(t *testing.T, dir string) *testNode {
 	if err != nil {
 		t.Fatal(err)
 	}
-	account, err := n.AccountManager().Backends(keystore.KeyStoreType)[0].(*keystore.KeyStore).NewAccount(testPassphrase)
+	account, err = n.AccountManager().Backends(keystore.KeyStoreType)[0].(*keystore.KeyStore).NewAccount(testPassphrase)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	node := &testNode{Dir: dir}
 
 	// use a unique IPCPath when running tests on Windows
 	if runtime.GOOS == "windows" {
 		conf.IPCPath = fmt.Sprintf("bzzd-%s.ipc", account.Address.String())
 	}
+
+	return conf, account
+}
+
+func newTestNode(t *testing.T, dir string) *testNode {
+
+	conf, account := getTestAccount(t, dir)
+	node := &testNode{Dir: dir}
 
 	// assign ports
 	httpPort, err := assignTCPPort()

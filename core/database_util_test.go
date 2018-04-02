@@ -1,18 +1,18 @@
-// Copyright 2015 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package core
 
@@ -21,11 +21,11 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/crypto/sha3"
-	"github.com/ethersocial/go-esc/ethdb"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/crypto/sha3"
+	"github.com/ethersocial/go-esn/ethdb"
+	"github.com/ethersocial/go-esn/rlp"
 )
 
 // Tests block header storage and retrieval operations.
@@ -290,9 +290,9 @@ func TestHeadStorage(t *testing.T) {
 func TestLookupStorage(t *testing.T) {
 	db, _ := ethdb.NewMemDatabase()
 
-	tx1 := types.NewTransaction(1, common.BytesToAddress([]byte{0x11}), big.NewInt(111), big.NewInt(1111), big.NewInt(11111), []byte{0x11, 0x11, 0x11})
-	tx2 := types.NewTransaction(2, common.BytesToAddress([]byte{0x22}), big.NewInt(222), big.NewInt(2222), big.NewInt(22222), []byte{0x22, 0x22, 0x22})
-	tx3 := types.NewTransaction(3, common.BytesToAddress([]byte{0x33}), big.NewInt(333), big.NewInt(3333), big.NewInt(33333), []byte{0x33, 0x33, 0x33})
+	tx1 := types.NewTransaction(1, common.BytesToAddress([]byte{0x11}), big.NewInt(111), 1111, big.NewInt(11111), []byte{0x11, 0x11, 0x11})
+	tx2 := types.NewTransaction(2, common.BytesToAddress([]byte{0x22}), big.NewInt(222), 2222, big.NewInt(22222), []byte{0x22, 0x22, 0x22})
+	tx3 := types.NewTransaction(3, common.BytesToAddress([]byte{0x33}), big.NewInt(333), 3333, big.NewInt(33333), []byte{0x33, 0x33, 0x33})
 	txs := []*types.Transaction{tx1, tx2, tx3}
 
 	block := types.NewBlock(&types.Header{Number: big.NewInt(314)}, txs, nil, nil)
@@ -337,25 +337,25 @@ func TestBlockReceiptStorage(t *testing.T) {
 
 	receipt1 := &types.Receipt{
 		Status:            types.ReceiptStatusFailed,
-		CumulativeGasUsed: big.NewInt(1),
+		CumulativeGasUsed: 1,
 		Logs: []*types.Log{
 			{Address: common.BytesToAddress([]byte{0x11})},
 			{Address: common.BytesToAddress([]byte{0x01, 0x11})},
 		},
 		TxHash:          common.BytesToHash([]byte{0x11, 0x11}),
 		ContractAddress: common.BytesToAddress([]byte{0x01, 0x11, 0x11}),
-		GasUsed:         big.NewInt(111111),
+		GasUsed:         111111,
 	}
 	receipt2 := &types.Receipt{
 		PostState:         common.Hash{2}.Bytes(),
-		CumulativeGasUsed: big.NewInt(2),
+		CumulativeGasUsed: 2,
 		Logs: []*types.Log{
 			{Address: common.BytesToAddress([]byte{0x22})},
 			{Address: common.BytesToAddress([]byte{0x02, 0x22})},
 		},
 		TxHash:          common.BytesToHash([]byte{0x22, 0x22}),
 		ContractAddress: common.BytesToAddress([]byte{0x02, 0x22, 0x22}),
-		GasUsed:         big.NewInt(222222),
+		GasUsed:         222222,
 	}
 	receipts := []*types.Receipt{receipt1, receipt2}
 

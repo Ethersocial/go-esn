@@ -1,18 +1,18 @@
-// Copyright 2015 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package tests
 
@@ -22,15 +22,15 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/hexutil"
-	"github.com/ethersocial/go-esc/common/math"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/core/state"
-	"github.com/ethersocial/go-esc/core/vm"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/ethdb"
-	"github.com/ethersocial/go-esc/params"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/hexutil"
+	"github.com/ethersocial/go-esn/common/math"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/state"
+	"github.com/ethersocial/go-esn/core/vm"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/ethdb"
+	"github.com/ethersocial/go-esn/params"
 )
 
 // VMTest checks EVM execution without block or transaction context.
@@ -80,7 +80,7 @@ type vmExecMarshaling struct {
 
 func (t *VMTest) Run(vmconfig vm.Config) error {
 	db, _ := ethdb.NewMemDatabase()
-	statedb := makePreState(db, t.json.Pre)
+	statedb := MakePreState(db, t.json.Pre)
 	ret, gasRemaining, err := t.exec(statedb, vmconfig)
 
 	if t.json.GasRemaining == nil {

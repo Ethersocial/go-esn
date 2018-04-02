@@ -1,21 +1,21 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 // Package light implements on-demand retrieval capable state and chain objects
-// for the ESC Light Client.
+// for the Ethereum Light Client.
 package les
 
 import (
@@ -23,15 +23,15 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/ethdb"
-	"github.com/ethersocial/go-esc/light"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/rlp"
-	"github.com/ethersocial/go-esc/trie"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/ethdb"
+	"github.com/ethersocial/go-esn/light"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/rlp"
+	"github.com/ethersocial/go-esn/trie"
 )
 
 var (
@@ -321,7 +321,7 @@ const (
 )
 
 type HelperTrieReq struct {
-	HelperTrieType    uint
+	Type              uint
 	TrieIdx           uint64
 	Key               []byte
 	FromLevel, AuxReq uint
@@ -365,7 +365,7 @@ func (r *ChtRequest) CanSend(peer *peer) bool {
 	peer.lock.RLock()
 	defer peer.lock.RUnlock()
 
-	return peer.headInfo.Number >= light.HelperTrieConfirmations && r.ChtNum <= (peer.headInfo.Number-light.HelperTrieConfirmations)/light.ChtFrequency
+	return peer.headInfo.Number >= light.HelperTrieConfirmations && r.ChtNum <= (peer.headInfo.Number-light.HelperTrieConfirmations)/light.CHTFrequencyClient
 }
 
 // Request sends an ODR request to the LES network (implementation of LesOdrRequest)
@@ -374,10 +374,10 @@ func (r *ChtRequest) Request(reqID uint64, peer *peer) error {
 	var encNum [8]byte
 	binary.BigEndian.PutUint64(encNum[:], r.BlockNum)
 	req := HelperTrieReq{
-		HelperTrieType: htCanonical,
-		TrieIdx:        r.ChtNum,
-		Key:            encNum[:],
-		AuxReq:         auxHeader,
+		Type:    htCanonical,
+		TrieIdx: r.ChtNum,
+		Key:     encNum[:],
+		AuxReq:  auxHeader,
 	}
 	return peer.RequestHelperTrieProofs(reqID, r.GetCost(peer), []HelperTrieReq{req})
 }
@@ -493,14 +493,14 @@ func (r *BloomRequest) Request(reqID uint64, peer *peer) error {
 	reqs := make([]HelperTrieReq, len(r.SectionIdxList))
 
 	var encNumber [10]byte
-	binary.BigEndian.PutUint16(encNumber[0:2], uint16(r.BitIdx))
+	binary.BigEndian.PutUint16(encNumber[:2], uint16(r.BitIdx))
 
 	for i, sectionIdx := range r.SectionIdxList {
-		binary.BigEndian.PutUint64(encNumber[2:10], sectionIdx)
+		binary.BigEndian.PutUint64(encNumber[2:], sectionIdx)
 		reqs[i] = HelperTrieReq{
-			HelperTrieType: htBloomBits,
-			TrieIdx:        r.BloomTrieNum,
-			Key:            common.CopyBytes(encNumber[:]),
+			Type:    htBloomBits,
+			TrieIdx: r.BloomTrieNum,
+			Key:     common.CopyBytes(encNumber[:]),
 		}
 	}
 	return peer.RequestHelperTrieProofs(reqID, r.GetCost(peer), reqs)
@@ -525,10 +525,10 @@ func (r *BloomRequest) Validate(db ethdb.Database, msg *Msg) error {
 
 	// Verify the proofs
 	var encNumber [10]byte
-	binary.BigEndian.PutUint16(encNumber[0:2], uint16(r.BitIdx))
+	binary.BigEndian.PutUint16(encNumber[:2], uint16(r.BitIdx))
 
 	for i, idx := range r.SectionIdxList {
-		binary.BigEndian.PutUint64(encNumber[2:10], idx)
+		binary.BigEndian.PutUint64(encNumber[2:], idx)
 		value, err, _ := trie.VerifyProof(r.BloomTrieRoot, encNumber[:], reads)
 		if err != nil {
 			return err

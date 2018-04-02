@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 // Package clique implements the proof-of-authority consensus engine.
 package clique
@@ -25,20 +25,20 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/accounts"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/hexutil"
-	"github.com/ethersocial/go-esc/consensus"
-	"github.com/ethersocial/go-esc/consensus/misc"
-	"github.com/ethersocial/go-esc/core/state"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/crypto/sha3"
-	"github.com/ethersocial/go-esc/ethdb"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/params"
-	"github.com/ethersocial/go-esc/rlp"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/accounts"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/hexutil"
+	"github.com/ethersocial/go-esn/consensus"
+	"github.com/ethersocial/go-esn/consensus/misc"
+	"github.com/ethersocial/go-esn/core/state"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/crypto/sha3"
+	"github.com/ethersocial/go-esn/ethdb"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/params"
+	"github.com/ethersocial/go-esn/rlp"
+	"github.com/ethersocial/go-esn/rpc"
 	lru "github.com/hashicorp/golang-lru"
 )
 
@@ -167,7 +167,7 @@ func sigHash(header *types.Header) (hash common.Hash) {
 	return hash
 }
 
-// ecrecover extracts the ESC account address from a signed header.
+// ecrecover extracts the Ethereum account address from a signed header.
 func ecrecover(header *types.Header, sigcache *lru.ARCCache) (common.Address, error) {
 	// If the signature's already cached, return that
 	hash := header.Hash()
@@ -180,7 +180,7 @@ func ecrecover(header *types.Header, sigcache *lru.ARCCache) (common.Address, er
 	}
 	signature := header.Extra[len(header.Extra)-extraSeal:]
 
-	// Recover the public key and the ESC address
+	// Recover the public key and the Ethereum address
 	pubkey, err := crypto.Ecrecover(sigHash(header).Bytes(), signature)
 	if err != nil {
 		return common.Address{}, err
@@ -193,7 +193,7 @@ func ecrecover(header *types.Header, sigcache *lru.ARCCache) (common.Address, er
 }
 
 // Clique is the proof-of-authority consensus engine proposed to support the
-// ESC testnet following the Ropsten attacks.
+// Ethereum testnet following the Ropsten attacks.
 type Clique struct {
 	config *params.CliqueConfig // Consensus engine configuration parameters
 	db     ethdb.Database       // Database to store and retrieve snapshot checkpoints
@@ -203,7 +203,7 @@ type Clique struct {
 
 	proposals map[common.Address]bool // Current list of proposals we are pushing
 
-	signer common.Address // ESC address of the signing key
+	signer common.Address // Ethereum address of the signing key
 	signFn SignerFn       // Signer function to authorize hashes with
 	lock   sync.RWMutex   // Protects the signer fields
 }
@@ -229,7 +229,7 @@ func New(config *params.CliqueConfig, db ethdb.Database) *Clique {
 	}
 }
 
-// Author implements consensus.Engine, returning the ESC address recovered
+// Author implements consensus.Engine, returning the Ethereum address recovered
 // from the signature in the header's extra-data section.
 func (c *Clique) Author(header *types.Header) (common.Address, error) {
 	return ecrecover(header, c.signatures)
@@ -510,7 +510,6 @@ func (c *Clique) Prepare(chain consensus.ChainReader, header *types.Header) erro
 	header.Nonce = types.BlockNonce{}
 
 	number := header.Number.Uint64()
-
 	// Assemble the voting snapshot to check which votes make sense
 	snap, err := c.snapshot(chain, number-1, header.ParentHash, nil)
 	if err != nil {
@@ -538,10 +537,8 @@ func (c *Clique) Prepare(chain consensus.ChainReader, header *types.Header) erro
 		c.lock.RUnlock()
 	}
 	// Set the correct difficulty
-	header.Difficulty = diffNoTurn
-	if snap.inturn(header.Number.Uint64(), c.signer) {
-		header.Difficulty = diffInTurn
-	}
+	header.Difficulty = CalcDifficulty(snap, c.signer)
+
 	// Ensure the extra data has all it's components
 	if len(header.Extra) < extraVanity {
 		header.Extra = append(header.Extra, bytes.Repeat([]byte{0x00}, extraVanity-len(header.Extra))...)
@@ -630,7 +627,7 @@ func (c *Clique) Seal(chain consensus.ChainReader, block *types.Block, stop <-ch
 		}
 	}
 	// Sweet, the protocol permits us to sign the block, wait for our time
-	delay := time.Unix(header.Time.Int64(), 0).Sub(time.Now())
+	delay := time.Unix(header.Time.Int64(), 0).Sub(time.Now()) // nolint: gosimple
 	if header.Difficulty.Cmp(diffNoTurn) == 0 {
 		// It's not our turn explicitly to sign, delay it a bit
 		wiggle := time.Duration(len(snap.Signers)/2+1) * wiggleTime
@@ -653,6 +650,27 @@ func (c *Clique) Seal(chain consensus.ChainReader, block *types.Block, stop <-ch
 	copy(header.Extra[len(header.Extra)-extraSeal:], sighash)
 
 	return block.WithSeal(header), nil
+}
+
+// CalcDifficulty is the difficulty adjustment algorithm. It returns the difficulty
+// that a new block should have based on the previous blocks in the chain and the
+// current signer.
+func (c *Clique) CalcDifficulty(chain consensus.ChainReader, time uint64, parent *types.Header) *big.Int {
+	snap, err := c.snapshot(chain, parent.Number.Uint64(), parent.Hash(), nil)
+	if err != nil {
+		return nil
+	}
+	return CalcDifficulty(snap, c.signer)
+}
+
+// CalcDifficulty is the difficulty adjustment algorithm. It returns the difficulty
+// that a new block should have based on the previous blocks in the chain and the
+// current signer.
+func CalcDifficulty(snap *Snapshot, signer common.Address) *big.Int {
+	if snap.inturn(snap.Number+1, signer) {
+		return new(big.Int).Set(diffInTurn)
+	}
+	return new(big.Int).Set(diffNoTurn)
 }
 
 // APIs implements consensus.Engine, returning the user facing RPC API to allow

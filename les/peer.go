@@ -1,20 +1,20 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package les implements the Light ESC Subprotocol.
+// Package les implements the Light Ethereum Subprotocol.
 package les
 
 import (
@@ -26,13 +26,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/eth"
-	"github.com/ethersocial/go-esc/les/flowcontrol"
-	"github.com/ethersocial/go-esc/light"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/eth"
+	"github.com/ethersocial/go-esn/les/flowcontrol"
+	"github.com/ethersocial/go-esn/light"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/rlp"
 )
 
 var (
@@ -281,7 +281,6 @@ func (p *peer) RequestProofs(reqID, cost uint64, reqs []ProofReq) error {
 	default:
 		panic(nil)
 	}
-
 }
 
 // RequestHelperTrieProofs fetches a batch of HelperTrie merkle proofs from a remote node.
@@ -291,12 +290,12 @@ func (p *peer) RequestHelperTrieProofs(reqID, cost uint64, reqs []HelperTrieReq)
 	case lpv1:
 		reqsV1 := make([]ChtReq, len(reqs))
 		for i, req := range reqs {
-			if req.HelperTrieType != htCanonical || req.AuxReq != auxHeader || len(req.Key) != 8 {
+			if req.Type != htCanonical || req.AuxReq != auxHeader || len(req.Key) != 8 {
 				return fmt.Errorf("Request invalid in LES/1 mode")
 			}
 			blockNum := binary.BigEndian.Uint64(req.Key)
 			// convert HelperTrie request to old CHT request
-			reqsV1[i] = ChtReq{ChtNum: (req.TrieIdx+1)*(light.ChtFrequency/light.ChtV1Frequency) - 1, BlockNum: blockNum, FromLevel: req.FromLevel}
+			reqsV1[i] = ChtReq{ChtNum: (req.TrieIdx + 1) * (light.CHTFrequencyClient / light.CHTFrequencyServer), BlockNum: blockNum, FromLevel: req.FromLevel}
 		}
 		return sendRequest(p.rw, GetHeaderProofsMsg, reqID, cost, reqsV1)
 	case lpv2:
@@ -511,7 +510,7 @@ type peerSetNotify interface {
 }
 
 // peerSet represents the collection of active peers currently participating in
-// the Light ESC sub-protocol.
+// the Light Ethereum sub-protocol.
 type peerSet struct {
 	peers      map[string]*peer
 	lock       sync.RWMutex

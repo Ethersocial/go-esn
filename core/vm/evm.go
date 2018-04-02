@@ -1,28 +1,29 @@
-// Copyright 2014 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2014 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package vm
 
 import (
 	"math/big"
 	"sync/atomic"
+	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/params"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/params"
 )
 
 // emptyCodeHash is used by create to ensure deployment is disallowed to already
@@ -38,7 +39,7 @@ type (
 )
 
 // run runs the given contract and takes care of running precompiles with a fallback to the byte code interpreter.
-func run(evm *EVM, snapshot int, contract *Contract, input []byte) ([]byte, error) {
+func run(evm *EVM, contract *Contract, input []byte) ([]byte, error) {
 	if contract.CodeAddr != nil {
 		precompiles := PrecompiledContractsHomestead
 		if evm.ChainConfig().IsByzantium(evm.BlockNumber) {
@@ -48,7 +49,7 @@ func run(evm *EVM, snapshot int, contract *Contract, input []byte) ([]byte, erro
 			return RunPrecompiledContract(p, input, contract)
 		}
 	}
-	return evm.interpreter.Run(snapshot, contract, input)
+	return evm.interpreter.Run(contract, input)
 }
 
 // Context provides the EVM with auxiliary information. Once provided
@@ -68,13 +69,13 @@ type Context struct {
 
 	// Block information
 	Coinbase    common.Address // Provides information for COINBASE
-	GasLimit    *big.Int       // Provides information for GASLIMIT
+	GasLimit    uint64         // Provides information for GASLIMIT
 	BlockNumber *big.Int       // Provides information for NUMBER
 	Time        *big.Int       // Provides information for TIME
 	Difficulty  *big.Int       // Provides information for DIFFICULTY
 }
 
-// EVM is the ESC Virtual Machine base object and provides
+// EVM is the Ethereum Virtual Machine base object and provides
 // the necessary tools to run a contract on the given state with
 // the provided context. It should be noted that any error
 // generated through any of the calls should be considered a
@@ -104,6 +105,10 @@ type EVM struct {
 	// abort is used to abort the EVM calling operations
 	// NOTE: must be set atomically
 	abort int32
+	// callGasTemp holds the gas available for the current call. This is needed because the
+	// available gas is calculated in gasCall* according to the 63/64 rule and later
+	// applied in opCall*.
+	callGasTemp uint64
 }
 
 // NewEVM retutrns a new EVM . The returned EVM is not thread safe and should
@@ -161,13 +166,23 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	}
 	evm.Transfer(evm.StateDB, caller.Address(), to.Address(), value)
 
-	// initialise a new contract and set the code that is to be used by the
-	// E The contract is a scoped environment for this execution context
-	// only.
+	// Initialise a new contract and set the code that is to be used by the EVM.
+	// The contract is a scoped environment for this execution context only.
 	contract := NewContract(caller, to, value, gas)
 	contract.SetCallCode(&addr, evm.StateDB.GetCodeHash(addr), evm.StateDB.GetCode(addr))
 
-	ret, err = run(evm, snapshot, contract, input)
+	start := time.Now()
+
+	// Capture the tracer start/end events in debug mode
+	if evm.vmConfig.Debug && evm.depth == 0 {
+		evm.vmConfig.Tracer.CaptureStart(caller.Address(), addr, false, input, gas, value)
+
+		defer func() { // Lazy evaluation of the parameters
+			evm.vmConfig.Tracer.CaptureEnd(ret, gas-contract.Gas, time.Since(start), err)
+		}()
+	}
+	ret, err = run(evm, contract, input)
+
 	// When an error was returned by the EVM or when setting the creation code
 	// above we revert to the snapshot and consume any gas remaining. Additionally
 	// when we're in homestead this also counts for code storage gas errors.
@@ -211,7 +226,7 @@ func (evm *EVM) CallCode(caller ContractRef, addr common.Address, input []byte, 
 	contract := NewContract(caller, to, value, gas)
 	contract.SetCallCode(&addr, evm.StateDB.GetCodeHash(addr), evm.StateDB.GetCode(addr))
 
-	ret, err = run(evm, snapshot, contract, input)
+	ret, err = run(evm, contract, input)
 	if err != nil {
 		evm.StateDB.RevertToSnapshot(snapshot)
 		if err != errExecutionReverted {
@@ -244,7 +259,7 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []by
 	contract := NewContract(caller, to, nil, gas).AsDelegate()
 	contract.SetCallCode(&addr, evm.StateDB.GetCodeHash(addr), evm.StateDB.GetCode(addr))
 
-	ret, err = run(evm, snapshot, contract, input)
+	ret, err = run(evm, contract, input)
 	if err != nil {
 		evm.StateDB.RevertToSnapshot(snapshot)
 		if err != errExecutionReverted {
@@ -287,7 +302,7 @@ func (evm *EVM) StaticCall(caller ContractRef, addr common.Address, input []byte
 	// When an error was returned by the EVM or when setting the creation code
 	// above we revert to the snapshot and consume any gas remaining. Additionally
 	// when we're in Homestead this also counts for code storage gas errors.
-	ret, err = run(evm, snapshot, contract, input)
+	ret, err = run(evm, contract, input)
 	if err != nil {
 		evm.StateDB.RevertToSnapshot(snapshot)
 		if err != errExecutionReverted {
@@ -334,7 +349,14 @@ func (evm *EVM) Create(caller ContractRef, code []byte, gas uint64, value *big.I
 	if evm.vmConfig.NoRecursion && evm.depth > 0 {
 		return nil, contractAddr, gas, nil
 	}
-	ret, err = run(evm, snapshot, contract, nil)
+
+	if evm.vmConfig.Debug && evm.depth == 0 {
+		evm.vmConfig.Tracer.CaptureStart(caller.Address(), contractAddr, true, code, gas, value)
+	}
+	start := time.Now()
+
+	ret, err = run(evm, contract, nil)
+
 	// check whether the max code size has been exceeded
 	maxCodeSizeExceeded := evm.ChainConfig().IsEIP158(evm.BlockNumber) && len(ret) > params.MaxCodeSize
 	// if the contract creation ran successfully and no errors were returned
@@ -363,10 +385,13 @@ func (evm *EVM) Create(caller ContractRef, code []byte, gas uint64, value *big.I
 	if maxCodeSizeExceeded && err == nil {
 		err = errMaxCodeSizeExceeded
 	}
+	if evm.vmConfig.Debug && evm.depth == 0 {
+		evm.vmConfig.Tracer.CaptureEnd(ret, gas-contract.Gas, time.Since(start), err)
+	}
 	return ret, contractAddr, contract.Gas, err
 }
 
-// ChainConfig returns the evmironment's chain configuration
+// ChainConfig returns the environment's chain configuration
 func (evm *EVM) ChainConfig() *params.ChainConfig { return evm.chainConfig }
 
 // Interpreter returns the EVM interpreter

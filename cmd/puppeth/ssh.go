@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of go-esc.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-esc is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-esc is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-esc. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -28,7 +28,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/log"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -116,6 +116,7 @@ func dial(server string, pubkey []byte) (*sshClient, error) {
 	keycheck := func(hostname string, remote net.Addr, key ssh.PublicKey) error {
 		// If no public key is known for SSH, ask the user to confirm
 		if pubkey == nil {
+			fmt.Println()
 			fmt.Printf("The authenticity of host '%s (%s)' can't be established.\n", hostname, remote)
 			fmt.Printf("SSH key fingerprint is %s [MD5]\n", ssh.FingerprintLegacyMD5(key))
 			fmt.Printf("Are you sure you want to continue connecting (yes/no)? ")
@@ -215,8 +216,8 @@ func (client *sshClient) Stream(cmd string) error {
 	return session.Run(cmd)
 }
 
-// Upload copied the set of files to a remote server via SCP, creating any non-
-// existing folder in te mean time.
+// Upload copies the set of files to a remote server via SCP, creating any non-
+// existing folders in the mean time.
 func (client *sshClient) Upload(files map[string][]byte) ([]byte, error) {
 	// Establish a single command session
 	session, err := client.client.NewSession()

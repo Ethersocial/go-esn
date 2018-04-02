@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package simulations
 
@@ -27,12 +27,13 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 
-	"github.com/ethersocial/go-esc/event"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/p2p/discover"
-	"github.com/ethersocial/go-esc/p2p/simulations/adapters"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/event"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/simulations/adapters"
+	"github.com/ethersocial/go-esn/rpc"
 	"github.com/julienschmidt/httprouter"
 	"golang.org/x/net/websocket"
 )
@@ -263,8 +264,10 @@ func (c *Client) Send(method, path string, in, out interface{}) error {
 
 // Server is an HTTP server providing an API to manage a simulation network
 type Server struct {
-	router  *httprouter.Router
-	network *Network
+	router     *httprouter.Router
+	network    *Network
+	mockerStop chan struct{} // when set, stops the current mocker
+	mockerMtx  sync.Mutex    // synchronises access to the mockerStop field
 }
 
 // NewServer returns a new simulation API server
@@ -278,6 +281,10 @@ func NewServer(network *Network) *Server {
 	s.GET("/", s.GetNetwork)
 	s.POST("/start", s.StartNetwork)
 	s.POST("/stop", s.StopNetwork)
+	s.POST("/mocker/start", s.StartMocker)
+	s.POST("/mocker/stop", s.StopMocker)
+	s.GET("/mocker", s.GetMockers)
+	s.POST("/reset", s.ResetNetwork)
 	s.GET("/events", s.StreamNetworkEvents)
 	s.GET("/snapshot", s.CreateSnapshot)
 	s.POST("/snapshot", s.LoadSnapshot)
@@ -314,6 +321,59 @@ func (s *Server) StopNetwork(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+// StartMocker starts the mocker node simulation
+func (s *Server) StartMocker(w http.ResponseWriter, req *http.Request) {
+	s.mockerMtx.Lock()
+	defer s.mockerMtx.Unlock()
+	if s.mockerStop != nil {
+		http.Error(w, "mocker already running", http.StatusInternalServerError)
+		return
+	}
+	mockerType := req.FormValue("mocker-type")
+	mockerFn := LookupMocker(mockerType)
+	if mockerFn == nil {
+		http.Error(w, fmt.Sprintf("unknown mocker type %q", mockerType), http.StatusBadRequest)
+		return
+	}
+	nodeCount, err := strconv.Atoi(req.FormValue("node-count"))
+	if err != nil {
+		http.Error(w, "invalid node-count provided", http.StatusBadRequest)
+		return
+	}
+	s.mockerStop = make(chan struct{})
+	go mockerFn(s.network, s.mockerStop, nodeCount)
+
+	w.WriteHeader(http.StatusOK)
+}
+
+// StopMocker stops the mocker node simulation
+func (s *Server) StopMocker(w http.ResponseWriter, req *http.Request) {
+	s.mockerMtx.Lock()
+	defer s.mockerMtx.Unlock()
+	if s.mockerStop == nil {
+		http.Error(w, "stop channel not initialized", http.StatusInternalServerError)
+		return
+	}
+	close(s.mockerStop)
+	s.mockerStop = nil
+
+	w.WriteHeader(http.StatusOK)
+}
+
+// GetMockerList returns a list of available mockers
+func (s *Server) GetMockers(w http.ResponseWriter, req *http.Request) {
+
+	list := GetMockerList()
+	s.JSON(w, http.StatusOK, list)
+}
+
+// ResetNetwork resets all properties of a network to its initial (empty) state
+func (s *Server) ResetNetwork(w http.ResponseWriter, req *http.Request) {
+	s.network.Reset()
 
 	w.WriteHeader(http.StatusOK)
 }

@@ -1,27 +1,27 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package chequebook package wraps the 'chequebook' ESC smart contract.
+// Package chequebook package wraps the 'chequebook' Ethereum smart contract.
 //
 // The functions in this package allow using chequebook for
 // issuing, receiving, verifying cheques in ether; (auto)cashing cheques in ether
 // as well as (auto)depositing ether to the chequebook contract.
 package chequebook
 
-//go:generate abigen --sol contract/chequebook.sol --pkg contract --out contract/chequebook.go
+//go:generate abigen --sol contract/chequebook.sol --exc contract/mortal.sol:mortal,contract/owned.sol:owned --pkg contract --out contract/chequebook.go
 //go:generate go run ./gencode.go
 
 import (
@@ -36,14 +36,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/accounts/abi/bind"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/hexutil"
-	"github.com/ethersocial/go-esc/contracts/chequebook/contract"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/swarm/services/swap/swap"
+	"github.com/ethersocial/go-esn/accounts/abi/bind"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/hexutil"
+	"github.com/ethersocial/go-esn/contracts/chequebook/contract"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/swarm/services/swap/swap"
 )
 
 // TODO(zelig): watch peer solvency and notify of bouncing cheques
@@ -56,8 +56,8 @@ import (
 // * watching incoming ether
 
 var (
-	gasToCash = big.NewInt(2000000) // gas cost of a cash transaction using chequebook
-	// gasToDeploy = big.NewInt(3000000)
+	gasToCash = uint64(2000000) // gas cost of a cash transaction using chequebook
+	// gasToDeploy = uint64(3000000)
 )
 
 // Backend wraps all methods required for chequebook operation.
@@ -620,7 +620,7 @@ func sig2vrs(sig []byte) (v byte, r, s [32]byte) {
 	return
 }
 
-// Cash cashes the cheque by sending an ESC transaction.
+// Cash cashes the cheque by sending an Ethereum transaction.
 func (self *Cheque) Cash(session *contract.ChequebookSession) (string, error) {
 	v, r, s := sig2vrs(self.Sig)
 	tx, err := session.Cash(self.Beneficiary, self.Amount, v, r, s)

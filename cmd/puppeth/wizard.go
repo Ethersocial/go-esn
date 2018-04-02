@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of go-esc.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-esc is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-esc is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-esc. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -28,22 +28,22 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/log"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
 // config contains all the configurations needed by puppeth that should be saved
 // between sessions.
 type config struct {
-	path      string        // File containing the configuration values
-	genesis   *core.Genesis // Genesis block to cache for node deploys
-	bootFull  []string      // Bootnodes to always connect to by full nodes
-	bootLight []string      // Bootnodes to always connect to by light nodes
-	ethstats  string        // Ethstats settings to cache for node deploys
+	path      string   // File containing the configuration values
+	bootnodes []string // Bootnodes to always connect to by all nodes
+	ethstats  string   // Ethstats settings to cache for node deploys
 
+	Genesis *core.Genesis     `json:"genesis,omitempty"` // Genesis block to cache for node deploys
 	Servers map[string][]byte `json:"servers,omitempty"`
 }
 
@@ -73,9 +73,10 @@ type wizard struct {
 	conf    config // Configurations from previous runs
 
 	servers  map[string]*sshClient // SSH connections to servers to administer
-	services map[string][]string   // ESC services known to be running on servers
+	services map[string][]string   // Ethereum services known to be running on servers
 
-	in *bufio.Reader // Wrapper around stdin to allow reading user input
+	in   *bufio.Reader // Wrapper around stdin to allow reading user input
+	lock sync.Mutex    // Lock to protect configs during concurrent service discovery
 }
 
 // read reads a single line from stdin, trimming if from spaces.
@@ -239,7 +240,7 @@ func (w *wizard) readPassword() string {
 }
 
 // readAddress reads a single line from stdin, trimming if from spaces and converts
-// it to an ESC address.
+// it to an Ethereum address.
 func (w *wizard) readAddress() *common.Address {
 	for {
 		// Read the address from the user
@@ -263,7 +264,7 @@ func (w *wizard) readAddress() *common.Address {
 }
 
 // readDefaultAddress reads a single line from stdin, trimming if from spaces and
-// converts it to an ESC address. If an empty line is entered, the default
+// converts it to an Ethereum address. If an empty line is entered, the default
 // value is returned.
 func (w *wizard) readDefaultAddress(def common.Address) common.Address {
 	for {

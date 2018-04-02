@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package discv5
 
@@ -23,7 +23,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/ethersocial/go-esc/common/mclock"
+	"github.com/ethersocial/go-esn/common/mclock"
+	"github.com/ethersocial/go-esn/log"
 )
 
 const (
@@ -235,7 +236,7 @@ func (t *topicTable) deleteEntry(e *topicEntry) {
 
 // It is assumed that topics and waitPeriods have the same length.
 func (t *topicTable) useTicket(node *Node, serialNo uint32, topics []Topic, idx int, issueTime uint64, waitPeriods []uint32) (registered bool) {
-	debugLog(fmt.Sprintf("useTicket %v %v %v", serialNo, topics, waitPeriods))
+	log.Trace("Using discovery ticket", "serial", serialNo, "topics", topics, "waits", waitPeriods)
 	//fmt.Println("useTicket", serialNo, topics, waitPeriods)
 	t.collectGarbage()
 

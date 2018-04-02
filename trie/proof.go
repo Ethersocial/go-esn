@@ -1,18 +1,18 @@
-// Copyright 2015 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package trie
 
@@ -20,22 +20,21 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/ethdb"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/rlp"
 )
 
-// Prove constructs a merkle proof for key. The result contains all
-// encoded nodes on the path to the value at key. The value itself is
-// also included in the last node and can be retrieved by verifying
-// the proof.
+// Prove constructs a merkle proof for key. The result contains all encoded nodes
+// on the path to the value at key. The value itself is also included in the last
+// node and can be retrieved by verifying the proof.
 //
-// If the trie does not contain a value for key, the returned proof
-// contains all nodes of the longest existing prefix of the key
-// (at least the root node), ending with the node that proves the
-// absence of the key.
-func (t *Trie) Prove(key []byte, fromLevel uint, proofDb DatabaseWriter) error {
+// If the trie does not contain a value for key, the returned proof contains all
+// nodes of the longest existing prefix of the key (at least the root node), ending
+// with the node that proves the absence of the key.
+func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.Putter) error {
 	// Collect all nodes on the path to key.
 	key = keybytesToHex(key)
 	nodes := []node{}
@@ -66,7 +65,7 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb DatabaseWriter) error {
 			panic(fmt.Sprintf("%T: invalid node: %v", tn, tn))
 		}
 	}
-	hasher := newHasher(0, 0)
+	hasher := newHasher(0, 0, nil)
 	for i, n := range nodes {
 		// Don't bother checking for errors here since hasher panics
 		// if encoding doesn't work and we're not writing to any database.
@@ -89,19 +88,29 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb DatabaseWriter) error {
 	return nil
 }
 
-// VerifyProof checks merkle proofs. The given proof must contain the
-// value for key in a trie with the given root hash. VerifyProof
-// returns an error if the proof contains invalid trie nodes or the
-// wrong value.
+// Prove constructs a merkle proof for key. The result contains all encoded nodes
+// on the path to the value at key. The value itself is also included in the last
+// node and can be retrieved by verifying the proof.
+//
+// If the trie does not contain a value for key, the returned proof contains all
+// nodes of the longest existing prefix of the key (at least the root node), ending
+// with the node that proves the absence of the key.
+func (t *SecureTrie) Prove(key []byte, fromLevel uint, proofDb ethdb.Putter) error {
+	return t.trie.Prove(key, fromLevel, proofDb)
+}
+
+// VerifyProof checks merkle proofs. The given proof must contain the value for
+// key in a trie with the given root hash. VerifyProof returns an error if the
+// proof contains invalid trie nodes or the wrong value.
 func VerifyProof(rootHash common.Hash, key []byte, proofDb DatabaseReader) (value []byte, err error, nodes int) {
 	key = keybytesToHex(key)
-	wantHash := rootHash[:]
+	wantHash := rootHash
 	for i := 0; ; i++ {
-		buf, _ := proofDb.Get(wantHash)
+		buf, _ := proofDb.Get(wantHash[:])
 		if buf == nil {
-			return nil, fmt.Errorf("proof node %d (hash %064x) missing", i, wantHash[:]), i
+			return nil, fmt.Errorf("proof node %d (hash %064x) missing", i, wantHash), i
 		}
-		n, err := decodeNode(wantHash, buf, 0)
+		n, err := decodeNode(wantHash[:], buf, 0)
 		if err != nil {
 			return nil, fmt.Errorf("bad proof node %d: %v", i, err), i
 		}
@@ -112,7 +121,7 @@ func VerifyProof(rootHash common.Hash, key []byte, proofDb DatabaseReader) (valu
 			return nil, nil, i
 		case hashNode:
 			key = keyrest
-			wantHash = cld
+			copy(wantHash[:], cld)
 		case valueNode:
 			return cld, nil, i + 1
 		}

@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 // +build go1.8
 
@@ -20,17 +20,20 @@ package ethash
 
 import "math/big"
 
-// cacheSize calculates and returns the size of the ethash verification cache that
-// belongs to a certain block number. The cache size grows linearly, however, we
-// always take the highest prime below the linearly growing threshold in order to
-// reduce the risk of accidental regularities leading to cyclic behavior.
+// cacheSize returns the size of the ethash verification cache that belongs to a certain
+// block number.
 func cacheSize(block uint64) uint64 {
-	// If we have a pre-generated value, use that
 	epoch := int(block / epochLength)
-	if epoch < len(cacheSizes) {
+	if epoch < maxEpoch {
 		return cacheSizes[epoch]
 	}
-	// No known cache size, calculate manually (sanity branch only)
+	return calcCacheSize(epoch)
+}
+
+// calcCacheSize calculates the cache size for epoch. The cache size grows linearly,
+// however, we always take the highest prime below the linearly growing threshold in order
+// to reduce the risk of accidental regularities leading to cyclic behavior.
+func calcCacheSize(epoch int) uint64 {
 	size := cacheInitBytes + cacheGrowthBytes*uint64(epoch) - hashBytes
 	for !new(big.Int).SetUint64(size / hashBytes).ProbablyPrime(1) { // Always accurate for n < 2^64
 		size -= 2 * hashBytes
@@ -38,17 +41,20 @@ func cacheSize(block uint64) uint64 {
 	return size
 }
 
-// datasetSize calculates and returns the size of the ethash mining dataset that
-// belongs to a certain block number. The dataset size grows linearly, however, we
-// always take the highest prime below the linearly growing threshold in order to
-// reduce the risk of accidental regularities leading to cyclic behavior.
+// datasetSize returns the size of the ethash mining dataset that belongs to a certain
+// block number.
 func datasetSize(block uint64) uint64 {
-	// If we have a pre-generated value, use that
 	epoch := int(block / epochLength)
-	if epoch < len(datasetSizes) {
+	if epoch < maxEpoch {
 		return datasetSizes[epoch]
 	}
-	// No known dataset size, calculate manually (sanity branch only)
+	return calcDatasetSize(epoch)
+}
+
+// calcDatasetSize calculates the dataset size for epoch. The dataset size grows linearly,
+// however, we always take the highest prime below the linearly growing threshold in order
+// to reduce the risk of accidental regularities leading to cyclic behavior.
+func calcDatasetSize(epoch int) uint64 {
 	size := datasetInitBytes + datasetGrowthBytes*uint64(epoch) - mixBytes
 	for !new(big.Int).SetUint64(size / mixBytes).ProbablyPrime(1) { // Always accurate for n < 2^64
 		size -= 2 * mixBytes
