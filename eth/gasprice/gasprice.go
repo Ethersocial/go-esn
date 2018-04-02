@@ -1,18 +1,18 @@
-// Copyright 2015 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package gasprice
 
@@ -22,10 +22,11 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/internal/ethapi"
-	"github.com/ethersocial/go-esc/params"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/internal/ethapi"
+	"github.com/ethersocial/go-esn/params"
+	"github.com/ethersocial/go-esn/rpc"
 )
 
 var maxPrice = big.NewInt(500 * params.Shannon)
@@ -101,9 +102,9 @@ func (gpo *Oracle) SuggestPrice(ctx context.Context) (*big.Int, error) {
 	ch := make(chan getBlockPricesResult, gpo.checkBlocks)
 	sent := 0
 	exp := 0
-	var txPrices []*big.Int
+	var blockPrices []*big.Int
 	for sent < gpo.checkBlocks && blockNum > 0 {
-		go gpo.getBlockPrices(ctx, blockNum, ch)
+		go gpo.getBlockPrices(ctx, types.MakeSigner(gpo.backend.ChainConfig(), big.NewInt(int64(blockNum))), blockNum, ch)
 		sent++
 		exp++
 		blockNum--
@@ -115,8 +116,8 @@ func (gpo *Oracle) SuggestPrice(ctx context.Context) (*big.Int, error) {
 			return lastPrice, res.err
 		}
 		exp--
-		if len(res.prices) > 0 {
-			txPrices = append(txPrices, res.prices...)
+		if res.price != nil {
+			blockPrices = append(blockPrices, res.price)
 			continue
 		}
 		if maxEmpty > 0 {
@@ -124,16 +125,16 @@ func (gpo *Oracle) SuggestPrice(ctx context.Context) (*big.Int, error) {
 			continue
 		}
 		if blockNum > 0 && sent < gpo.maxBlocks {
-			go gpo.getBlockPrices(ctx, blockNum, ch)
+			go gpo.getBlockPrices(ctx, types.MakeSigner(gpo.backend.ChainConfig(), big.NewInt(int64(blockNum))), blockNum, ch)
 			sent++
 			exp++
 			blockNum--
 		}
 	}
 	price := lastPrice
-	if len(txPrices) > 0 {
-		sort.Sort(bigIntArray(txPrices))
-		price = txPrices[(len(txPrices)-1)*gpo.percentile/100]
+	if len(blockPrices) > 0 {
+		sort.Sort(bigIntArray(blockPrices))
+		price = blockPrices[(len(blockPrices)-1)*gpo.percentile/100]
 	}
 	if price.Cmp(maxPrice) > 0 {
 		price = new(big.Int).Set(maxPrice)
@@ -147,24 +148,38 @@ func (gpo *Oracle) SuggestPrice(ctx context.Context) (*big.Int, error) {
 }
 
 type getBlockPricesResult struct {
-	prices []*big.Int
-	err    error
+	price *big.Int
+	err   error
 }
 
-// getLowestPrice calculates the lowest transaction gas price in a given block
+type transactionsByGasPrice []*types.Transaction
+
+func (t transactionsByGasPrice) Len() int           { return len(t) }
+func (t transactionsByGasPrice) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
+func (t transactionsByGasPrice) Less(i, j int) bool { return t[i].GasPrice().Cmp(t[j].GasPrice()) < 0 }
+
+// getBlockPrices calculates the lowest transaction gas price in a given block
 // and sends it to the result channel. If the block is empty, price is nil.
-func (gpo *Oracle) getBlockPrices(ctx context.Context, blockNum uint64, ch chan getBlockPricesResult) {
+func (gpo *Oracle) getBlockPrices(ctx context.Context, signer types.Signer, blockNum uint64, ch chan getBlockPricesResult) {
 	block, err := gpo.backend.BlockByNumber(ctx, rpc.BlockNumber(blockNum))
 	if block == nil {
 		ch <- getBlockPricesResult{nil, err}
 		return
 	}
-	txs := block.Transactions()
-	prices := make([]*big.Int, len(txs))
-	for i, tx := range txs {
-		prices[i] = tx.GasPrice()
+
+	blockTxs := block.Transactions()
+	txs := make([]*types.Transaction, len(blockTxs))
+	copy(txs, blockTxs)
+	sort.Sort(transactionsByGasPrice(txs))
+
+	for _, tx := range txs {
+		sender, err := types.Sender(signer, tx)
+		if err == nil && sender != block.Coinbase() {
+			ch <- getBlockPricesResult{tx.GasPrice(), nil}
+			return
+		}
 	}
-	ch <- getBlockPricesResult{prices, nil}
+	ch <- getBlockPricesResult{nil, nil}
 }
 
 type bigIntArray []*big.Int

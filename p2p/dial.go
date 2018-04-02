@@ -1,18 +1,18 @@
-// Copyright 2015 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package p2p
 
@@ -24,9 +24,9 @@ import (
 	"net"
 	"time"
 
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/p2p/discover"
-	"github.com/ethersocial/go-esc/p2p/netutil"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/netutil"
 )
 
 const (
@@ -157,7 +157,7 @@ func (s *dialstate) removeStatic(n *discover.Node) {
 }
 
 func (s *dialstate) newTasks(nRunning int, peers map[discover.NodeID]*Peer, now time.Time) []task {
-	if s.start == (time.Time{}) {
+	if s.start.IsZero() {
 		s.start = now
 	}
 
@@ -291,11 +291,14 @@ func (t *dialTask) Do(srv *Server) {
 			return
 		}
 	}
-	success := t.dial(srv, t.dest)
-	// Try resolving the ID of static nodes if dialing failed.
-	if !success && t.flags&staticDialedConn != 0 {
-		if t.resolve(srv) {
-			t.dial(srv, t.dest)
+	err := t.dial(srv, t.dest)
+	if err != nil {
+		log.Trace("Dial error", "task", t, "err", err)
+		// Try resolving the ID of static nodes if dialing failed.
+		if _, ok := err.(*dialError); ok && t.flags&staticDialedConn != 0 {
+			if t.resolve(srv) {
+				t.dial(srv, t.dest)
+			}
 		}
 	}
 }
@@ -334,16 +337,18 @@ func (t *dialTask) resolve(srv *Server) bool {
 	return true
 }
 
+type dialError struct {
+	error
+}
+
 // dial performs the actual connection attempt.
-func (t *dialTask) dial(srv *Server, dest *discover.Node) bool {
+func (t *dialTask) dial(srv *Server, dest *discover.Node) error {
 	fd, err := srv.Dialer.Dial(dest)
 	if err != nil {
-		log.Trace("Dial error", "task", t, "err", err)
-		return false
+		return &dialError{err}
 	}
 	mfd := newMeteredConn(fd, false)
-	srv.SetupConn(mfd, t.flags, dest)
-	return true
+	return srv.SetupConn(mfd, t.flags, dest)
 }
 
 func (t *dialTask) String() string {

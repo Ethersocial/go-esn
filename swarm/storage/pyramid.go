@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package storage
 
@@ -338,7 +338,7 @@ func (self *PyramidChunker) loadTree(chunkLevel [][]*TreeEntry, key Key, chunkC 
 	chunkLevel[depth-1] = append(chunkLevel[depth-1], newEntry)
 
 	// Add the rest of the tree
-	for lvl := (depth - 1); lvl >= 1; lvl-- {
+	for lvl := depth - 1; lvl >= 1; lvl-- {
 
 		//TODO(jmozah): instead of loading finished branches and then trim in the end,
 		//avoid loading them in the first place
@@ -391,7 +391,7 @@ func (self *PyramidChunker) prepareChunks(isAppend bool, chunkLevel [][]*TreeEnt
 	parent := NewTreeEntry(self)
 	var unFinishedChunk *Chunk
 
-	if isAppend == true && len(chunkLevel[0]) != 0 {
+	if isAppend && len(chunkLevel[0]) != 0 {
 
 		lastIndex := len(chunkLevel[0]) - 1
 		ent := chunkLevel[0][lastIndex]
@@ -512,7 +512,7 @@ func (self *PyramidChunker) buildTree(isAppend bool, chunkLevel [][]*TreeEntry, 
 		}
 	}
 
-	if compress == false && last == false {
+	if !compress && !last {
 		return
 	}
 
@@ -522,7 +522,7 @@ func (self *PyramidChunker) buildTree(isAppend bool, chunkLevel [][]*TreeEntry, 
 	for lvl := int64(ent.level); lvl < endLvl; lvl++ {
 
 		lvlCount := int64(len(chunkLevel[lvl]))
-		if lvlCount == 1 && last == true {
+		if lvlCount == 1 && last {
 			copy(rootKey, chunkLevel[lvl][0].key)
 			return
 		}
@@ -540,7 +540,7 @@ func (self *PyramidChunker) buildTree(isAppend bool, chunkLevel [][]*TreeEntry, 
 				nextLvlCount = int64(len(chunkLevel[lvl+1]) - 1)
 				tempEntry = chunkLevel[lvl+1][nextLvlCount]
 			}
-			if isAppend == true && tempEntry != nil && tempEntry.updatePending == true {
+			if isAppend && tempEntry != nil && tempEntry.updatePending {
 				updateEntry := &TreeEntry{
 					level:         int(lvl + 1),
 					branchCount:   0,
@@ -585,9 +585,9 @@ func (self *PyramidChunker) buildTree(isAppend bool, chunkLevel [][]*TreeEntry, 
 
 		}
 
-		if isAppend == false {
+		if !isAppend {
 			chunkWG.Wait()
-			if compress == true {
+			if compress {
 				chunkLevel[lvl] = nil
 			}
 		}
@@ -599,7 +599,7 @@ func (self *PyramidChunker) enqueueTreeChunk(chunkLevel [][]*TreeEntry, ent *Tre
 	if ent != nil {
 
 		// wait for data chunks to get over before processing the tree chunk
-		if last == true {
+		if last {
 			chunkWG.Wait()
 		}
 
@@ -612,7 +612,7 @@ func (self *PyramidChunker) enqueueTreeChunk(chunkLevel [][]*TreeEntry, ent *Tre
 		}
 
 		// Update or append based on weather it is a new entry or being reused
-		if ent.updatePending == true {
+		if ent.updatePending {
 			chunkWG.Wait()
 			chunkLevel[ent.level][ent.index] = ent
 		} else {

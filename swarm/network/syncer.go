@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package network
 
@@ -22,8 +22,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/swarm/storage"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/swarm/storage"
 )
 
 // syncer parameters (global, not peer specific) default values
@@ -131,9 +131,8 @@ type SyncParams struct {
 }
 
 // constructor with default values
-func NewSyncParams(bzzdir string) *SyncParams {
+func NewDefaultSyncParams() *SyncParams {
 	return &SyncParams{
-		RequestDbPath:      filepath.Join(bzzdir, "requests"),
 		RequestDbBatchSize: requestDbBatchSize,
 		KeyBufferSize:      keyBufferSize,
 		SyncBufferSize:     syncBufferSize,
@@ -142,6 +141,12 @@ func NewSyncParams(bzzdir string) *SyncParams {
 		SyncPriorities:     []uint{High, Medium, Medium, Low, Low},
 		SyncModes:          []bool{true, true, true, true, false},
 	}
+}
+
+//this can only finally be set after all config options (file, cmd line, env vars)
+//have been evaluated
+func (self *SyncParams) Init(path string) {
+	self.RequestDbPath = filepath.Join(path, "requests")
 }
 
 // syncer is the agent that manages content distribution/storage replication/chunk storeRequest forwarding

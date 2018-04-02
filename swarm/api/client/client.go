@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package client
 
@@ -33,7 +33,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethersocial/go-esc/swarm/api"
+	"github.com/ethersocial/go-esn/swarm/api"
 )
 
 var (
@@ -57,7 +57,7 @@ func (c *Client) UploadRaw(r io.Reader, size int64) (string, error) {
 	if size <= 0 {
 		return "", errors.New("data size must be greater than zero")
 	}
-	req, err := http.NewRequest("POST", c.Gateway+"/bzzr:/", r)
+	req, err := http.NewRequest("POST", c.Gateway+"/bzz-raw:/", r)
 	if err != nil {
 		return "", err
 	}
@@ -79,7 +79,7 @@ func (c *Client) UploadRaw(r io.Reader, size int64) (string, error) {
 
 // DownloadRaw downloads raw data from swarm
 func (c *Client) DownloadRaw(hash string) (io.ReadCloser, error) {
-	uri := c.Gateway + "/bzzr:/" + hash
+	uri := c.Gateway + "/bzz-raw:/" + hash
 	res, err := http.DefaultClient.Get(uri)
 	if err != nil {
 		return nil, err
@@ -269,7 +269,7 @@ func (c *Client) DownloadManifest(hash string) (*api.Manifest, error) {
 //
 // where entries ending with "/" are common prefixes.
 func (c *Client) List(hash, prefix string) (*api.ManifestList, error) {
-	res, err := http.DefaultClient.Get(c.Gateway + "/bzz:/" + hash + "/" + prefix + "?list=true")
+	res, err := http.DefaultClient.Get(c.Gateway + "/bzz-list:/" + hash + "/" + prefix)
 	if err != nil {
 		return nil, err
 	}

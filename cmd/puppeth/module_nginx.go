@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of go-esc.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-esc is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-esc is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-esc. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -22,8 +22,9 @@ import (
 	"html/template"
 	"math/rand"
 	"path/filepath"
+	"strconv"
 
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/log"
 )
 
 // nginxDockerfile is theis the Dockerfile required to build an nginx reverse-
@@ -54,7 +55,7 @@ services:
 // deployNginx deploys a new nginx reverse-proxy container to expose one or more
 // HTTP services running on a single host. If an instance with the specified
 // network name already exists there, it will be overwritten!
-func deployNginx(client *sshClient, network string, port int) ([]byte, error) {
+func deployNginx(client *sshClient, network string, port int, nocache bool) ([]byte, error) {
 	log.Info("Deploying nginx reverse-proxy", "server", client.server, "port", port)
 
 	// Generate the content to upload to the server
@@ -78,8 +79,11 @@ func deployNginx(client *sshClient, network string, port int) ([]byte, error) {
 	}
 	defer client.Run("rm -rf " + workdir)
 
-	// Build and deploy the ethstats service
-	return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s up -d --build", workdir, network))
+	// Build and deploy the reverse-proxy service
+	if nocache {
+		return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s build --pull --no-cache && docker-compose -p %s up -d --force-recreate", workdir, network, network))
+	}
+	return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s up -d --build --force-recreate", workdir, network))
 }
 
 // nginxInfos is returned from an nginx reverse-proxy status check to allow
@@ -88,9 +92,12 @@ type nginxInfos struct {
 	port int
 }
 
-// String implements the stringer interface.
-func (info *nginxInfos) String() string {
-	return fmt.Sprintf("port=%d", info.port)
+// Report converts the typed struct into a plain string->string map, containing
+// most - but not all - fields for reporting to the user.
+func (info *nginxInfos) Report() map[string]string {
+	return map[string]string{
+		"Shared listener port": strconv.Itoa(info.port),
+	}
 }
 
 // checkNginx does a health-check against an nginx reverse-proxy to verify whether

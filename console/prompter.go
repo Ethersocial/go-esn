@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package console
 
@@ -50,6 +50,9 @@ type UserPrompter interface {
 	// AppendHistory appends an entry to the scrollback history. It should be called
 	// if and only if the prompt to append was a valid command.
 	AppendHistory(command string)
+
+	// ClearHistory clears the entire history
+	ClearHistory()
 
 	// SetWordCompleter sets the completion function that the prompter will call to
 	// fetch completion candidates when the user presses tab.
@@ -152,10 +155,14 @@ func (p *terminalPrompter) SetHistory(history []string) {
 	p.State.ReadHistory(strings.NewReader(strings.Join(history, "\n")))
 }
 
-// AppendHistory appends an entry to the scrollback history. It should be called
-// if and only if the prompt to append was a valid command.
+// AppendHistory appends an entry to the scrollback history.
 func (p *terminalPrompter) AppendHistory(command string) {
 	p.State.AppendHistory(command)
+}
+
+// ClearHistory clears the entire history
+func (p *terminalPrompter) ClearHistory() {
+	p.State.ClearHistory()
 }
 
 // SetWordCompleter sets the completion function that the prompter will call to

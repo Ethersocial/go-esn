@@ -1,35 +1,35 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package api
 
 import (
 	"crypto/ecdsa"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/contracts/ens"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/swarm/network"
-	"github.com/ethersocial/go-esc/swarm/services/swap"
-	"github.com/ethersocial/go-esc/swarm/storage"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/contracts/ens"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/node"
+	"github.com/ethersocial/go-esn/swarm/network"
+	"github.com/ethersocial/go-esn/swarm/services/swap"
+	"github.com/ethersocial/go-esn/swarm/storage"
 )
 
 const (
@@ -46,101 +46,68 @@ type Config struct {
 	*network.HiveParams
 	Swap *swap.SwapParams
 	*network.SyncParams
-	Path       string
-	ListenAddr string
-	Port       string
-	PublicKey  string
-	BzzKey     string
-	EnsRoot    common.Address
-	NetworkId  uint64
+	Contract    common.Address
+	EnsRoot     common.Address
+	EnsApi      string
+	Path        string
+	ListenAddr  string
+	Port        string
+	PublicKey   string
+	BzzKey      string
+	NetworkId   uint64
+	SwapEnabled bool
+	SyncEnabled bool
+	SwapApi     string
+	Cors        string
+	BzzAccount  string
+	BootNodes   string
 }
 
-// config is agnostic to where private key is coming from
-// so managing accounts is outside swarm and left to wrappers
-func NewConfig(path string, contract common.Address, prvKey *ecdsa.PrivateKey, networkId uint64) (self *Config, err error) {
-	address := crypto.PubkeyToAddress(prvKey.PublicKey) // default beneficiary address
-	dirpath := filepath.Join(path, "bzz-"+common.Bytes2Hex(address.Bytes()))
-	err = os.MkdirAll(dirpath, os.ModePerm)
-	if err != nil {
-		return
-	}
-	confpath := filepath.Join(dirpath, "config.json")
-	var data []byte
-	pubkey := crypto.FromECDSAPub(&prvKey.PublicKey)
-	pubkeyhex := common.ToHex(pubkey)
-	keyhex := crypto.Keccak256Hash(pubkey).Hex()
+//create a default config with all parameters to set to defaults
+func NewDefaultConfig() (self *Config) {
 
 	self = &Config{
-		SyncParams:    network.NewSyncParams(dirpath),
-		HiveParams:    network.NewHiveParams(dirpath),
+		StoreParams:   storage.NewDefaultStoreParams(),
 		ChunkerParams: storage.NewChunkerParams(),
-		StoreParams:   storage.NewStoreParams(dirpath),
+		HiveParams:    network.NewDefaultHiveParams(),
+		SyncParams:    network.NewDefaultSyncParams(),
+		Swap:          swap.NewDefaultSwapParams(),
 		ListenAddr:    DefaultHTTPListenAddr,
 		Port:          DefaultHTTPPort,
-		Path:          dirpath,
-		Swap:          swap.DefaultSwapParams(contract, prvKey),
-		PublicKey:     pubkeyhex,
-		BzzKey:        keyhex,
+		Path:          node.DefaultDataDir(),
+		EnsApi:        node.DefaultIPCEndpoint("geth"),
 		EnsRoot:       ens.TestNetAddress,
-		NetworkId:     networkId,
-	}
-	data, err = ioutil.ReadFile(confpath)
-
-	// if not set in function param, then set default for swarm network, will be overwritten by config file if present
-	if networkId == 0 {
-		self.NetworkId = network.NetworkId
-	}
-
-	if err != nil {
-		if !os.IsNotExist(err) {
-			return
-		}
-
-		// file does not exist
-		// write out config file
-		err = self.Save()
-		if err != nil {
-			err = fmt.Errorf("error writing config: %v", err)
-		}
-		return
-	}
-
-	// file exists, deserialise
-	err = json.Unmarshal(data, self)
-	if err != nil {
-		return nil, fmt.Errorf("unable to parse config: %v", err)
-	}
-	// check public key
-	if pubkeyhex != self.PublicKey {
-		return nil, fmt.Errorf("public key does not match the one in the config file %v != %v", pubkeyhex, self.PublicKey)
-	}
-	if keyhex != self.BzzKey {
-		return nil, fmt.Errorf("bzz key does not match the one in the config file %v != %v", keyhex, self.BzzKey)
-	}
-
-	// if set in function param, replace id set from config file
-	if networkId != 0 {
-		self.NetworkId = networkId
-	}
-
-	self.Swap.SetKey(prvKey)
-
-	if (self.EnsRoot == common.Address{}) {
-		self.EnsRoot = ens.TestNetAddress
+		NetworkId:     network.NetworkId,
+		SwapEnabled:   false,
+		SyncEnabled:   true,
+		SwapApi:       "",
+		BootNodes:     "",
 	}
 
 	return
 }
 
-func (self *Config) Save() error {
-	data, err := json.MarshalIndent(self, "", "    ")
+//some config params need to be initialized after the complete
+//config building phase is completed (e.g. due to overriding flags)
+func (self *Config) Init(prvKey *ecdsa.PrivateKey) {
+
+	address := crypto.PubkeyToAddress(prvKey.PublicKey)
+	self.Path = filepath.Join(self.Path, "bzz-"+common.Bytes2Hex(address.Bytes()))
+	err := os.MkdirAll(self.Path, os.ModePerm)
 	if err != nil {
-		return err
+		log.Error(fmt.Sprintf("Error creating root swarm data directory: %v", err))
+		return
 	}
-	err = os.MkdirAll(self.Path, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	confpath := filepath.Join(self.Path, "config.json")
-	return ioutil.WriteFile(confpath, data, os.ModePerm)
+
+	pubkey := crypto.FromECDSAPub(&prvKey.PublicKey)
+	pubkeyhex := common.ToHex(pubkey)
+	keyhex := crypto.Keccak256Hash(pubkey).Hex()
+
+	self.PublicKey = pubkeyhex
+	self.BzzKey = keyhex
+
+	self.Swap.Init(self.Contract, prvKey)
+	self.SyncParams.Init(self.Path)
+	self.HiveParams.Init(self.Path)
+	self.StoreParams.Init(self.Path)
 }

@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of go-esc.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-esc is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-esc is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-esc. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -21,30 +21,19 @@ import (
 	"fmt"
 	"math/rand"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"text/template"
 
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/log"
 )
 
 // ethstatsDockerfile is the Dockerfile required to build an ethstats backend
 // and associated monitoring site.
 var ethstatsDockerfile = `
-FROM mhart/alpine-node:latest
-
-RUN \
-  apk add --update git                                         && \
-  git clone --depth=1 https://github.com/karalabe/eth-netstats && \
-	apk del git && rm -rf /var/cache/apk/*                       && \
-	\
-  cd /eth-netstats && npm install && npm install -g grunt-cli && grunt
-
-WORKDIR /eth-netstats
-EXPOSE 3000
+FROM puppeth/ethstats:latest
 
 RUN echo 'module.exports = {trusted: [{{.Trusted}}], banned: [{{.Banned}}], reserved: ["yournode"]};' > lib/utils/config.js
-
-CMD ["npm", "start"]
 `
 
 // ethstatsComposefile is the docker-compose.yml file required to deploy and
@@ -72,7 +61,7 @@ services:
 // deployEthstats deploys a new ethstats container to a remote machine via SSH,
 // docker and docker-compose. If an instance with the specified network name
 // already exists there, it will be overwritten!
-func deployEthstats(client *sshClient, network string, port int, secret string, vhost string, trusted []string, banned []string) ([]byte, error) {
+func deployEthstats(client *sshClient, network string, port int, secret string, vhost string, trusted []string, banned []string, nocache bool) ([]byte, error) {
 	// Generate the content to upload to the server
 	workdir := fmt.Sprintf("%d", rand.Int63())
 	files := make(map[string][]byte)
@@ -110,7 +99,10 @@ func deployEthstats(client *sshClient, network string, port int, secret string, 
 	defer client.Run("rm -rf " + workdir)
 
 	// Build and deploy the ethstats service
-	return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s up -d --build", workdir, network))
+	if nocache {
+		return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s build --pull --no-cache && docker-compose -p %s up -d --force-recreate", workdir, network, network))
+	}
+	return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s up -d --build --force-recreate", workdir, network))
 }
 
 // ethstatsInfos is returned from an ethstats status check to allow reporting
@@ -123,9 +115,15 @@ type ethstatsInfos struct {
 	banned []string
 }
 
-// String implements the stringer interface.
-func (info *ethstatsInfos) String() string {
-	return fmt.Sprintf("host=%s, port=%d, secret=%s, banned=%v", info.host, info.port, info.secret, info.banned)
+// Report converts the typed struct into a plain string->string map, containing
+// most - but not all - fields for reporting to the user.
+func (info *ethstatsInfos) Report() map[string]string {
+	return map[string]string{
+		"Website address":       info.host,
+		"Website listener port": strconv.Itoa(info.port),
+		"Login secret":          info.secret,
+		"Banned addresses":      fmt.Sprintf("%v", info.banned),
+	}
 }
 
 // checkEthstats does a health-check against an ethstats server to verify whether
