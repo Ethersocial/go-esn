@@ -28,7 +28,6 @@ import (
 	"github.com/ethersocial/go-esn/accounts"
 	"github.com/ethersocial/go-esn/accounts/keystore"
 	"github.com/ethersocial/go-esn/cmd/utils"
-	"github.com/ethersocial/go-esn/common"
 	"github.com/ethersocial/go-esn/console"
 	"github.com/ethersocial/go-esn/eth"
 	"github.com/ethersocial/go-esn/ethclient"
@@ -46,8 +45,6 @@ const (
 var (
 	// Git SHA1 commit hash of the release (set via linker flags)
 	gitCommit = ""
-	// Ethereum address of the Gesn release oracle.
-	relOracle = common.HexToAddress("0xfa7b9770ca4cb04296cac84f37736d4041251cdf")
 	// The app that holds all commands and flags.
 	app = utils.NewApp(gitCommit, "the go-ethereum command line interface")
 	// flags that configure the node
