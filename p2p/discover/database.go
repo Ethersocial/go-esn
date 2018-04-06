@@ -1,18 +1,18 @@
-// Copyright 2015 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 // Contains the node database, storing previously seen nodes and any collected
 // metadata about them for QoS purposes.
@@ -27,9 +27,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/rlp"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/errors"
 	"github.com/syndtr/goleveldb/leveldb/iterator"
@@ -226,14 +226,14 @@ func (db *nodeDB) ensureExpirer() {
 // expirer should be started in a go routine, and is responsible for looping ad
 // infinitum and dropping stale data from the database.
 func (db *nodeDB) expirer() {
-	tick := time.Tick(nodeDBCleanupCycle)
+	tick := time.NewTicker(nodeDBCleanupCycle)
+	defer tick.Stop()
 	for {
 		select {
-		case <-tick:
+		case <-tick.C:
 			if err := db.expireNodes(); err != nil {
 				log.Error("Failed to expire nodedb items", "err", err)
 			}
-
 		case <-db.quit:
 			return
 		}
@@ -257,7 +257,7 @@ func (db *nodeDB) expireNodes() error {
 		}
 		// Skip the node if not expired yet (and not self)
 		if !bytes.Equal(id[:], db.self[:]) {
-			if seen := db.lastPong(id); seen.After(threshold) {
+			if seen := db.bondTime(id); seen.After(threshold) {
 				continue
 			}
 		}
@@ -278,13 +278,18 @@ func (db *nodeDB) updateLastPing(id NodeID, instance time.Time) error {
 	return db.storeInt64(makeKey(id, nodeDBDiscoverPing), instance.Unix())
 }
 
-// lastPong retrieves the time of the last successful contact from remote node.
-func (db *nodeDB) lastPong(id NodeID) time.Time {
+// bondTime retrieves the time of the last successful pong from remote node.
+func (db *nodeDB) bondTime(id NodeID) time.Time {
 	return time.Unix(db.fetchInt64(makeKey(id, nodeDBDiscoverPong)), 0)
 }
 
-// updateLastPong updates the last time a remote node successfully contacted.
-func (db *nodeDB) updateLastPong(id NodeID, instance time.Time) error {
+// hasBond reports whether the given node is considered bonded.
+func (db *nodeDB) hasBond(id NodeID) bool {
+	return time.Since(db.bondTime(id)) < nodeDBNodeExpiration
+}
+
+// updateBondTime updates the last pong time of a node.
+func (db *nodeDB) updateBondTime(id NodeID, instance time.Time) error {
 	return db.storeInt64(makeKey(id, nodeDBDiscoverPong), instance.Unix())
 }
 
@@ -327,7 +332,7 @@ seek:
 		if n.ID == db.self {
 			continue seek
 		}
-		if now.Sub(db.lastPong(n.ID)) > maxAge {
+		if now.Sub(db.bondTime(n.ID)) > maxAge {
 			continue seek
 		}
 		for i := range nodes {

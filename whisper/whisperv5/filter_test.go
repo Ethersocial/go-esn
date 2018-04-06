@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package whisperv5
 
@@ -22,8 +22,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/crypto"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/crypto"
 )
 
 var seed int64
@@ -88,7 +88,7 @@ func generateTestCases(t *testing.T, SizeTestFilters int) []FilterTestCase {
 	for i := 0; i < SizeTestFilters; i++ {
 		f, _ := generateFilter(t, true)
 		cases[i].f = f
-		cases[i].alive = (mrand.Int()&int(1) == 0)
+		cases[i].alive = mrand.Int()&int(1) == 0
 	}
 	return cases
 }
@@ -122,7 +122,7 @@ func TestInstallFilters(t *testing.T) {
 
 	for i, testCase := range tst {
 		fil := filters.Get(testCase.id)
-		exist := (fil != nil)
+		exist := fil != nil
 		if exist != testCase.alive {
 			t.Fatalf("seed %d: failed alive: %d, %v, %v", seed, i, exist, testCase.alive)
 		}
@@ -776,6 +776,7 @@ func TestWatchers(t *testing.T) {
 func TestVariableTopics(t *testing.T) {
 	InitSingleTest()
 
+	const lastTopicByte = 3
 	var match bool
 	params, err := generateMessageParams()
 	if err != nil {
@@ -796,19 +797,52 @@ func TestVariableTopics(t *testing.T) {
 	}
 
 	for i := 0; i < 4; i++ {
-		arr := make([]byte, i+1, 4)
-		copy(arr, env.Topic[:i+1])
-
-		f.Topics[4] = arr
+		env.Topic = BytesToTopic(f.Topics[i])
 		match = f.MatchEnvelope(env)
 		if !match {
 			t.Fatalf("failed MatchEnvelope symmetric with seed %d, step %d.", seed, i)
 		}
 
-		f.Topics[4][i]++
+		f.Topics[i][lastTopicByte]++
 		match = f.MatchEnvelope(env)
 		if match {
 			t.Fatalf("MatchEnvelope symmetric with seed %d, step %d: false positive.", seed, i)
 		}
+	}
+}
+
+func TestMatchSingleTopic_ReturnTrue(t *testing.T) {
+	bt := []byte("test")
+	topic := BytesToTopic(bt)
+
+	if !matchSingleTopic(topic, bt) {
+		t.FailNow()
+	}
+}
+
+func TestMatchSingleTopic_WithTail_ReturnTrue(t *testing.T) {
+	bt := []byte("test with tail")
+	topic := BytesToTopic([]byte("test"))
+
+	if !matchSingleTopic(topic, bt) {
+		t.FailNow()
+	}
+}
+
+func TestMatchSingleTopic_NotEquals_ReturnFalse(t *testing.T) {
+	bt := []byte("tes")
+	topic := BytesToTopic(bt)
+
+	if matchSingleTopic(topic, bt) {
+		t.FailNow()
+	}
+}
+
+func TestMatchSingleTopic_InsufficientLength_ReturnFalse(t *testing.T) {
+	bt := []byte("test")
+	topic := BytesToTopic([]byte("not_equal"))
+
+	if matchSingleTopic(topic, bt) {
+		t.FailNow()
 	}
 }

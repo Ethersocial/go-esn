@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package storage
 
@@ -21,7 +21,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/log"
 )
 
 /*
@@ -57,13 +57,19 @@ type StoreParams struct {
 	Radius        int
 }
 
-func NewStoreParams(path string) (self *StoreParams) {
+//create params with default values
+func NewDefaultStoreParams() (self *StoreParams) {
 	return &StoreParams{
-		ChunkDbPath:   filepath.Join(path, "chunks"),
 		DbCapacity:    defaultDbCapacity,
 		CacheCapacity: defaultCacheCapacity,
 		Radius:        defaultRadius,
 	}
+}
+
+//this can only finally be set after all config options (file, cmd line, env vars)
+//have been evaluated
+func (self *StoreParams) Init(path string) {
+	self.ChunkDbPath = filepath.Join(path, "chunks")
 }
 
 // netstore contructor, takes path argument that is used to initialise dbStore,

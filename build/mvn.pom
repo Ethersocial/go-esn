@@ -9,9 +9,9 @@
   <version>{{.Version}}</version>
   <packaging>aar</packaging>
 
-  <name>Android ESC Client</name>
-  <description>Android port of the go-esc libraries and node</description>
-  <url>https://github.com/ethersocial/go-esc</url>
+  <name>Android Ethereum Client</name>
+  <description>Android port of the go-ethereum libraries and node</description>
+  <url>https://github.com/ethersocial/go-esn</url>
   <inceptionYear>2015</inceptionYear>
 
   <licenses>
@@ -23,7 +23,7 @@
   </licenses>
 
   <organization>
-    <name>ESC</name>
+    <name>Ethereum</name>
     <url>https://ethereum.org</url>
   </organization>
 
@@ -48,10 +48,10 @@
 
   <issueManagement>
     <system>GitHub Issues</system>
-    <url>https://github.com/ethersocial/go-esc/issues/</url>
+    <url>https://github.com/ethersocial/go-esn/issues/</url>
   </issueManagement>
 
   <scm>
-    <url>https://github.com/ethersocial/go-esc</url>
+    <url>https://github.com/ethersocial/go-esn</url>
   </scm>
 </project>

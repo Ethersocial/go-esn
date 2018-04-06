@@ -1,18 +1,18 @@
-// Copyright 2015 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package console
 
@@ -26,11 +26,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/eth"
-	"github.com/ethersocial/go-esc/internal/jsre"
-	"github.com/ethersocial/go-esc/node"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/consensus/ethash"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/eth"
+	"github.com/ethersocial/go-esn/internal/jsre"
+	"github.com/ethersocial/go-esn/node"
 )
 
 const (
@@ -67,6 +68,7 @@ func (p *hookedPrompter) PromptConfirm(prompt string) (bool, error) {
 }
 func (p *hookedPrompter) SetHistory(history []string)              {}
 func (p *hookedPrompter) AppendHistory(command string)             {}
+func (p *hookedPrompter) ClearHistory()                            {}
 func (p *hookedPrompter) SetWordCompleter(completer WordCompleter) {}
 
 // tester is a console test environment for the console tests to operate on.
@@ -88,7 +90,7 @@ func newTester(t *testing.T, confOverride func(*eth.Config)) *tester {
 		t.Fatalf("failed to create temporary keystore: %v", err)
 	}
 
-	// Create a networkless protocol stack and start an ESC service within
+	// Create a networkless protocol stack and start an Ethereum service within
 	stack, err := node.New(&node.Config{DataDir: workspace, UseLightweightKDF: true, Name: testInstance})
 	if err != nil {
 		t.Fatalf("failed to create node: %v", err)
@@ -96,13 +98,15 @@ func newTester(t *testing.T, confOverride func(*eth.Config)) *tester {
 	ethConf := &eth.Config{
 		Genesis:   core.DeveloperGenesisBlock(15, common.Address{}),
 		Etherbase: common.HexToAddress(testAddress),
-		PowTest:   true,
+		Ethash: ethash.Config{
+			PowMode: ethash.ModeTest,
+		},
 	}
 	if confOverride != nil {
 		confOverride(ethConf)
 	}
 	if err = stack.Register(func(ctx *node.ServiceContext) (node.Service, error) { return eth.New(ctx, ethConf) }); err != nil {
-		t.Fatalf("failed to register ESC protocol: %v", err)
+		t.Fatalf("failed to register Ethereum protocol: %v", err)
 	}
 	// Start the node and assemble the JavaScript console around it
 	if err = stack.Start(); err != nil {
@@ -160,7 +164,7 @@ func TestWelcome(t *testing.T) {
 
 	tester.console.Welcome()
 
-	output := string(tester.output.Bytes())
+	output := tester.output.String()
 	if want := "Welcome"; !strings.Contains(output, want) {
 		t.Fatalf("console output missing welcome message: have\n%s\nwant also %s", output, want)
 	}
@@ -184,7 +188,7 @@ func TestEvaluate(t *testing.T) {
 	defer tester.Close(t)
 
 	tester.console.Evaluate("2 + 2")
-	if output := string(tester.output.Bytes()); !strings.Contains(output, "4") {
+	if output := tester.output.String(); !strings.Contains(output, "4") {
 		t.Fatalf("statement evaluation failed: have %s, want %s", output, "4")
 	}
 }
@@ -214,7 +218,7 @@ func TestInteractive(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatalf("secondary prompt timeout")
 	}
-	if output := string(tester.output.Bytes()); !strings.Contains(output, "4") {
+	if output := tester.output.String(); !strings.Contains(output, "4") {
 		t.Fatalf("statement evaluation failed: have %s, want %s", output, "4")
 	}
 }
@@ -226,7 +230,7 @@ func TestPreload(t *testing.T) {
 	defer tester.Close(t)
 
 	tester.console.Evaluate("preloaded")
-	if output := string(tester.output.Bytes()); !strings.Contains(output, "some-preloaded-string") {
+	if output := tester.output.String(); !strings.Contains(output, "some-preloaded-string") {
 		t.Fatalf("preloaded variable missing: have %s, want %s", output, "some-preloaded-string")
 	}
 }
@@ -239,7 +243,7 @@ func TestExecute(t *testing.T) {
 	tester.console.Execute("exec.js")
 
 	tester.console.Evaluate("execed")
-	if output := string(tester.output.Bytes()); !strings.Contains(output, "some-executed-string") {
+	if output := tester.output.String(); !strings.Contains(output, "some-executed-string") {
 		t.Fatalf("execed variable missing: have %s, want %s", output, "some-executed-string")
 	}
 }
@@ -271,7 +275,7 @@ func TestPrettyPrint(t *testing.T) {
   string: ` + two + `
 }
 `
-	if output := string(tester.output.Bytes()); output != want {
+	if output := tester.output.String(); output != want {
 		t.Fatalf("pretty print mismatch: have %s, want %s", output, want)
 	}
 }
@@ -283,7 +287,7 @@ func TestPrettyError(t *testing.T) {
 	tester.console.Evaluate("throw 'hello'")
 
 	want := jsre.ErrorColor("hello") + "\n"
-	if output := string(tester.output.Bytes()); output != want {
+	if output := tester.output.String(); output != want {
 		t.Fatalf("pretty error mismatch: have %s, want %s", output, want)
 	}
 }

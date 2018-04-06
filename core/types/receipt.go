@@ -1,18 +1,18 @@
-// Copyright 2014 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2014 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package types
 
@@ -20,11 +20,11 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"math/big"
+	"unsafe"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/hexutil"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/hexutil"
+	"github.com/ethersocial/go-esn/rlp"
 )
 
 //go:generate gencodec -type Receipt -field-override receiptMarshaling -out gen_receipt_json.go
@@ -45,46 +45,46 @@ const (
 // Receipt represents the results of a transaction.
 type Receipt struct {
 	// Consensus fields
-	PostState         []byte   `json:"root"`
-	Status            uint     `json:"status"`
-	CumulativeGasUsed *big.Int `json:"cumulativeGasUsed" gencodec:"required"`
-	Bloom             Bloom    `json:"logsBloom"         gencodec:"required"`
-	Logs              []*Log   `json:"logs"              gencodec:"required"`
+	PostState         []byte `json:"root"`
+	Status            uint   `json:"status"`
+	CumulativeGasUsed uint64 `json:"cumulativeGasUsed" gencodec:"required"`
+	Bloom             Bloom  `json:"logsBloom"         gencodec:"required"`
+	Logs              []*Log `json:"logs"              gencodec:"required"`
 
 	// Implementation fields (don't reorder!)
 	TxHash          common.Hash    `json:"transactionHash" gencodec:"required"`
 	ContractAddress common.Address `json:"contractAddress"`
-	GasUsed         *big.Int       `json:"gasUsed" gencodec:"required"`
+	GasUsed         uint64         `json:"gasUsed" gencodec:"required"`
 }
 
 type receiptMarshaling struct {
 	PostState         hexutil.Bytes
 	Status            hexutil.Uint
-	CumulativeGasUsed *hexutil.Big
-	GasUsed           *hexutil.Big
+	CumulativeGasUsed hexutil.Uint64
+	GasUsed           hexutil.Uint64
 }
 
 // receiptRLP is the consensus encoding of a receipt.
 type receiptRLP struct {
 	PostStateOrStatus []byte
-	CumulativeGasUsed *big.Int
+	CumulativeGasUsed uint64
 	Bloom             Bloom
 	Logs              []*Log
 }
 
 type receiptStorageRLP struct {
 	PostStateOrStatus []byte
-	CumulativeGasUsed *big.Int
+	CumulativeGasUsed uint64
 	Bloom             Bloom
 	TxHash            common.Hash
 	ContractAddress   common.Address
 	Logs              []*LogForStorage
-	GasUsed           *big.Int
+	GasUsed           uint64
 }
 
 // NewReceipt creates a barebone transaction receipt, copying the init fields.
-func NewReceipt(root []byte, failed bool, cumulativeGasUsed *big.Int) *Receipt {
-	r := &Receipt{PostState: common.CopyBytes(root), CumulativeGasUsed: new(big.Int).Set(cumulativeGasUsed)}
+func NewReceipt(root []byte, failed bool, cumulativeGasUsed uint64) *Receipt {
+	r := &Receipt{PostState: common.CopyBytes(root), CumulativeGasUsed: cumulativeGasUsed}
 	if failed {
 		r.Status = ReceiptStatusFailed
 	} else {
@@ -135,6 +135,18 @@ func (r *Receipt) statusEncoding() []byte {
 		return receiptStatusSuccessfulRLP
 	}
 	return r.PostState
+}
+
+// Size returns the approximate memory used by all internal contents. It is used
+// to approximate and limit the memory consumption of various caches.
+func (r *Receipt) Size() common.StorageSize {
+	size := common.StorageSize(unsafe.Sizeof(*r)) + common.StorageSize(len(r.PostState))
+
+	size += common.StorageSize(len(r.Logs)) * common.StorageSize(unsafe.Sizeof(Log{}))
+	for _, log := range r.Logs {
+		size += common.StorageSize(len(log.Topics)*common.HashLength + len(log.Data))
+	}
+	return size
 }
 
 // String implements the Stringer interface.

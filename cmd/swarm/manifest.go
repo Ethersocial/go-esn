@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of go-esc.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-esc is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-esc is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-esc. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 // Command  MANIFEST update
 package main
@@ -24,11 +24,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ethersocial/go-esc/cmd/utils"
-	"github.com/ethersocial/go-esc/swarm/api"
-	swarm "github.com/ethersocial/go-esc/swarm/api/client"
+	"github.com/ethersocial/go-esn/cmd/utils"
+	"github.com/ethersocial/go-esn/swarm/api"
+	swarm "github.com/ethersocial/go-esn/swarm/api/client"
 	"gopkg.in/urfave/cli.v1"
 )
+
+const bzzManifestJSON = "application/bzz-manifest+json"
 
 func add(ctx *cli.Context) {
 	args := ctx.Args()
@@ -145,7 +147,7 @@ func addEntryToManifest(ctx *cli.Context, mhash, path, hash, ctype string) strin
 		if path == entry.Path {
 			utils.Fatalf("Path %s already present, not adding anything", path)
 		} else {
-			if entry.ContentType == "application/bzz-manifest+json" {
+			if entry.ContentType == bzzManifestJSON {
 				prfxlen := strings.HasPrefix(path, entry.Path)
 				if prfxlen && len(path) > len(longestPathEntry.Path) {
 					longestPathEntry = entry
@@ -207,7 +209,7 @@ func updateEntryInManifest(ctx *cli.Context, mhash, path, hash, ctype string) st
 		if path == entry.Path {
 			newEntry = entry
 		} else {
-			if entry.ContentType == "application/bzz-manifest+json" {
+			if entry.ContentType == bzzManifestJSON {
 				prfxlen := strings.HasPrefix(path, entry.Path)
 				if prfxlen && len(path) > len(longestPathEntry.Path) {
 					longestPathEntry = entry
@@ -281,7 +283,7 @@ func removeEntryFromManifest(ctx *cli.Context, mhash, path string) string {
 		if path == entry.Path {
 			entryToRemove = entry
 		} else {
-			if entry.ContentType == "application/bzz-manifest+json" {
+			if entry.ContentType == bzzManifestJSON {
 				prfxlen := strings.HasPrefix(path, entry.Path)
 				if prfxlen && len(path) > len(longestPathEntry.Path) {
 					longestPathEntry = entry

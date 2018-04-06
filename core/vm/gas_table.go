@@ -1,27 +1,25 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package vm
 
 import (
-	"math/big"
-
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/math"
-	"github.com/ethersocial/go-esc/params"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/math"
+	"github.com/ethersocial/go-esn/params"
 )
 
 // memoryGasCosts calculates the quadratic gas for memory expansion. It does so
@@ -130,7 +128,7 @@ func gasSStore(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack, m
 		// 0 => non 0
 		return params.SstoreSetGas, nil
 	} else if !common.EmptyHash(val) && common.EmptyHash(common.BigToHash(y)) {
-		evm.StateDB.AddRefund(new(big.Int).SetUint64(params.SstoreRefundGas))
+		evm.StateDB.AddRefund(params.SstoreRefundGas)
 
 		return params.SstoreClearGas, nil
 	} else {
@@ -342,19 +340,11 @@ func gasCall(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack, mem
 		return 0, errGasUintOverflow
 	}
 
-	cg, err := callGas(gt, contract.Gas, gas, stack.Back(0))
+	evm.callGasTemp, err = callGas(gt, contract.Gas, gas, stack.Back(0))
 	if err != nil {
 		return 0, err
 	}
-	// Replace the stack item with the new gas calculation. This means that
-	// either the original item is left on the stack or the item is replaced by:
-	// (availableGas - gas) * 63 / 64
-	// We replace the stack item so that it's available when the opCall instruction is
-	// called. This information is otherwise lost due to the dependency on *current*
-	// available gas.
-	stack.data[stack.len()-1] = new(big.Int).SetUint64(cg)
-
-	if gas, overflow = math.SafeAdd(gas, cg); overflow {
+	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
 		return 0, errGasUintOverflow
 	}
 	return gas, nil
@@ -374,19 +364,11 @@ func gasCallCode(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack,
 		return 0, errGasUintOverflow
 	}
 
-	cg, err := callGas(gt, contract.Gas, gas, stack.Back(0))
+	evm.callGasTemp, err = callGas(gt, contract.Gas, gas, stack.Back(0))
 	if err != nil {
 		return 0, err
 	}
-	// Replace the stack item with the new gas calculation. This means that
-	// either the original item is left on the stack or the item is replaced by:
-	// (availableGas - gas) * 63 / 64
-	// We replace the stack item so that it's available when the opCall instruction is
-	// called. This information is otherwise lost due to the dependency on *current*
-	// available gas.
-	stack.data[stack.len()-1] = new(big.Int).SetUint64(cg)
-
-	if gas, overflow = math.SafeAdd(gas, cg); overflow {
+	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
 		return 0, errGasUintOverflow
 	}
 	return gas, nil
@@ -421,7 +403,7 @@ func gasSuicide(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack, 
 	}
 
 	if !evm.StateDB.HasSuicided(contract.Address()) {
-		evm.StateDB.AddRefund(new(big.Int).SetUint64(params.SuicideRefundGas))
+		evm.StateDB.AddRefund(params.SuicideRefundGas)
 	}
 	return gas, nil
 }
@@ -436,18 +418,11 @@ func gasDelegateCall(gt params.GasTable, evm *EVM, contract *Contract, stack *St
 		return 0, errGasUintOverflow
 	}
 
-	cg, err := callGas(gt, contract.Gas, gas, stack.Back(0))
+	evm.callGasTemp, err = callGas(gt, contract.Gas, gas, stack.Back(0))
 	if err != nil {
 		return 0, err
 	}
-	// Replace the stack item with the new gas calculation. This means that
-	// either the original item is left on the stack or the item is replaced by:
-	// (availableGas - gas) * 63 / 64
-	// We replace the stack item so that it's available when the opCall instruction is
-	// called.
-	stack.data[stack.len()-1] = new(big.Int).SetUint64(cg)
-
-	if gas, overflow = math.SafeAdd(gas, cg); overflow {
+	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
 		return 0, errGasUintOverflow
 	}
 	return gas, nil
@@ -463,18 +438,11 @@ func gasStaticCall(gt params.GasTable, evm *EVM, contract *Contract, stack *Stac
 		return 0, errGasUintOverflow
 	}
 
-	cg, err := callGas(gt, contract.Gas, gas, stack.Back(0))
+	evm.callGasTemp, err = callGas(gt, contract.Gas, gas, stack.Back(0))
 	if err != nil {
 		return 0, err
 	}
-	// Replace the stack item with the new gas calculation. This means that
-	// either the original item is left on the stack or the item is replaced by:
-	// (availableGas - gas) * 63 / 64
-	// We replace the stack item so that it's available when the opCall instruction is
-	// called.
-	stack.data[stack.len()-1] = new(big.Int).SetUint64(cg)
-
-	if gas, overflow = math.SafeAdd(gas, cg); overflow {
+	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
 		return 0, errGasUintOverflow
 	}
 	return gas, nil

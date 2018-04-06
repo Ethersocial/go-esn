@@ -1,27 +1,27 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of go-esc.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-esc is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-esc is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-esc. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 // faucet is a Ether faucet backed by a light client.
 package main
 
 //go:generate go-bindata -nometadata -o website.go faucet.html
+//go:generate gofmt -w -s website.go
 
 import (
 	"bytes"
-	"compress/zlib"
 	"context"
 	"encoding/json"
 	"errors"
@@ -41,23 +41,23 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/accounts"
-	"github.com/ethersocial/go-esc/accounts/keystore"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/eth"
-	"github.com/ethersocial/go-esc/eth/downloader"
-	"github.com/ethersocial/go-esc/ethclient"
-	"github.com/ethersocial/go-esc/ethstats"
-	"github.com/ethersocial/go-esc/les"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/node"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/p2p/discover"
-	"github.com/ethersocial/go-esc/p2p/discv5"
-	"github.com/ethersocial/go-esc/p2p/nat"
-	"github.com/ethersocial/go-esc/params"
+	"github.com/ethersocial/go-esn/accounts"
+	"github.com/ethersocial/go-esn/accounts/keystore"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/eth"
+	"github.com/ethersocial/go-esn/eth/downloader"
+	"github.com/ethersocial/go-esn/ethclient"
+	"github.com/ethersocial/go-esn/ethstats"
+	"github.com/ethersocial/go-esn/les"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/node"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/discv5"
+	"github.com/ethersocial/go-esn/p2p/nat"
+	"github.com/ethersocial/go-esn/params"
 	"golang.org/x/net/websocket"
 )
 
@@ -66,7 +66,7 @@ var (
 	apiPortFlag = flag.Int("apiport", 8080, "Listener port for the HTTP API connection")
 	ethPortFlag = flag.Int("ethport", 50505, "Listener port for the devp2p connection")
 	bootFlag    = flag.String("bootnodes", "", "Comma separated bootnode enode URLs to seed with")
-	netFlag     = flag.Uint64("network", 0, "Network ID to use for the ESC protocol")
+	netFlag     = flag.Uint64("network", 0, "Network ID to use for the Ethereum protocol")
 	statsFlag   = flag.String("ethstats", "", "Ethstats network monitoring auth string")
 
 	netnameFlag = flag.String("faucet.name", "", "Network name to assign to the faucet")
@@ -83,7 +83,8 @@ var (
 	captchaToken  = flag.String("captcha.token", "", "Recaptcha site key to authenticate client side")
 	captchaSecret = flag.String("captcha.secret", "", "Recaptcha secret key to authenticate server side")
 
-	logFlag = flag.Int("loglevel", 3, "Log level to use for ESC and the faucet")
+	noauthFlag = flag.Bool("noauth", false, "Enables funding requests without authentication")
+	logFlag    = flag.Int("loglevel", 3, "Log level to use for Ethereum and the faucet")
 )
 
 var (
@@ -132,6 +133,7 @@ func main() {
 		"Amounts":   amounts,
 		"Periods":   periods,
 		"Recaptcha": *captchaToken,
+		"NoAuth":    *noauthFlag,
 	})
 	if err != nil {
 		log.Crit("Failed to render the faucet template", "err", err)
@@ -185,16 +187,16 @@ func main() {
 // request represents an accepted funding request.
 type request struct {
 	Avatar  string             `json:"avatar"`  // Avatar URL to make the UI nicer
-	Account common.Address     `json:"account"` // ESC address being funded
+	Account common.Address     `json:"account"` // Ethereum address being funded
 	Time    time.Time          `json:"time"`    // Timestamp when the request was accepted
 	Tx      *types.Transaction `json:"tx"`      // Transaction funding the account
 }
 
-// faucet represents a crypto faucet backed by an ESC light client.
+// faucet represents a crypto faucet backed by an Ethereum light client.
 type faucet struct {
 	config *params.ChainConfig // Chain configurations for signing
-	stack  *node.Node          // ESC protocol stack
-	client *ethclient.Client   // Client connection to the ESC chain
+	stack  *node.Node          // Ethereum protocol stack
+	client *ethclient.Client   // Client connection to the Ethereum chain
 	index  []byte              // Index page to serve up on the web
 
 	keystore *keystore.KeyStore // Keystore containing the single signer
@@ -221,15 +223,14 @@ func newFaucet(genesis *core.Genesis, port int, enodes []*discv5.Node, network u
 			NoDiscovery:      true,
 			DiscoveryV5:      true,
 			ListenAddr:       fmt.Sprintf(":%d", port),
-			DiscoveryV5Addr:  fmt.Sprintf(":%d", port+1),
-			MaxPeers:         50,
+			MaxPeers:         25,
 			BootstrapNodesV5: enodes,
 		},
 	})
 	if err != nil {
 		return nil, err
 	}
-	// Assemble the ESC light client protocol
+	// Assemble the Ethereum light client protocol
 	if err := stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
 		cfg := eth.DefaultConfig
 		cfg.SyncMode = downloader.LightSync
@@ -277,7 +278,7 @@ func newFaucet(genesis *core.Genesis, port int, enodes []*discv5.Node, network u
 	}, nil
 }
 
-// close terminates the ESC connection and tears down the faucet.
+// close terminates the Ethereum connection and tears down the faucet.
 func (f *faucet) close() error {
 	return f.stack.Stop()
 }
@@ -374,7 +375,7 @@ func (f *faucet) apiHandler(conn *websocket.Conn) {
 		if err = websocket.JSON.Receive(conn, &msg); err != nil {
 			return
 		}
-		if !strings.HasPrefix(msg.URL, "https://gist.github.com/") && !strings.HasPrefix(msg.URL, "https://twitter.com/") &&
+		if !*noauthFlag && !strings.HasPrefix(msg.URL, "https://gist.github.com/") && !strings.HasPrefix(msg.URL, "https://twitter.com/") &&
 			!strings.HasPrefix(msg.URL, "https://plus.google.com/") && !strings.HasPrefix(msg.URL, "https://www.facebook.com/") {
 			if err = sendError(conn, errors.New("URL doesn't link to supported services")); err != nil {
 				log.Warn("Failed to send URL error to client", "err", err)
@@ -427,7 +428,7 @@ func (f *faucet) apiHandler(conn *websocket.Conn) {
 				continue
 			}
 		}
-		// Retrieve the ESC address to fund, the requesting user and a profile picture
+		// Retrieve the Ethereum address to fund, the requesting user and a profile picture
 		var (
 			username string
 			avatar   string
@@ -435,15 +436,21 @@ func (f *faucet) apiHandler(conn *websocket.Conn) {
 		)
 		switch {
 		case strings.HasPrefix(msg.URL, "https://gist.github.com/"):
-			username, avatar, address, err = authGitHub(msg.URL)
+			if err = sendError(conn, errors.New("GitHub authentication discontinued at the official request of GitHub")); err != nil {
+				log.Warn("Failed to send GitHub deprecation to client", "err", err)
+				return
+			}
+			continue
 		case strings.HasPrefix(msg.URL, "https://twitter.com/"):
 			username, avatar, address, err = authTwitter(msg.URL)
 		case strings.HasPrefix(msg.URL, "https://plus.google.com/"):
 			username, avatar, address, err = authGooglePlus(msg.URL)
 		case strings.HasPrefix(msg.URL, "https://www.facebook.com/"):
 			username, avatar, address, err = authFacebook(msg.URL)
+		case *noauthFlag:
+			username, avatar, address, err = authNoAuth(msg.URL)
 		default:
-			err = errors.New("Something funky happened, please open an issue at https://github.com/ethersocial/go-esc/issues")
+			err = errors.New("Something funky happened, please open an issue at https://github.com/ethersocial/go-esn/issues")
 		}
 		if err != nil {
 			if err = sendError(conn, err); err != nil {
@@ -466,7 +473,7 @@ func (f *faucet) apiHandler(conn *websocket.Conn) {
 			amount = new(big.Int).Mul(amount, new(big.Int).Exp(big.NewInt(5), big.NewInt(int64(msg.Tier)), nil))
 			amount = new(big.Int).Div(amount, new(big.Int).Exp(big.NewInt(2), big.NewInt(int64(msg.Tier)), nil))
 
-			tx := types.NewTransaction(f.nonce+uint64(len(f.reqs)), address, amount, big.NewInt(21000), f.price, nil)
+			tx := types.NewTransaction(f.nonce+uint64(len(f.reqs)), address, amount, 21000, f.price, nil)
 			signed, err := f.keystore.SignTx(f.account, tx, f.config.ChainId)
 			if err != nil {
 				f.lock.Unlock()
@@ -498,7 +505,7 @@ func (f *faucet) apiHandler(conn *websocket.Conn) {
 
 		// Send an error if too frequent funding, othewise a success
 		if !fund {
-			if err = sendError(conn, fmt.Errorf("%s left until next allowance", common.PrettyDuration(timeout.Sub(time.Now())))); err != nil {
+			if err = sendError(conn, fmt.Errorf("%s left until next allowance", common.PrettyDuration(timeout.Sub(time.Now())))); err != nil { // nolint: gosimple
 				log.Warn("Failed to send funding error to client", "err", err)
 				return
 			}
@@ -619,7 +626,7 @@ func sendSuccess(conn *websocket.Conn, msg string) error {
 }
 
 // authGitHub tries to authenticate a faucet request using GitHub gists, returning
-// the username, avatar URL and ESC address to fund on success.
+// the username, avatar URL and Ethereum address to fund on success.
 func authGitHub(url string) (string, string, common.Address, error) {
 	// Retrieve the gist from the GitHub Gist APIs
 	parts := strings.Split(url, "/")
@@ -647,7 +654,7 @@ func authGitHub(url string) (string, string, common.Address, error) {
 	if gist.Owner.Login == "" {
 		return "", "", common.Address{}, errors.New("Anonymous Gists not allowed")
 	}
-	// Iterate over all the files and look for ESC addresses
+	// Iterate over all the files and look for Ethereum addresses
 	var address common.Address
 	for _, file := range gist.Files {
 		content := strings.TrimSpace(file.Content)
@@ -656,7 +663,7 @@ func authGitHub(url string) (string, string, common.Address, error) {
 		}
 	}
 	if address == (common.Address{}) {
-		return "", "", common.Address{}, errors.New("No ESC address found to fund")
+		return "", "", common.Address{}, errors.New("No Ethereum address found to fund")
 	}
 	// Validate the user's existence since the API is unhelpful here
 	if res, err = http.Head("https://github.com/" + gist.Owner.Login); err != nil {
@@ -672,7 +679,7 @@ func authGitHub(url string) (string, string, common.Address, error) {
 }
 
 // authTwitter tries to authenticate a faucet request using Twitter posts, returning
-// the username, avatar URL and ESC address to fund on success.
+// the username, avatar URL and Ethereum address to fund on success.
 func authTwitter(url string) (string, string, common.Address, error) {
 	// Ensure the user specified a meaningful URL, no fancy nonsense
 	parts := strings.Split(url, "/")
@@ -683,24 +690,20 @@ func authTwitter(url string) (string, string, common.Address, error) {
 
 	// Twitter's API isn't really friendly with direct links. Still, we don't
 	// want to do ask read permissions from users, so just load the public posts and
-	// scrape it for the ESC address and profile URL.
+	// scrape it for the Ethereum address and profile URL.
 	res, err := http.Get(url)
 	if err != nil {
 		return "", "", common.Address{}, err
 	}
 	defer res.Body.Close()
 
-	reader, err := zlib.NewReader(res.Body)
-	if err != nil {
-		return "", "", common.Address{}, err
-	}
-	body, err := ioutil.ReadAll(reader)
+	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return "", "", common.Address{}, err
 	}
 	address := common.HexToAddress(string(regexp.MustCompile("0x[0-9a-fA-F]{40}").Find(body)))
 	if address == (common.Address{}) {
-		return "", "", common.Address{}, errors.New("No ESC address found to fund")
+		return "", "", common.Address{}, errors.New("No Ethereum address found to fund")
 	}
 	var avatar string
 	if parts = regexp.MustCompile("src=\"([^\"]+twimg.com/profile_images[^\"]+)\"").FindStringSubmatch(string(body)); len(parts) == 2 {
@@ -710,7 +713,7 @@ func authTwitter(url string) (string, string, common.Address, error) {
 }
 
 // authGooglePlus tries to authenticate a faucet request using GooglePlus posts,
-// returning the username, avatar URL and ESC address to fund on success.
+// returning the username, avatar URL and Ethereum address to fund on success.
 func authGooglePlus(url string) (string, string, common.Address, error) {
 	// Ensure the user specified a meaningful URL, no fancy nonsense
 	parts := strings.Split(url, "/")
@@ -721,7 +724,7 @@ func authGooglePlus(url string) (string, string, common.Address, error) {
 
 	// Google's API isn't really friendly with direct links. Still, we don't
 	// want to do ask read permissions from users, so just load the public posts and
-	// scrape it for the ESC address and profile URL.
+	// scrape it for the Ethereum address and profile URL.
 	res, err := http.Get(url)
 	if err != nil {
 		return "", "", common.Address{}, err
@@ -734,7 +737,7 @@ func authGooglePlus(url string) (string, string, common.Address, error) {
 	}
 	address := common.HexToAddress(string(regexp.MustCompile("0x[0-9a-fA-F]{40}").Find(body)))
 	if address == (common.Address{}) {
-		return "", "", common.Address{}, errors.New("No ESC address found to fund")
+		return "", "", common.Address{}, errors.New("No Ethereum address found to fund")
 	}
 	var avatar string
 	if parts = regexp.MustCompile("src=\"([^\"]+googleusercontent.com[^\"]+photo.jpg)\"").FindStringSubmatch(string(body)); len(parts) == 2 {
@@ -744,7 +747,7 @@ func authGooglePlus(url string) (string, string, common.Address, error) {
 }
 
 // authFacebook tries to authenticate a faucet request using Facebook posts,
-// returning the username, avatar URL and ESC address to fund on success.
+// returning the username, avatar URL and Ethereum address to fund on success.
 func authFacebook(url string) (string, string, common.Address, error) {
 	// Ensure the user specified a meaningful URL, no fancy nonsense
 	parts := strings.Split(url, "/")
@@ -755,7 +758,7 @@ func authFacebook(url string) (string, string, common.Address, error) {
 
 	// Facebook's Graph API isn't really friendly with direct links. Still, we don't
 	// want to do ask read permissions from users, so just load the public posts and
-	// scrape it for the ESC address and profile URL.
+	// scrape it for the Ethereum address and profile URL.
 	res, err := http.Get(url)
 	if err != nil {
 		return "", "", common.Address{}, err
@@ -768,11 +771,22 @@ func authFacebook(url string) (string, string, common.Address, error) {
 	}
 	address := common.HexToAddress(string(regexp.MustCompile("0x[0-9a-fA-F]{40}").Find(body)))
 	if address == (common.Address{}) {
-		return "", "", common.Address{}, errors.New("No ESC address found to fund")
+		return "", "", common.Address{}, errors.New("No Ethereum address found to fund")
 	}
 	var avatar string
 	if parts = regexp.MustCompile("src=\"([^\"]+fbcdn.net[^\"]+)\"").FindStringSubmatch(string(body)); len(parts) == 2 {
 		avatar = parts[1]
 	}
 	return username + "@facebook", avatar, address, nil
+}
+
+// authNoAuth tries to interpret a faucet request as a plain Ethereum address,
+// without actually performing any remote authentication. This mode is prone to
+// Byzantine attack, so only ever use for truly private networks.
+func authNoAuth(url string) (string, string, common.Address, error) {
+	address := common.HexToAddress(regexp.MustCompile("0x[0-9a-fA-F]{40}").FindString(url))
+	if address == (common.Address{}) {
+		return "", "", common.Address{}, errors.New("No Ethereum address found to fund")
+	}
+	return address.Hex() + "@noauth", "", address, nil
 }

@@ -1,18 +1,18 @@
-// Copyright 2016 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package swap
 
@@ -26,14 +26,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/accounts/abi/bind"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/contracts/chequebook"
-	"github.com/ethersocial/go-esc/contracts/chequebook/contract"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/swarm/services/swap/swap"
+	"github.com/ethersocial/go-esn/accounts/abi/bind"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/contracts/chequebook"
+	"github.com/ethersocial/go-esn/contracts/chequebook/contract"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/swarm/services/swap/swap"
 )
 
 // SwAP       Swarm Accounting Protocol with
@@ -80,17 +80,10 @@ type PayProfile struct {
 	lock        sync.RWMutex
 }
 
-func DefaultSwapParams(contract common.Address, prvkey *ecdsa.PrivateKey) *SwapParams {
-	pubkey := &prvkey.PublicKey
+//create params with default values
+func NewDefaultSwapParams() *SwapParams {
 	return &SwapParams{
-		PayProfile: &PayProfile{
-			PublicKey:   common.ToHex(crypto.FromECDSAPub(pubkey)),
-			Contract:    contract,
-			Beneficiary: crypto.PubkeyToAddress(*pubkey),
-			privateKey:  prvkey,
-			publicKey:   pubkey,
-			owner:       crypto.PubkeyToAddress(*pubkey),
-		},
+		PayProfile: &PayProfile{},
 		Params: &swap.Params{
 			Profile: &swap.Profile{
 				BuyAt:  buyAt,
@@ -106,6 +99,21 @@ func DefaultSwapParams(contract common.Address, prvkey *ecdsa.PrivateKey) *SwapP
 				AutoDepositBuffer:    autoDepositBuffer,
 			},
 		},
+	}
+}
+
+//this can only finally be set after all config options (file, cmd line, env vars)
+//have been evaluated
+func (self *SwapParams) Init(contract common.Address, prvkey *ecdsa.PrivateKey) {
+	pubkey := &prvkey.PublicKey
+
+	self.PayProfile = &PayProfile{
+		PublicKey:   common.ToHex(crypto.FromECDSAPub(pubkey)),
+		Contract:    contract,
+		Beneficiary: crypto.PubkeyToAddress(*pubkey),
+		privateKey:  prvkey,
+		publicKey:   pubkey,
+		owner:       crypto.PubkeyToAddress(*pubkey),
 	}
 }
 

@@ -11,10 +11,10 @@ fi
 workspace="$PWD/build/_workspace"
 root="$PWD"
 ethdir="$workspace/src/github.com/ethersocial"
-if [ ! -L "$ethdir/go-esc" ]; then
+if [ ! -L "$ethdir/go-esn" ]; then
     mkdir -p "$ethdir"
     cd "$ethdir"
-    ln -s ../../../../../. go-esc
+    ln -s ../../../../../. go-esn
     cd "$root"
 fi
 
@@ -23,8 +23,8 @@ GOPATH="$workspace"
 export GOPATH
 
 # Run the command inside the workspace.
-cd "$ethdir/go-esc"
-PWD="$ethdir/go-esc"
+cd "$ethdir/go-esn"
+PWD="$ethdir/go-esn"
 
 # Launch the arguments with the configured environment.
 exec "$@"

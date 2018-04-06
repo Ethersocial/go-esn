@@ -1,18 +1,18 @@
-// Copyright 2015 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package discover
 
@@ -125,13 +125,13 @@ func TestNodeDBFetchStore(t *testing.T) {
 		t.Errorf("ping: value mismatch: have %v, want %v", stored, inst)
 	}
 	// Check fetch/store operations on a node pong object
-	if stored := db.lastPong(node.ID); stored.Unix() != 0 {
+	if stored := db.bondTime(node.ID); stored.Unix() != 0 {
 		t.Errorf("pong: non-existing object: %v", stored)
 	}
-	if err := db.updateLastPong(node.ID, inst); err != nil {
+	if err := db.updateBondTime(node.ID, inst); err != nil {
 		t.Errorf("pong: failed to update: %v", err)
 	}
-	if stored := db.lastPong(node.ID); stored.Unix() != inst.Unix() {
+	if stored := db.bondTime(node.ID); stored.Unix() != inst.Unix() {
 		t.Errorf("pong: value mismatch: have %v, want %v", stored, inst)
 	}
 	// Check fetch/store operations on a node findnode-failure object
@@ -224,8 +224,8 @@ func TestNodeDBSeedQuery(t *testing.T) {
 		if err := db.updateNode(seed.node); err != nil {
 			t.Fatalf("node %d: failed to insert: %v", i, err)
 		}
-		if err := db.updateLastPong(seed.node.ID, seed.pong); err != nil {
-			t.Fatalf("node %d: failed to insert lastPong: %v", i, err)
+		if err := db.updateBondTime(seed.node.ID, seed.pong); err != nil {
+			t.Fatalf("node %d: failed to insert bondTime: %v", i, err)
 		}
 	}
 
@@ -332,8 +332,8 @@ func TestNodeDBExpiration(t *testing.T) {
 		if err := db.updateNode(seed.node); err != nil {
 			t.Fatalf("node %d: failed to insert: %v", i, err)
 		}
-		if err := db.updateLastPong(seed.node.ID, seed.pong); err != nil {
-			t.Fatalf("node %d: failed to update pong: %v", i, err)
+		if err := db.updateBondTime(seed.node.ID, seed.pong); err != nil {
+			t.Fatalf("node %d: failed to update bondTime: %v", i, err)
 		}
 	}
 	// Expire some of them, and check the rest
@@ -365,8 +365,8 @@ func TestNodeDBSelfExpiration(t *testing.T) {
 		if err := db.updateNode(seed.node); err != nil {
 			t.Fatalf("node %d: failed to insert: %v", i, err)
 		}
-		if err := db.updateLastPong(seed.node.ID, seed.pong); err != nil {
-			t.Fatalf("node %d: failed to update pong: %v", i, err)
+		if err := db.updateBondTime(seed.node.ID, seed.pong); err != nil {
+			t.Fatalf("node %d: failed to update bondTime: %v", i, err)
 		}
 	}
 	// Expire the nodes and make sure self has been evacuated too

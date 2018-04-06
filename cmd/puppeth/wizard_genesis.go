@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of go-esc.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-esc is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-esc is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-esc. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -25,10 +25,10 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/params"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/params"
 )
 
 // makeGenesis creates a new genesis struct based on some user input.
@@ -118,24 +118,16 @@ func (w *wizard) makeGenesis() {
 	for i := int64(0); i < 256; i++ {
 		genesis.Alloc[common.BigToAddress(big.NewInt(i))] = core.GenesisAccount{Balance: big.NewInt(1)}
 	}
-	fmt.Println()
-
 	// Query the user for some custom extras
 	fmt.Println()
 	fmt.Println("Specify your chain/network ID if you want an explicit one (default = random)")
 	genesis.Config.ChainId = new(big.Int).SetUint64(uint64(w.readDefaultInt(rand.Intn(65536))))
 
-	fmt.Println()
-	fmt.Println("Anything fun to embed into the genesis block? (max 32 bytes)")
-
-	extra := w.read()
-	if len(extra) > 32 {
-		extra = extra[:32]
-	}
-	genesis.ExtraData = append([]byte(extra), genesis.ExtraData[len(extra):]...)
-
 	// All done, store the genesis and flush to disk
-	w.conf.genesis = genesis
+	log.Info("Configured new genesis block")
+
+	w.conf.Genesis = genesis
+	w.conf.flush()
 }
 
 // manageGenesis permits the modification of chain configuration parameters in
@@ -145,43 +137,55 @@ func (w *wizard) manageGenesis() {
 	fmt.Println()
 	fmt.Println(" 1. Modify existing fork rules")
 	fmt.Println(" 2. Export genesis configuration")
+	fmt.Println(" 3. Remove genesis configuration")
 
 	choice := w.read()
 	switch {
 	case choice == "1":
 		// Fork rule updating requested, iterate over each fork
 		fmt.Println()
-		fmt.Printf("Which block should Homestead come into effect? (default = %v)\n", w.conf.genesis.Config.HomesteadBlock)
-		w.conf.genesis.Config.HomesteadBlock = w.readDefaultBigInt(w.conf.genesis.Config.HomesteadBlock)
+		fmt.Printf("Which block should Homestead come into effect? (default = %v)\n", w.conf.Genesis.Config.HomesteadBlock)
+		w.conf.Genesis.Config.HomesteadBlock = w.readDefaultBigInt(w.conf.Genesis.Config.HomesteadBlock)
 
 		fmt.Println()
-		fmt.Printf("Which block should EIP150 come into effect? (default = %v)\n", w.conf.genesis.Config.EIP150Block)
-		w.conf.genesis.Config.EIP150Block = w.readDefaultBigInt(w.conf.genesis.Config.EIP150Block)
+		fmt.Printf("Which block should EIP150 come into effect? (default = %v)\n", w.conf.Genesis.Config.EIP150Block)
+		w.conf.Genesis.Config.EIP150Block = w.readDefaultBigInt(w.conf.Genesis.Config.EIP150Block)
 
 		fmt.Println()
-		fmt.Printf("Which block should EIP155 come into effect? (default = %v)\n", w.conf.genesis.Config.EIP155Block)
-		w.conf.genesis.Config.EIP155Block = w.readDefaultBigInt(w.conf.genesis.Config.EIP155Block)
+		fmt.Printf("Which block should EIP155 come into effect? (default = %v)\n", w.conf.Genesis.Config.EIP155Block)
+		w.conf.Genesis.Config.EIP155Block = w.readDefaultBigInt(w.conf.Genesis.Config.EIP155Block)
 
 		fmt.Println()
-		fmt.Printf("Which block should EIP158 come into effect? (default = %v)\n", w.conf.genesis.Config.EIP158Block)
-		w.conf.genesis.Config.EIP158Block = w.readDefaultBigInt(w.conf.genesis.Config.EIP158Block)
+		fmt.Printf("Which block should EIP158 come into effect? (default = %v)\n", w.conf.Genesis.Config.EIP158Block)
+		w.conf.Genesis.Config.EIP158Block = w.readDefaultBigInt(w.conf.Genesis.Config.EIP158Block)
 
 		fmt.Println()
-		fmt.Printf("Which block should Byzantium come into effect? (default = %v)\n", w.conf.genesis.Config.ByzantiumBlock)
-		w.conf.genesis.Config.ByzantiumBlock = w.readDefaultBigInt(w.conf.genesis.Config.ByzantiumBlock)
+		fmt.Printf("Which block should Byzantium come into effect? (default = %v)\n", w.conf.Genesis.Config.ByzantiumBlock)
+		w.conf.Genesis.Config.ByzantiumBlock = w.readDefaultBigInt(w.conf.Genesis.Config.ByzantiumBlock)
 
-		out, _ := json.MarshalIndent(w.conf.genesis.Config, "", "  ")
+		out, _ := json.MarshalIndent(w.conf.Genesis.Config, "", "  ")
 		fmt.Printf("Chain configuration updated:\n\n%s\n", out)
 
 	case choice == "2":
 		// Save whatever genesis configuration we currently have
 		fmt.Println()
 		fmt.Printf("Which file to save the genesis into? (default = %s.json)\n", w.network)
-		out, _ := json.MarshalIndent(w.conf.genesis, "", "  ")
+		out, _ := json.MarshalIndent(w.conf.Genesis, "", "  ")
 		if err := ioutil.WriteFile(w.readDefaultString(fmt.Sprintf("%s.json", w.network)), out, 0644); err != nil {
 			log.Error("Failed to save genesis file", "err", err)
 		}
 		log.Info("Exported existing genesis block")
+
+	case choice == "3":
+		// Make sure we don't have any services running
+		if len(w.conf.servers()) > 0 {
+			log.Error("Genesis reset requires all services and servers torn down")
+			return
+		}
+		log.Info("Genesis block destroyed")
+
+		w.conf.Genesis = nil
+		w.conf.flush()
 
 	default:
 		log.Error("That's not something I can do")

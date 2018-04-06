@@ -55,10 +55,9 @@ var (
 		"crypto/sha3/",
 		"internal/jsre/deps",
 		"log/",
+		"common/bitutil/bitutil",
 		// don't license generated files
-		"contracts/chequebook/contract/",
-		"contracts/ens/contract/",
-		"contracts/release/contract.go",
+		"contracts/chequebook/contract/code.go",
 	}
 
 	// paths with this prefix are licensed as GPL. all other files are LGPL.
@@ -69,13 +68,13 @@ var (
 	licenseCommentRE = regexp.MustCompile(`^//\s*(Copyright|This file is part of).*?\n(?://.*?\n)*\n*`)
 
 	// this text appears at the start of AUTHORS
-	authorsFileHeader = "# This is the official list of go-esc Authors for copyright purposes.\n\n"
+	authorsFileHeader = "# This is the official list of go-ethereum authors for copyright purposes.\n\n"
 )
 
 // this template generates the license comment.
 // its input is an info structure.
 var licenseT = template.Must(template.New("").Parse(`
-// Copyright {{.Year}} The go-esc Authors
+// Copyright {{.Year}} The go-ethereum Authors
 // This file is part of {{.Whole false}}.
 //
 // {{.Whole true}} is free software: you can redistribute it and/or modify
@@ -114,12 +113,12 @@ func (i info) ShortLicense() string {
 
 func (i info) Whole(startOfSentence bool) string {
 	if i.gpl() {
-		return "go-esc"
+		return "go-ethereum"
 	}
 	if startOfSentence {
-		return "The go-esc library"
+		return "The go-ethereum library"
 	}
-	return "the go-esc library"
+	return "the go-ethereum library"
 }
 
 func (i info) gpl() bool {

@@ -1,18 +1,18 @@
-// Copyright 2015 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package abi
 
@@ -24,6 +24,7 @@ import (
 	"strings"
 )
 
+// Type enumerator
 const (
 	IntTy byte = iota
 	UintTy
@@ -100,68 +101,65 @@ func NewType(t string) (typ Type, err error) {
 			return Type{}, fmt.Errorf("invalid formatting of array type")
 		}
 		return typ, err
-	} else {
-		// parse the type and size of the abi-type.
-		parsedType := typeRegex.FindAllStringSubmatch(t, -1)[0]
-		// varSize is the size of the variable
-		var varSize int
-		if len(parsedType[3]) > 0 {
-			var err error
-			varSize, err = strconv.Atoi(parsedType[2])
-			if err != nil {
-				return Type{}, fmt.Errorf("abi: error parsing variable size: %v", err)
-			}
-		} else {
-			if parsedType[0] == "uint" || parsedType[0] == "int" {
-				// this should fail because it means that there's something wrong with
-				// the abi type (the compiler should always format it to the size...always)
-				return Type{}, fmt.Errorf("unsupported arg type: %s", t)
-			}
+	}
+	// parse the type and size of the abi-type.
+	parsedType := typeRegex.FindAllStringSubmatch(t, -1)[0]
+	// varSize is the size of the variable
+	var varSize int
+	if len(parsedType[3]) > 0 {
+		var err error
+		varSize, err = strconv.Atoi(parsedType[2])
+		if err != nil {
+			return Type{}, fmt.Errorf("abi: error parsing variable size: %v", err)
 		}
-		// varType is the parsed abi type
-		varType := parsedType[1]
-
-		switch varType {
-		case "int":
-			typ.Kind, typ.Type = reflectIntKindAndType(false, varSize)
-			typ.Size = varSize
-			typ.T = IntTy
-		case "uint":
-			typ.Kind, typ.Type = reflectIntKindAndType(true, varSize)
-			typ.Size = varSize
-			typ.T = UintTy
-		case "bool":
-			typ.Kind = reflect.Bool
-			typ.T = BoolTy
-			typ.Type = reflect.TypeOf(bool(false))
-		case "address":
-			typ.Kind = reflect.Array
-			typ.Type = address_t
-			typ.Size = 20
-			typ.T = AddressTy
-		case "string":
-			typ.Kind = reflect.String
-			typ.Type = reflect.TypeOf("")
-			typ.T = StringTy
-		case "bytes":
-			if varSize == 0 {
-				typ.T = BytesTy
-				typ.Kind = reflect.Slice
-				typ.Type = reflect.SliceOf(reflect.TypeOf(byte(0)))
-			} else {
-				typ.T = FixedBytesTy
-				typ.Kind = reflect.Array
-				typ.Size = varSize
-				typ.Type = reflect.ArrayOf(varSize, reflect.TypeOf(byte(0)))
-			}
-		case "function":
-			typ.Kind = reflect.Array
-			typ.T = FunctionTy
-			typ.Size = 24
-			typ.Type = reflect.ArrayOf(24, reflect.TypeOf(byte(0)))
-		default:
+	} else {
+		if parsedType[0] == "uint" || parsedType[0] == "int" {
+			// this should fail because it means that there's something wrong with
+			// the abi type (the compiler should always format it to the size...always)
 			return Type{}, fmt.Errorf("unsupported arg type: %s", t)
 		}
+	}
+	// varType is the parsed abi type
+	switch varType := parsedType[1]; varType {
+	case "int":
+		typ.Kind, typ.Type = reflectIntKindAndType(false, varSize)
+		typ.Size = varSize
+		typ.T = IntTy
+	case "uint":
+		typ.Kind, typ.Type = reflectIntKindAndType(true, varSize)
+		typ.Size = varSize
+		typ.T = UintTy
+	case "bool":
+		typ.Kind = reflect.Bool
+		typ.T = BoolTy
+		typ.Type = reflect.TypeOf(bool(false))
+	case "address":
+		typ.Kind = reflect.Array
+		typ.Type = address_t
+		typ.Size = 20
+		typ.T = AddressTy
+	case "string":
+		typ.Kind = reflect.String
+		typ.Type = reflect.TypeOf("")
+		typ.T = StringTy
+	case "bytes":
+		if varSize == 0 {
+			typ.T = BytesTy
+			typ.Kind = reflect.Slice
+			typ.Type = reflect.SliceOf(reflect.TypeOf(byte(0)))
+		} else {
+			typ.T = FixedBytesTy
+			typ.Kind = reflect.Array
+			typ.Size = varSize
+			typ.Type = reflect.ArrayOf(varSize, reflect.TypeOf(byte(0)))
+		}
+	case "function":
+		typ.Kind = reflect.Array
+		typ.T = FunctionTy
+		typ.Size = 24
+		typ.Type = reflect.ArrayOf(24, reflect.TypeOf(byte(0)))
+	default:
+		return Type{}, fmt.Errorf("unsupported arg type: %s", t)
 	}
 
 	return

@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 // +build nacl js nocgo
 
@@ -21,11 +21,14 @@ package crypto
 import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
+	"errors"
 	"fmt"
+	"math/big"
 
 	"github.com/btcsuite/btcd/btcec"
 )
 
+// Ecrecover returns the uncompressed public key that created the given signature.
 func Ecrecover(hash, sig []byte) ([]byte, error) {
 	pub, err := SigToPub(hash, sig)
 	if err != nil {
@@ -35,6 +38,7 @@ func Ecrecover(hash, sig []byte) ([]byte, error) {
 	return bytes, err
 }
 
+// SigToPub returns the public key that created the given signature.
 func SigToPub(hash, sig []byte) (*ecdsa.PublicKey, error) {
 	// Convert to btcec input format with 'recovery id' v at the beginning.
 	btcsig := make([]byte, 65)
@@ -64,11 +68,47 @@ func Sign(hash []byte, prv *ecdsa.PrivateKey) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Convert to ESC signature format with 'recovery id' v at the end.
+	// Convert to Ethereum signature format with 'recovery id' v at the end.
 	v := sig[0] - 27
 	copy(sig, sig[1:])
 	sig[64] = v
 	return sig, nil
+}
+
+// VerifySignature checks that the given public key created signature over hash.
+// The public key should be in compressed (33 bytes) or uncompressed (65 bytes) format.
+// The signature should have the 64 byte [R || S] format.
+func VerifySignature(pubkey, hash, signature []byte) bool {
+	if len(signature) != 64 {
+		return false
+	}
+	sig := &btcec.Signature{R: new(big.Int).SetBytes(signature[:32]), S: new(big.Int).SetBytes(signature[32:])}
+	key, err := btcec.ParsePubKey(pubkey, btcec.S256())
+	if err != nil {
+		return false
+	}
+	// Reject malleable signatures. libsecp256k1 does this check but btcec doesn't.
+	if sig.S.Cmp(secp256k1_halfN) > 0 {
+		return false
+	}
+	return sig.Verify(hash, key)
+}
+
+// DecompressPubkey parses a public key in the 33-byte compressed format.
+func DecompressPubkey(pubkey []byte) (*ecdsa.PublicKey, error) {
+	if len(pubkey) != 33 {
+		return nil, errors.New("invalid compressed public key length")
+	}
+	key, err := btcec.ParsePubKey(pubkey, btcec.S256())
+	if err != nil {
+		return nil, err
+	}
+	return key.ToECDSA(), nil
+}
+
+// CompressPubkey encodes a public key to the 33-byte compressed format.
+func CompressPubkey(pubkey *ecdsa.PublicKey) []byte {
+	return (*btcec.PublicKey)(pubkey).SerializeCompressed()
 }
 
 // S256 returns an instance of the secp256k1 curve.

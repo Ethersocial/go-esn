@@ -1,18 +1,18 @@
-// Copyright 2015 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package abi
 
@@ -22,17 +22,8 @@ import (
 	"math/big"
 	"reflect"
 
-	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esn/common"
 )
-
-// unpacker is a utility interface that enables us to have
-// abstraction between events and methods and also to properly
-// "unpack" them; e.g. events use Inputs, methods use Outputs.
-type unpacker interface {
-	tupleUnpack(v interface{}, output []byte) error
-	singleUnpack(v interface{}, output []byte) error
-	isTupleReturn() bool
-}
 
 // reads the integer based on its kind
 func readInteger(kind reflect.Kind, b []byte) interface{} {
@@ -79,7 +70,7 @@ func readBool(word []byte) (bool, error) {
 // This enforces that standard by always presenting it as a 24-array (address + sig = 24 bytes)
 func readFunctionType(t Type, word []byte) (funcTy [24]byte, err error) {
 	if t.T != FunctionTy {
-		return [24]byte{}, fmt.Errorf("abi: invalid type in call to make function type byte array.")
+		return [24]byte{}, fmt.Errorf("abi: invalid type in call to make function type byte array")
 	}
 	if garbage := binary.BigEndian.Uint64(word[24:32]); garbage != 0 {
 		err = fmt.Errorf("abi: got improperly encoded function type, got %v", word)
@@ -92,7 +83,7 @@ func readFunctionType(t Type, word []byte) (funcTy [24]byte, err error) {
 // through reflection, creates a fixed array to be read from
 func readFixedBytes(t Type, word []byte) (interface{}, error) {
 	if t.T != FixedBytesTy {
-		return nil, fmt.Errorf("abi: invalid type in call to make fixed byte array.")
+		return nil, fmt.Errorf("abi: invalid type in call to make fixed byte array")
 	}
 	// convert
 	array := reflect.New(t.Type).Elem()
@@ -202,15 +193,4 @@ func lengthPrefixPointsTo(index int, output []byte) (start int, length int, err 
 
 	//fmt.Printf("LENGTH PREFIX INFO: \nsize: %v\noffset: %v\nstart: %v\n", length, offset, start)
 	return
-}
-
-// checks for proper formatting of byte output
-func bytesAreProper(output []byte) error {
-	if len(output) == 0 {
-		return fmt.Errorf("abi: unmarshalling empty output")
-	} else if len(output)%32 != 0 {
-		return fmt.Errorf("abi: improperly formatted output")
-	} else {
-		return nil
-	}
 }

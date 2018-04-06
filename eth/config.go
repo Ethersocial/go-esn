@@ -1,18 +1,18 @@
-// Copyright 2017 The go-esc Authors
-// This file is part of the go-esc library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-esc library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-esc library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-esc library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package eth
 
@@ -22,27 +22,33 @@ import (
 	"os/user"
 	"path/filepath"
 	"runtime"
+	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/hexutil"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/eth/downloader"
-	"github.com/ethersocial/go-esc/eth/gasprice"
-	"github.com/ethersocial/go-esc/params"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/hexutil"
+	"github.com/ethersocial/go-esn/consensus/ethash"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/eth/downloader"
+	"github.com/ethersocial/go-esn/eth/gasprice"
+	"github.com/ethersocial/go-esn/params"
 )
 
-// DefaultConfig contains default settings for use on the ESC main net.
+// DefaultConfig contains default settings for use on the Ethereum main net.
 var DefaultConfig = Config{
-	SyncMode:             downloader.FastSync,
-	EthashCacheDir:       "ethash",
-	EthashCachesInMem:    2,
-	EthashCachesOnDisk:   3,
-	EthashDatasetsInMem:  1,
-	EthashDatasetsOnDisk: 2,
-	NetworkId:            1,
-	LightPeers:           20,
-	DatabaseCache:        128,
-	GasPrice:             big.NewInt(18 * params.Shannon),
+	SyncMode: downloader.FastSync,
+	Ethash: ethash.Config{
+		CacheDir:       "ethash",
+		CachesInMem:    2,
+		CachesOnDisk:   3,
+		DatasetsInMem:  1,
+		DatasetsOnDisk: 2,
+	},
+	NetworkId:     1,
+	LightPeers:    20,
+	DatabaseCache: 768,
+	TrieCache:     256,
+	TrieTimeout:   5 * time.Minute,
+	GasPrice:      big.NewInt(18 * params.Shannon),
 
 	TxPool: core.DefaultTxPoolConfig,
 	GPO: gasprice.Config{
@@ -59,9 +65,9 @@ func init() {
 		}
 	}
 	if runtime.GOOS == "windows" {
-		DefaultConfig.EthashDatasetDir = filepath.Join(home, "AppData", "Ethash")
+		DefaultConfig.Ethash.DatasetDir = filepath.Join(home, "AppData", "Ethash")
 	} else {
-		DefaultConfig.EthashDatasetDir = filepath.Join(home, ".ethash")
+		DefaultConfig.Ethash.DatasetDir = filepath.Join(home, ".ethash")
 	}
 }
 
@@ -69,12 +75,13 @@ func init() {
 
 type Config struct {
 	// The genesis block, which is inserted if the database is empty.
-	// If nil, the ESC main net block is used.
+	// If nil, the Ethereum main net block is used.
 	Genesis *core.Genesis `toml:",omitempty"`
 
 	// Protocol options
 	NetworkId uint64 // Network ID to use for selecting peers to connect to
 	SyncMode  downloader.SyncMode
+	NoPruning bool
 
 	// Light client options
 	LightServ  int `toml:",omitempty"` // Maximum percentage of time allowed for serving LES requests
@@ -84,6 +91,8 @@ type Config struct {
 	SkipBcVersionCheck bool `toml:"-"`
 	DatabaseHandles    int  `toml:"-"`
 	DatabaseCache      int
+	TrieCache          int
+	TrieTimeout        time.Duration
 
 	// Mining-related options
 	Etherbase    common.Address `toml:",omitempty"`
@@ -92,12 +101,7 @@ type Config struct {
 	GasPrice     *big.Int
 
 	// Ethash options
-	EthashCacheDir       string
-	EthashCachesInMem    int
-	EthashCachesOnDisk   int
-	EthashDatasetDir     string
-	EthashDatasetsInMem  int
-	EthashDatasetsOnDisk int
+	Ethash ethash.Config
 
 	// Transaction pool options
 	TxPool core.TxPoolConfig
@@ -109,10 +113,7 @@ type Config struct {
 	EnablePreimageRecording bool
 
 	// Miscellaneous options
-	DocRoot   string `toml:"-"`
-	PowFake   bool   `toml:"-"`
-	PowTest   bool   `toml:"-"`
-	PowShared bool   `toml:"-"`
+	DocRoot string `toml:"-"`
 }
 
 type configMarshaling struct {
