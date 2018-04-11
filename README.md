@@ -1,4 +1,4 @@
-## Go EtherSocial
+## Go EtherSocial (ESN)
 
 Official golang implementation of the EtherSocial protocol.
 
