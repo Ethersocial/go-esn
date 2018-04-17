@@ -17,9 +17,10 @@
 package fuse
 
 import (
-	"github.com/ethersocial/go-esn/swarm/api"
 	"sync"
 	"time"
+
+	"github.com/ethersocial/go-esn/swarm/api"
 )
 
 const (

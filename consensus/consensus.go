@@ -18,12 +18,13 @@
 package consensus
 
 import (
+	"math/big"
+
 	"github.com/ethersocial/go-esn/common"
 	"github.com/ethersocial/go-esn/core/state"
 	"github.com/ethersocial/go-esn/core/types"
 	"github.com/ethersocial/go-esn/params"
 	"github.com/ethersocial/go-esn/rpc"
-	"math/big"
 )
 
 // ChainReader defines a small collection of methods needed to access the local
