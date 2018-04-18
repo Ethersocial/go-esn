@@ -35,7 +35,7 @@ import (
 	mmap "github.com/edsrzf/mmap-go"
 	"github.com/ethersocial/go-esn/consensus"
 	"github.com/ethersocial/go-esn/log"
-	"github.com/ethereum/go-esn/metrics"
+	"github.com/ethersocial/go-esn/metrics"
 	"github.com/ethersocial/go-esn/rpc"
 	"github.com/hashicorp/golang-lru/simplelru"
 )
