@@ -27,12 +27,13 @@ import (
 
 	ethereum "github.com/ethersocial/go-esn"
 	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core"
 	"github.com/ethersocial/go-esn/core/types"
 	"github.com/ethersocial/go-esn/ethdb"
 	"github.com/ethersocial/go-esn/event"
 	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/metrics"
 	"github.com/ethersocial/go-esn/params"
-	"github.com/rcrowley/go-metrics"
 )
 
 var (
@@ -221,7 +222,10 @@ func New(mode SyncMode, stateDb ethdb.Database, mux *event.TypeMux, chain BlockC
 		quitCh:         make(chan struct{}),
 		stateCh:        make(chan dataPack),
 		stateSyncStart: make(chan *stateSync),
-		trackStateReq:  make(chan *stateReq),
+		syncStatsState: stateSyncStats{
+			processed: core.GetTrieSyncProgress(stateDb),
+		},
+		trackStateReq: make(chan *stateReq),
 	}
 	go dl.qosTuner()
 	go dl.stateFetcher()

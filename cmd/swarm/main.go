@@ -17,11 +17,9 @@
 package main
 
 import (
-	"context"
 	"crypto/ecdsa"
 	"fmt"
 	"io/ioutil"
-	"math/big"
 	"os"
 	"os/signal"
 	"runtime"
@@ -29,14 +27,12 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
-	"time"
 
 	"github.com/ethersocial/go-esn/accounts"
 	"github.com/ethersocial/go-esn/accounts/keystore"
 	"github.com/ethersocial/go-esn/cmd/utils"
 	"github.com/ethersocial/go-esn/common"
 	"github.com/ethersocial/go-esn/console"
-	"github.com/ethersocial/go-esn/contracts/ens"
 	"github.com/ethersocial/go-esn/crypto"
 	"github.com/ethersocial/go-esn/ethclient"
 	"github.com/ethersocial/go-esn/internal/debug"
@@ -45,10 +41,11 @@ import (
 	"github.com/ethersocial/go-esn/p2p"
 	"github.com/ethersocial/go-esn/p2p/discover"
 	"github.com/ethersocial/go-esn/params"
-	"github.com/ethersocial/go-esn/rpc"
 	"github.com/ethersocial/go-esn/swarm"
 	bzzapi "github.com/ethersocial/go-esn/swarm/api"
-	cli "gopkg.in/urfave/cli.v1"
+	swarmmetrics "github.com/ethersocial/go-esn/swarm/metrics"
+
+	"gopkg.in/urfave/cli.v1"
 )
 
 const clientIdentifier = "swarm"
@@ -58,7 +55,7 @@ var (
 	testbetBootNodes = []string{
 		"enode://ec8ae764f7cb0417bdfb009b9d0f18ab3818a3a4e8e7c67dd5f18971a93510a2e6f43cd0b69a27e439a9629457ea804104f37c85e41eed057d3faabbf7744cdf@13.74.157.139:30429",
 		"enode://c2e1fceb3bf3be19dff71eec6cccf19f2dbf7567ee017d130240c670be8594bc9163353ca55dd8df7a4f161dd94b36d0615c17418b5a3cdcbb4e9d99dfa4de37@13.74.157.139:30430",
-		"enode://1aded60f7986b8bccce5f3c20596724ab087af2dfa618f83a9ec385a4a34230e197a5c7a53db19a50b0eba6d5a08f0e02484587084c4bb2a8ecda43c0d337838@13.74.157.139:30431",
+		"enode://fe29b82319b734ce1ec68b84657d57145fee237387e63273989d354486731e59f78858e452ef800a020559da22dcca759536e6aa5517c53930d29ce0b1029286@13.74.157.139:30431",
 		"enode://1d7187e7bde45cf0bee489ce9852dd6d1a0d9aa67a33a6b8e6db8a4fbc6fcfa6f0f1a5419343671521b863b187d1c73bad3603bae66421d157ffef357669ddb8@13.74.157.139:30432",
 		"enode://0e4cba800f7b1ee73673afa6a4acead4018f0149d2e3216be3f133318fd165b324cd71b81fbe1e80deac8dbf56e57a49db7be67f8b9bc81bd2b7ee496434fb5d@13.74.157.139:30433",
 	}
@@ -109,15 +106,10 @@ var (
 		Usage:  "Swarm Syncing enabled (default true)",
 		EnvVar: SWARM_ENV_SYNC_ENABLE,
 	}
-	EnsAPIFlag = cli.StringFlag{
+	EnsAPIFlag = cli.StringSliceFlag{
 		Name:   "ens-api",
-		Usage:  "URL of the Ethereum API provider to use for ENS record lookups",
+		Usage:  "ENS API endpoint for a TLD and with contract address, can be repeated, format [tld:][contract-addr@]url",
 		EnvVar: SWARM_ENV_ENS_API,
-	}
-	EnsAddrFlag = cli.StringFlag{
-		Name:   "ens-addr",
-		Usage:  "ENS contract address (default is detected as testnet or mainnet using --ens-api)",
-		EnvVar: SWARM_ENV_ENS_ADDR,
 	}
 	SwarmApiFlag = cli.StringFlag{
 		Name:  "bzzapi",
@@ -154,6 +146,10 @@ var (
 	DeprecatedEthAPIFlag = cli.StringFlag{
 		Name:  "ethapi",
 		Usage: "DEPRECATED: please use --ens-api and --swap-api",
+	}
+	DeprecatedEnsAddrFlag = cli.StringFlag{
+		Name:  "ens-addr",
+		Usage: "DEPRECATED: ENS contract address, please use --ens-api with contract address according to its format",
 	}
 )
 
@@ -342,7 +338,6 @@ DEPRECATED: use 'swarm db clean'.
 		// bzzd-specific flags
 		CorsStringFlag,
 		EnsAPIFlag,
-		EnsAddrFlag,
 		SwarmTomlConfigPathFlag,
 		SwarmConfigPathFlag,
 		SwarmSwapEnabledFlag,
@@ -362,11 +357,17 @@ DEPRECATED: use 'swarm db clean'.
 		SwarmUploadMimeType,
 		//deprecated flags
 		DeprecatedEthAPIFlag,
+		DeprecatedEnsAddrFlag,
 	}
 	app.Flags = append(app.Flags, debug.Flags...)
+	app.Flags = append(app.Flags, swarmmetrics.Flags...)
 	app.Before = func(ctx *cli.Context) error {
 		runtime.GOMAXPROCS(runtime.NumCPU())
-		return debug.Setup(ctx)
+		if err := debug.Setup(ctx); err != nil {
+			return err
+		}
+		swarmmetrics.Setup(ctx)
+		return nil
 	}
 	app.After = func(ctx *cli.Context) error {
 		debug.Exit()
@@ -447,38 +448,6 @@ func bzzd(ctx *cli.Context) error {
 	return nil
 }
 
-// detectEnsAddr determines the ENS contract address by getting both the
-// version and genesis hash using the client and matching them to either
-// mainnet or testnet addresses
-func detectEnsAddr(client *rpc.Client) (common.Address, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	var version string
-	if err := client.CallContext(ctx, &version, "net_version"); err != nil {
-		return common.Address{}, err
-	}
-
-	block, err := ethclient.NewClient(client).BlockByNumber(ctx, big.NewInt(0))
-	if err != nil {
-		return common.Address{}, err
-	}
-
-	switch {
-
-	case version == "1" && block.Hash() == params.MainnetGenesisHash:
-		log.Info("using Mainnet ENS contract address", "addr", ens.MainNetAddress)
-		return ens.MainNetAddress, nil
-
-	case version == "3" && block.Hash() == params.TestnetGenesisHash:
-		log.Info("using Testnet ENS contract address", "addr", ens.TestNetAddress)
-		return ens.TestNetAddress, nil
-
-	default:
-		return common.Address{}, fmt.Errorf("unknown version and genesis hash: %s %s", version, block.Hash())
-	}
-}
-
 func registerBzzService(bzzconfig *bzzapi.Config, ctx *cli.Context, stack *node.Node) {
 
 	//define the swarm service boot function
@@ -493,27 +462,7 @@ func registerBzzService(bzzconfig *bzzapi.Config, ctx *cli.Context, stack *node.
 			}
 		}
 
-		var ensClient *ethclient.Client
-		if bzzconfig.EnsApi != "" {
-			log.Info("connecting to ENS API", "url", bzzconfig.EnsApi)
-			client, err := rpc.Dial(bzzconfig.EnsApi)
-			if err != nil {
-				return nil, fmt.Errorf("error connecting to ENS API %s: %s", bzzconfig.EnsApi, err)
-			}
-			ensClient = ethclient.NewClient(client)
-
-			//no ENS root address set yet
-			if bzzconfig.EnsRoot == (common.Address{}) {
-				ensAddr, err := detectEnsAddr(client)
-				if err == nil {
-					bzzconfig.EnsRoot = ensAddr
-				} else {
-					log.Warn(fmt.Sprintf("could not determine ENS contract address, using default %s", bzzconfig.EnsRoot), "err", err)
-				}
-			}
-		}
-
-		return swarm.NewSwarm(ctx, swapClient, ensClient, bzzconfig, bzzconfig.SwapEnabled, bzzconfig.SyncEnabled, bzzconfig.Cors)
+		return swarm.NewSwarm(ctx, swapClient, bzzconfig)
 	}
 	//register within the ethereum node
 	if err := stack.Register(boot); err != nil {

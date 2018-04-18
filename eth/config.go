@@ -44,7 +44,7 @@ var DefaultConfig = Config{
 		DatasetsOnDisk: 2,
 	},
 	NetworkId:     1,
-	LightPeers:    20,
+	LightPeers:    100,
 	DatabaseCache: 768,
 	TrieCache:     256,
 	TrieTimeout:   5 * time.Minute,
@@ -52,8 +52,8 @@ var DefaultConfig = Config{
 
 	TxPool: core.DefaultTxPoolConfig,
 	GPO: gasprice.Config{
-		Blocks:     10,
-		Percentile: 50,
+		Blocks:     20,
+		Percentile: 60,
 	},
 }
 

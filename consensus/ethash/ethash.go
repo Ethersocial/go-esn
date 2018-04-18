@@ -35,9 +35,9 @@ import (
 	mmap "github.com/edsrzf/mmap-go"
 	"github.com/ethersocial/go-esn/consensus"
 	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/metrics"
 	"github.com/ethersocial/go-esn/rpc"
 	"github.com/hashicorp/golang-lru/simplelru"
-	metrics "github.com/rcrowley/go-metrics"
 )
 
 var ErrInvalidDumpMagic = errors.New("invalid dump magic")
