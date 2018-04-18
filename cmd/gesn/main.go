@@ -147,7 +147,7 @@ var (
 )
 
 func init() {
-	// Initialize the CLI app and start Gesc
+	// Initialize the CLI app and start Gesn
 	app.Action = gesn
 	app.HideVersion = true // we have a command to print the version
 	app.Copyright = "Copyright 2018 The go-esn Authors, Copyright 2013-2017 The go-ethereum Authors"
