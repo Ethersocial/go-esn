@@ -36,10 +36,10 @@ import (
 
 	"github.com/elastic/gosigar"
 	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/metrics"
 	"github.com/ethersocial/go-esn/p2p"
 	"github.com/ethersocial/go-esn/params"
 	"github.com/ethersocial/go-esn/rpc"
-	"github.com/rcrowley/go-metrics"
 	"golang.org/x/net/websocket"
 )
 
