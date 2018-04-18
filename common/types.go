@@ -18,15 +18,15 @@ package common
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"math/big"
 	"math/rand"
 	"reflect"
+	"strings"
 
-	"encoding/json"
 	"github.com/ethersocial/go-esn/common/hexutil"
 	"github.com/ethersocial/go-esn/crypto/sha3"
-	"strings"
 )
 
 const (

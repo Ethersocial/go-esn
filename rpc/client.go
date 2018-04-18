@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -33,7 +34,6 @@ import (
 	"time"
 
 	"github.com/ethersocial/go-esn/log"
-	"os"
 )
 
 var (
