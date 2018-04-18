@@ -6,17 +6,6 @@ matrix:
     - os: linux
       dist: trusty
       sudo: required
-      go: 1.7.x
-      script:
-        - sudo modprobe fuse
-        - sudo chmod 666 /dev/fuse
-        - sudo chown root:$USER /etc/fuse.conf
-        - go run build/ci.go install
-        - go run build/ci.go test -coverage
-
-    - os: linux
-      dist: trusty
-      sudo: required
       go: 1.8.x
       script:
         - sudo modprobe fuse
@@ -78,7 +67,7 @@ matrix:
             - fakeroot
       script:
         # Build for the primary platforms that Trusty can manage
-        - go run build/ci.go debsrc -signer "Go Ethereum Linux Builder <ethersocialcoin@ethereum.org>" -upload ppa:ethersocial/ethersocial
+        - go run build/ci.go debsrc -signer "Go Ethereum Linux Builder <ethersocialcoin@gmail.com>" -upload ppa:ethersocial/ethersocial
         - go run build/ci.go install
         - go run build/ci.go archive -type tar -signer LINUX_SIGNING_KEY -upload gethstore/builds
         - go run build/ci.go install -arch 386

@@ -24,7 +24,7 @@ import (
 	"github.com/ethersocial/go-esn/common"
 	"github.com/ethersocial/go-esn/crypto"
 	"github.com/ethersocial/go-esn/log"
-	"github.com/rcrowley/go-metrics"
+	"github.com/ethersocial/go-esn/metrics"
 )
 
 var (

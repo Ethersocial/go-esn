@@ -238,8 +238,6 @@ func checkFaucet(client *sshClient, network string) (*faucetInfos, error) {
 		amount:        amount,
 		minutes:       minutes,
 		tiers:         tiers,
-		githubUser:    infos.envvars["GITHUB_USER"],
-		githubToken:   infos.envvars["GITHUB_TOKEN"],
 		captchaToken:  infos.envvars["CAPTCHA_TOKEN"],
 		captchaSecret: infos.envvars["CAPTCHA_SECRET"],
 		noauth:        infos.envvars["NO_AUTH"] == "true",
