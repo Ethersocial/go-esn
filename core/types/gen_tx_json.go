@@ -7,8 +7,8 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/hexutil"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/hexutil"
 )
 
 func (t txdata) MarshalJSON() ([]byte, error) {

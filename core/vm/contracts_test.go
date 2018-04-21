@@ -5,7 +5,7 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esn/common"
 )
 
 // precompiledTest defines the input/output pairs for precompiled contract tests.

@@ -1,18 +1,18 @@
-// Copyright 2016 The go-ethereum Authors
-// This file is part of go-ethereum.
+// Copyright 2016 The go-esn Authors
+// This file is part of go-esn.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-esn is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-esn is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-esn. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -21,10 +21,10 @@ import (
 	"os/signal"
 	"strings"
 
-	"github.com/ethersocial/go-esc/cmd/utils"
-	"github.com/ethersocial/go-esc/console"
-	"github.com/ethersocial/go-esc/node"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/cmd/utils"
+	"github.com/ethersocial/go-esn/console"
+	"github.com/ethersocial/go-esn/node"
+	"github.com/ethersocial/go-esn/rpc"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -38,9 +38,9 @@ var (
 		Flags:    append(append(append(nodeFlags, rpcFlags...), consoleFlags...), whisperFlags...),
 		Category: "CONSOLE COMMANDS",
 		Description: `
-The Gesc console is an interactive shell for the JavaScript runtime environment
+The Gesn console is an interactive shell for the JavaScript runtime environment
 which exposes a node admin interface as well as the Ðapp JavaScript API.
-See https://github.com/ethersocial/go-esc/wiki/Javascipt-Console.`,
+See https://github.com/ethersocial/go-esn/wiki/Javascipt-Console.`,
 	}
 
 	attachCommand = cli.Command{
@@ -51,10 +51,10 @@ See https://github.com/ethersocial/go-esc/wiki/Javascipt-Console.`,
 		Flags:     append(consoleFlags, utils.DataDirFlag),
 		Category:  "CONSOLE COMMANDS",
 		Description: `
-The Gesc console is an interactive shell for the JavaScript runtime environment
+The Gesn console is an interactive shell for the JavaScript runtime environment
 which exposes a node admin interface as well as the Ðapp JavaScript API.
-See https://github.com/ethersocial/go-esc/wiki/Javascipt-Console.
-This command allows to open a console on a running gesc node.`,
+See https://github.com/ethersocial/go-esn/wiki/Javascipt-Console.
+This command allows to open a console on a running gesn node.`,
 	}
 
 	javascriptCommand = cli.Command{
@@ -66,11 +66,11 @@ This command allows to open a console on a running gesc node.`,
 		Category:  "CONSOLE COMMANDS",
 		Description: `
 The JavaScript VM exposes a node admin interface as well as the Ðapp
-JavaScript API. See https://github.com/ethersocial/go-esc/wiki/Javascipt-Console`,
+JavaScript API. See https://github.com/ethersocial/go-esn/wiki/Javascipt-Console`,
 	}
 )
 
-// localConsole starts a new gesc node, attaching a JavaScript console to it at the
+// localConsole starts a new gesn node, attaching a JavaScript console to it at the
 // same time.
 func localConsole(ctx *cli.Context) error {
 	// Create and start the node based on the CLI flags
@@ -81,7 +81,7 @@ func localConsole(ctx *cli.Context) error {
 	// Attach to the newly started node and start the JavaScript console
 	client, err := node.Attach()
 	if err != nil {
-		utils.Fatalf("Failed to attach to the inproc gesc: %v", err)
+		utils.Fatalf("Failed to attach to the inproc gesn: %v", err)
 	}
 	config := console.Config{
 		DataDir: utils.MakeDataDir(ctx),
@@ -108,13 +108,13 @@ func localConsole(ctx *cli.Context) error {
 	return nil
 }
 
-// remoteConsole will connect to a remote gesc instance, attaching a JavaScript
+// remoteConsole will connect to a remote gesn instance, attaching a JavaScript
 // console to it.
 func remoteConsole(ctx *cli.Context) error {
-	// Attach to a remotely running gesc instance and start the JavaScript console
+	// Attach to a remotely running gesn instance and start the JavaScript console
 	client, err := dialRPC(ctx.Args().First())
 	if err != nil {
-		utils.Fatalf("Unable to attach to remote gesc: %v", err)
+		utils.Fatalf("Unable to attach to remote gesn: %v", err)
 	}
 	config := console.Config{
 		DataDir: utils.MakeDataDir(ctx),
@@ -143,19 +143,19 @@ func remoteConsole(ctx *cli.Context) error {
 
 // dialRPC returns a RPC client which connects to the given endpoint.
 // The check for empty endpoint implements the defaulting logic
-// for "gesc attach" and "gesc monitor" with no argument.
+// for "gesn attach" and "gesn monitor" with no argument.
 func dialRPC(endpoint string) (*rpc.Client, error) {
 	if endpoint == "" {
 		endpoint = node.DefaultIPCEndpoint(clientIdentifier)
 	} else if strings.HasPrefix(endpoint, "rpc:") || strings.HasPrefix(endpoint, "ipc:") {
-		// Backwards compatibility with gesc < 1.5 which required
+		// Backwards compatibility with gesn < 1.5 which required
 		// these prefixes.
 		endpoint = endpoint[4:]
 	}
 	return rpc.Dial(endpoint)
 }
 
-// ephemeralConsole starts a new gesc node, attaches an ephemeral JavaScript
+// ephemeralConsole starts a new gesn node, attaches an ephemeral JavaScript
 // console to it, executes each of the files specified as arguments and tears
 // everything down.
 func ephemeralConsole(ctx *cli.Context) error {
@@ -167,7 +167,7 @@ func ephemeralConsole(ctx *cli.Context) error {
 	// Attach to the newly started node and start the JavaScript console
 	client, err := node.Attach()
 	if err != nil {
-		utils.Fatalf("Failed to attach to the inproc gesc: %v", err)
+		utils.Fatalf("Failed to attach to the inproc gesn: %v", err)
 	}
 	config := console.Config{
 		DataDir: utils.MakeDataDir(ctx),

@@ -6,10 +6,10 @@ import (
 	"encoding/json"
 	"math/big"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/hexutil"
-	"github.com/ethersocial/go-esc/common/math"
-	"github.com/ethersocial/go-esc/core/types"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/hexutil"
+	"github.com/ethersocial/go-esn/common/math"
+	"github.com/ethersocial/go-esn/core/types"
 )
 
 var _ = (*btHeaderMarshaling)(nil)

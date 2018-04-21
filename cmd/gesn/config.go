@@ -1,18 +1,18 @@
-// Copyright 2017 The go-ethereum Authors
-// This file is part of go-ethereum.
+// Copyright 2017 The go-esn Authors
+// This file is part of go-esn.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-esn is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-esn is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-esn. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -28,13 +28,13 @@ import (
 
 	cli "gopkg.in/urfave/cli.v1"
 
-	"github.com/ethersocial/go-esc/cmd/utils"
-	"github.com/ethersocial/go-esc/contracts/release"
-	"github.com/ethersocial/go-esc/dashboard"
-	"github.com/ethersocial/go-esc/eth"
-	"github.com/ethersocial/go-esc/node"
-	"github.com/ethersocial/go-esc/params"
-	whisper "github.com/ethersocial/go-esc/whisper/whisperv5"
+	"github.com/ethersocial/go-esn/cmd/utils"
+	"github.com/ethersocial/go-esn/contracts/release"
+	"github.com/ethersocial/go-esn/dashboard"
+	"github.com/ethersocial/go-esn/eth"
+	"github.com/ethersocial/go-esn/node"
+	"github.com/ethersocial/go-esn/params"
+	whisper "github.com/ethersocial/go-esn/whisper/whisperv5"
 	"github.com/naoina/toml"
 )
 
@@ -76,7 +76,7 @@ type ethstatsConfig struct {
 	URL string `toml:",omitempty"`
 }
 
-type gescConfig struct {
+type gesnConfig struct {
 	Eth       eth.Config
 	Shh       whisper.Config
 	Node      node.Config
@@ -84,7 +84,7 @@ type gescConfig struct {
 	Dashboard dashboard.Config
 }
 
-func loadConfig(file string, cfg *gescConfig) error {
+func loadConfig(file string, cfg *gesnConfig) error {
 	f, err := os.Open(file)
 	if err != nil {
 		return err
@@ -105,13 +105,13 @@ func defaultNodeConfig() node.Config {
 	cfg.Version = params.VersionWithCommit(gitCommit)
 	cfg.HTTPModules = append(cfg.HTTPModules, "eth", "shh")
 	cfg.WSModules = append(cfg.WSModules, "eth", "shh")
-	cfg.IPCPath = "gesc.ipc"
+	cfg.IPCPath = "gesn.ipc"
 	return cfg
 }
 
-func makeConfigNode(ctx *cli.Context) (*node.Node, gescConfig) {
+func makeConfigNode(ctx *cli.Context) (*node.Node, gesnConfig) {
 	// Load defaults.
-	cfg := gescConfig{
+	cfg := gesnConfig{
 		Eth:       eth.DefaultConfig,
 		Shh:       whisper.DefaultConfig,
 		Node:      defaultNodeConfig(),
@@ -190,7 +190,7 @@ func makeFullNode(ctx *cli.Context) *node.Node {
 		copy(config.Commit[:], commit)
 		return release.NewReleaseService(ctx, config)
 	}); err != nil {
-		utils.Fatalf("Failed to register the Gesc release oracle service: %v", err)
+		utils.Fatalf("Failed to register the Gesn release oracle service: %v", err)
 	}
 	return stack
 }

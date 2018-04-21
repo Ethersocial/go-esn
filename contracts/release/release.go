@@ -1,18 +1,18 @@
-// Copyright 2015 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// Copyright 2015 The go-esn Authors
+// This file is part of the go-esn library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-esn library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-esn library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-esn library. If not, see <http://www.gnu.org/licenses/>.
 
 // Package release contains the node service that tracks client releases.
 package release
@@ -25,15 +25,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethersocial/go-esc/accounts/abi/bind"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/eth"
-	"github.com/ethersocial/go-esc/internal/ethapi"
-	"github.com/ethersocial/go-esc/les"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/node"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/accounts/abi/bind"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/eth"
+	"github.com/ethersocial/go-esn/internal/ethapi"
+	"github.com/ethersocial/go-esn/les"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/node"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/rpc"
 )
 
 // Interval to check for new releases
@@ -41,7 +41,7 @@ const releaseRecheckInterval = time.Hour
 
 // Config contains the configurations of the release service.
 type Config struct {
-	Oracle common.Address // Ethereum address of the release oracle
+	Oracle common.Address // ESC address of the release oracle
 	Major  uint32         // Major version component of the release
 	Minor  uint32         // Minor version component of the release
 	Patch  uint32         // Patch version component of the release
@@ -60,7 +60,7 @@ type ReleaseService struct {
 // NewReleaseService creates a new service to periodically check for new client
 // releases and notify the user of such.
 func NewReleaseService(ctx *node.ServiceContext, config Config) (node.Service, error) {
-	// Retrieve the Ethereum service dependency to access the blockchain
+	// Retrieve the ESC service dependency to access the blockchain
 	var apiBackend ethapi.Backend
 	var ethereum *eth.Ethereum
 	if err := ctx.Service(&ethereum); err == nil {
@@ -149,7 +149,7 @@ func (r *ReleaseService) checkVersion() {
 
 		warning := fmt.Sprintf("Client v%d.%d.%d-%x seems older than the latest upstream release v%d.%d.%d-%x",
 			r.config.Major, r.config.Minor, r.config.Patch, r.config.Commit[:4], version.Major, version.Minor, version.Patch, version.Commit[:4])
-		howtofix := fmt.Sprintf("Please check https://github.com/ethersocial/go-esc/releases for new releases")
+		howtofix := fmt.Sprintf("Please check https://github.com/ethersocial/go-esn/releases for new releases")
 		separator := strings.Repeat("-", len(warning))
 
 		log.Warn(separator)

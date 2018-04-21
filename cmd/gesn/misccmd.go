@@ -1,18 +1,18 @@
-// Copyright 2016 The go-ethereum Authors
-// This file is part of go-ethereum.
+// Copyright 2016 The go-esn Authors
+// This file is part of go-esn.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-esn is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-esn is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-esn. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -23,10 +23,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethersocial/go-esc/cmd/utils"
-	"github.com/ethersocial/go-esc/consensus/ethash"
-	"github.com/ethersocial/go-esc/eth"
-	"github.com/ethersocial/go-esc/params"
+	"github.com/ethersocial/go-esn/cmd/utils"
+	"github.com/ethersocial/go-esn/consensus/ethash"
+	"github.com/ethersocial/go-esn/eth"
+	"github.com/ethersocial/go-esn/params"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -80,7 +80,7 @@ The output of this command is supposed to be machine-readable.
 func makecache(ctx *cli.Context) error {
 	args := ctx.Args()
 	if len(args) != 2 {
-		utils.Fatalf(`Usage: gesc makecache <block number> <outputdir>`)
+		utils.Fatalf(`Usage: gesn makecache <block number> <outputdir>`)
 	}
 	block, err := strconv.ParseUint(args[0], 0, 64)
 	if err != nil {
@@ -95,7 +95,7 @@ func makecache(ctx *cli.Context) error {
 func makedag(ctx *cli.Context) error {
 	args := ctx.Args()
 	if len(args) != 2 {
-		utils.Fatalf(`Usage: gesc makedag <block number> <outputdir>`)
+		utils.Fatalf(`Usage: gesn makedag <block number> <outputdir>`)
 	}
 	block, err := strconv.ParseUint(args[0], 0, 64)
 	if err != nil {
@@ -123,18 +123,18 @@ func version(ctx *cli.Context) error {
 }
 
 func license(_ *cli.Context) error {
-	fmt.Println(`Gesc is free software: you can redistribute it and/or modify
+	fmt.Println(`Gesn is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Gesc is distributed in the hope that it will be useful,
+Gesn is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with gesc. If not, see <http://www.gnu.org/licenses/>.
+along with gesn. If not, see <http://www.gnu.org/licenses/>.
 `)
 	return nil
 }

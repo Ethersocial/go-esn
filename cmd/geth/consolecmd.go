@@ -1,18 +1,18 @@
-// Copyright 2016 The go-ethereum Authors
-// This file is part of go-ethereum.
+// Copyright 2016 The go-esn Authors
+// This file is part of go-esn.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-esn is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-esn is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-esn. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -21,10 +21,10 @@ import (
 	"os/signal"
 	"strings"
 
-	"github.com/ethersocial/go-esc/cmd/utils"
-	"github.com/ethersocial/go-esc/console"
-	"github.com/ethersocial/go-esc/node"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/cmd/utils"
+	"github.com/ethersocial/go-esn/console"
+	"github.com/ethersocial/go-esn/node"
+	"github.com/ethersocial/go-esn/rpc"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -40,7 +40,7 @@ var (
 		Description: `
 The Geth console is an interactive shell for the JavaScript runtime environment
 which exposes a node admin interface as well as the Ðapp JavaScript API.
-See https://github.com/ethersocial/go-esc/wiki/Javascipt-Console.`,
+See https://github.com/ethersocial/go-esn/wiki/Javascipt-Console.`,
 	}
 
 	attachCommand = cli.Command{
@@ -53,7 +53,7 @@ See https://github.com/ethersocial/go-esc/wiki/Javascipt-Console.`,
 		Description: `
 The Geth console is an interactive shell for the JavaScript runtime environment
 which exposes a node admin interface as well as the Ðapp JavaScript API.
-See https://github.com/ethersocial/go-esc/wiki/Javascipt-Console.
+See https://github.com/ethersocial/go-esn/wiki/Javascipt-Console.
 This command allows to open a console on a running geth node.`,
 	}
 
@@ -66,7 +66,7 @@ This command allows to open a console on a running geth node.`,
 		Category:  "CONSOLE COMMANDS",
 		Description: `
 The JavaScript VM exposes a node admin interface as well as the Ðapp
-JavaScript API. See https://github.com/ethersocial/go-esc/wiki/Javascipt-Console`,
+JavaScript API. See https://github.com/ethersocial/go-esn/wiki/Javascipt-Console`,
 	}
 )
 

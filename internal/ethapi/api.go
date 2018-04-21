@@ -1,18 +1,18 @@
-// Copyright 2015 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// Copyright 2015 The go-esn Authors
+// This file is part of the go-esn library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-esn library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-esn library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-esn library. If not, see <http://www.gnu.org/licenses/>.
 
 package ethapi
 
@@ -24,21 +24,21 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethersocial/go-esc/accounts"
-	"github.com/ethersocial/go-esc/accounts/keystore"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/hexutil"
-	"github.com/ethersocial/go-esc/common/math"
-	"github.com/ethersocial/go-esc/consensus/ethash"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/core/vm"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/params"
-	"github.com/ethersocial/go-esc/rlp"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/accounts"
+	"github.com/ethersocial/go-esn/accounts/keystore"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/hexutil"
+	"github.com/ethersocial/go-esn/common/math"
+	"github.com/ethersocial/go-esn/consensus/ethash"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/core/vm"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/params"
+	"github.com/ethersocial/go-esn/rlp"
+	"github.com/ethersocial/go-esn/rpc"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
@@ -48,13 +48,13 @@ const (
 	defaultGasPrice = 50 * params.Shannon
 )
 
-// PublicEthereumAPI provides an API to access Ethereum related information.
+// PublicEthereumAPI provides an API to access ESC related information.
 // It offers only methods that operate on public data that is freely available to anyone.
 type PublicEthereumAPI struct {
 	b Backend
 }
 
-// NewPublicEthereumAPI creates a new Ethereum protocol API.
+// NewPublicEthereumAPI creates a new ESC protocol API.
 func NewPublicEthereumAPI(b Backend) *PublicEthereumAPI {
 	return &PublicEthereumAPI{b}
 }
@@ -64,7 +64,7 @@ func (s *PublicEthereumAPI) GasPrice(ctx context.Context) (*big.Int, error) {
 	return s.b.SuggestPrice(ctx)
 }
 
-// ProtocolVersion returns the current Ethereum protocol version this node supports
+// ProtocolVersion returns the current ESC protocol version this node supports
 func (s *PublicEthereumAPI) ProtocolVersion() hexutil.Uint {
 	return hexutil.Uint(s.b.ProtocolVersion())
 }
@@ -382,7 +382,7 @@ func signHash(data []byte) []byte {
 	return crypto.Keccak256([]byte(msg))
 }
 
-// Sign calculates an Ethereum ECDSA signature for:
+// Sign calculates an ESC ECDSA signature for:
 // keccack256("\x19Ethereum Signed Message:\n" + len(message) + message))
 //
 // Note, the produced signature conforms to the secp256k1 curve R, S and V values,
@@ -390,7 +390,7 @@ func signHash(data []byte) []byte {
 //
 // The key used to calculate the signature is decrypted with the given password.
 //
-// https://github.com/ethersocial/go-esc/wiki/Management-APIs#personal_sign
+// https://github.com/ethersocial/go-esn/wiki/Management-APIs#personal_sign
 func (s *PrivateAccountAPI) Sign(ctx context.Context, data hexutil.Bytes, addr common.Address, passwd string) (hexutil.Bytes, error) {
 	// Look up the wallet containing the requested signer
 	account := accounts.Account{Address: addr}
@@ -417,13 +417,13 @@ func (s *PrivateAccountAPI) Sign(ctx context.Context, data hexutil.Bytes, addr c
 // Note, the signature must conform to the secp256k1 curve R, S and V values, where
 // the V value must be be 27 or 28 for legacy reasons.
 //
-// https://github.com/ethersocial/go-esc/wiki/Management-APIs#personal_ecRecover
+// https://github.com/ethersocial/go-esn/wiki/Management-APIs#personal_ecRecover
 func (s *PrivateAccountAPI) EcRecover(ctx context.Context, data, sig hexutil.Bytes) (common.Address, error) {
 	if len(sig) != 65 {
 		return common.Address{}, fmt.Errorf("signature must be 65 bytes long")
 	}
 	if sig[64] != 27 && sig[64] != 28 {
-		return common.Address{}, fmt.Errorf("invalid Ethereum signature (V is not 27 or 28)")
+		return common.Address{}, fmt.Errorf("invalid ESC signature (V is not 27 or 28)")
 	}
 	sig[64] -= 27 // Transform yellow paper V from 27/28 to 0/1
 
@@ -442,13 +442,13 @@ func (s *PrivateAccountAPI) SignAndSendTransaction(ctx context.Context, args Sen
 	return s.SendTransaction(ctx, args, passwd)
 }
 
-// PublicBlockChainAPI provides an API to access the Ethereum blockchain.
+// PublicBlockChainAPI provides an API to access the ESC blockchain.
 // It offers only methods that operate on public data that is freely available to anyone.
 type PublicBlockChainAPI struct {
 	b Backend
 }
 
-// NewPublicBlockChainAPI creates a new Ethereum blockchain API.
+// NewPublicBlockChainAPI creates a new ESC blockchain API.
 func NewPublicBlockChainAPI(b Backend) *PublicBlockChainAPI {
 	return &PublicBlockChainAPI{b}
 }
@@ -1290,14 +1290,14 @@ func (s *PublicTransactionPoolAPI) Resend(ctx context.Context, sendArgs SendTxAr
 	return common.Hash{}, fmt.Errorf("Transaction %#x not found", matchTx.Hash())
 }
 
-// PublicDebugAPI is the collection of Ethereum APIs exposed over the public
+// PublicDebugAPI is the collection of ESC APIs exposed over the public
 // debugging endpoint.
 type PublicDebugAPI struct {
 	b Backend
 }
 
 // NewPublicDebugAPI creates a new API definition for the public debug methods
-// of the Ethereum service.
+// of the ESC service.
 func NewPublicDebugAPI(b Backend) *PublicDebugAPI {
 	return &PublicDebugAPI{b: b}
 }
@@ -1333,14 +1333,14 @@ func (api *PublicDebugAPI) SeedHash(ctx context.Context, number uint64) (string,
 	return fmt.Sprintf("0x%x", ethash.SeedHash(number)), nil
 }
 
-// PrivateDebugAPI is the collection of Ethereum APIs exposed over the private
+// PrivateDebugAPI is the collection of ESC APIs exposed over the private
 // debugging endpoint.
 type PrivateDebugAPI struct {
 	b Backend
 }
 
 // NewPrivateDebugAPI creates a new API definition for the private debug methods
-// of the Ethereum service.
+// of the ESC service.
 func NewPrivateDebugAPI(b Backend) *PrivateDebugAPI {
 	return &PrivateDebugAPI{b: b}
 }
