@@ -12,11 +12,5 @@ FROM alpine:latest
 RUN apk add --no-cache ca-certificates
 COPY --from=builder /go-esn/build/bin/gesn /usr/local/bin/
 
-RUN addgroup -g 1000 gesn && \
-    adduser -h /root -D -u 1000 -G gesn gesn && \
-    chown gesn:gesn /root
-
-USER gesn
-
 EXPOSE 9545 9546 50505 50505/udp 50506/udp
 ENTRYPOINT ["gesn"]
