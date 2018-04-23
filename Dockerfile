@@ -12,5 +12,5 @@ FROM alpine:latest
 RUN apk add --no-cache ca-certificates
 COPY --from=builder /go-esn/build/bin/gesn /usr/local/bin/
 
-EXPOSE 9545 9546 50505 50505/udp 50506/udp
+EXPOSE 9545 9546 50505 50505/udp
 ENTRYPOINT ["gesn"]
