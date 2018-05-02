@@ -23,7 +23,7 @@ import (
 	"github.com/ethersocial/go-esn/params"
 )
 
-// This table defines supported forks and their chain config.
+// Forks table defines supported forks and their chain config.
 var Forks = map[string]*params.ChainConfig{
 	"Frontier": {
 		ChainId: big.NewInt(1),
