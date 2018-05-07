@@ -1,18 +1,18 @@
-// Copyright 2016 The go-ethereum Authors
-// This file is part of go-ethereum.
+// Copyright 2016 The go-esn Authors
+// This file is part of go-esn.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-esn is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-esn is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-esn. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -23,18 +23,18 @@ import (
 	"testing"
 
 	"github.com/docker/docker/pkg/reexec"
-	"github.com/ethersocial/go-esc/internal/cmdtest"
+	"github.com/ethersocial/go-esn/internal/cmdtest"
 )
 
 func tmpdir(t *testing.T) string {
-	dir, err := ioutil.TempDir("", "gesc-test")
+	dir, err := ioutil.TempDir("", "gesn-test")
 	if err != nil {
 		t.Fatal(err)
 	}
 	return dir
 }
 
-type testgesc struct {
+type testgesn struct {
 	*cmdtest.TestCmd
 
 	// template variables for expect
@@ -43,8 +43,8 @@ type testgesc struct {
 }
 
 func init() {
-	// Run the app if we've been exec'd as "gesc-test" in runGesc.
-	reexec.Register("gesc-test", func() {
+	// Run the app if we've been exec'd as "gesn-test" in runGesn.
+	reexec.Register("gesn-test", func() {
 		if err := app.Run(os.Args); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -61,10 +61,10 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-// spawns gesc with the given command line args. If the args don't set --datadir, the
+// spawns gesn with the given command line args. If the args don't set --datadir, the
 // child g gets a temporary data directory.
-func runGesc(t *testing.T, args ...string) *testgesc {
-	tt := &testgesc{}
+func runGesn(t *testing.T, args ...string) *testgesn {
+	tt := &testgesn{}
 	tt.TestCmd = cmdtest.NewTestCmd(t, tt)
 	for i, arg := range args {
 		switch {
@@ -90,9 +90,9 @@ func runGesc(t *testing.T, args ...string) *testgesc {
 		}()
 	}
 
-	// Boot "gesc". This actually runs the test binary but the TestMain
+	// Boot "gesn". This actually runs the test binary but the TestMain
 	// function will prevent any tests from running.
-	tt.Run("gesc-test", args...)
+	tt.Run("gesn-test", args...)
 
 	return tt
 }

@@ -1,4 +1,4 @@
-export ROOT="${GOPATH}/src/github.com/ethersocial/go-esc"
+export ROOT="${GOPATH}/src/github.com/ethersocial/go-esn"
 export PATH="${ROOT}/swarm/dev/bin:${PATH}"
 
 cd "${ROOT}/swarm/dev"

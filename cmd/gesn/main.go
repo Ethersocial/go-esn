@@ -1,20 +1,20 @@
-// Copyright 2014 The go-ethereum Authors
-// This file is part of go-ethereum.
+// Copyright 2014 The go-esn Authors
+// This file is part of go-esn.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-esn is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-esn is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-esn. If not, see <http://www.gnu.org/licenses/>.
 
-// gesc is the official command-line client for ESC.
+// gesn is the official command-line client for ESC.
 package main
 
 import (
@@ -25,31 +25,31 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethersocial/go-esc/accounts"
-	"github.com/ethersocial/go-esc/accounts/keystore"
-	"github.com/ethersocial/go-esc/cmd/utils"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/console"
-	"github.com/ethersocial/go-esc/eth"
-	"github.com/ethersocial/go-esc/ethclient"
-	"github.com/ethersocial/go-esc/internal/debug"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/metrics"
-	"github.com/ethersocial/go-esc/node"
+	"github.com/ethersocial/go-esn/accounts"
+	"github.com/ethersocial/go-esn/accounts/keystore"
+	"github.com/ethersocial/go-esn/cmd/utils"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/console"
+	"github.com/ethersocial/go-esn/eth"
+	"github.com/ethersocial/go-esn/ethclient"
+	"github.com/ethersocial/go-esn/internal/debug"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/metrics"
+	"github.com/ethersocial/go-esn/node"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
 const (
-	clientIdentifier = "gesc" // Client identifier to advertise over the network
+	clientIdentifier = "gesn" // Client identifier to advertise over the network
 )
 
 var (
 	// Git SHA1 commit hash of the release (set via linker flags)
 	gitCommit = ""
-	// ESC address of the Gesc release oracle.
+	// ESC address of the Gesn release oracle.
 	relOracle = common.HexToAddress("0xfa7b9770ca4cb04296cac84f37736d4041251cdf")
 	// The app that holds all commands and flags.
-	app = utils.NewApp(gitCommit, "the go-esc command line interface")
+	app = utils.NewApp(gitCommit, "the go-esn command line interface")
 	// flags that configure the node
 	nodeFlags = []cli.Flag{
 		utils.IdentityFlag,
@@ -143,10 +143,10 @@ var (
 )
 
 func init() {
-	// Initialize the CLI app and start Gesc
-	app.Action = gesc
+	// Initialize the CLI app and start Gesn
+	app.Action = gesn
 	app.HideVersion = true // we have a command to print the version
-	app.Copyright = "Copyright 2013-2017 The go-ethereum Authors"
+	app.Copyright = "Copyright 2013-2017 The go-esn Authors"
 	app.Commands = []cli.Command{
 		// See chaincmd.go:
 		initCommand,
@@ -207,10 +207,10 @@ func main() {
 	}
 }
 
-// gesc is the main entry point into the system if no special subcommand is ran.
+// gesn is the main entry point into the system if no special subcommand is ran.
 // It creates a default node based on the command line arguments and runs it in
 // blocking mode, waiting for it to be shut down.
-func gesc(ctx *cli.Context) error {
+func gesn(ctx *cli.Context) error {
 	node := makeFullNode(ctx)
 	startNode(ctx, node)
 	node.Wait()

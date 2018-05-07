@@ -1,6 +1,6 @@
-## Go Ethereum Dashboard
+## Go ESC Dashboard
 
-The dashboard is a data visualizer integrated into geth, intended to collect and visualize useful information of an Ethereum node. It consists of two parts:
+The dashboard is a data visualizer integrated into geth, intended to collect and visualize useful information of an ESC node. It consists of two parts:
 
 * The client visualizes the collected data.
 * The server collects the data, and updates the clients.
@@ -9,7 +9,7 @@ The client's UI uses [React][React] with JSX syntax, which is validated by the [
 
 ### Development and bundling
 
-As the dashboard depends on certain NPM packages (which are not included in the go-esc repo), these need to be installed first:
+As the dashboard depends on certain NPM packages (which are not included in the go-esn repo), these need to be installed first:
 
 ```
 $ (cd dashboard/assets && npm install)

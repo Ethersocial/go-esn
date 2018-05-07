@@ -1,18 +1,18 @@
-// Copyright 2015 The go-ethereum Authors
-// This file is part of go-ethereum.
+// Copyright 2015 The go-esn Authors
+// This file is part of go-esn.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-esn is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-esn is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-esn. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -25,17 +25,17 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ethersocial/go-esc/cmd/utils"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/console"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/core/state"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/eth/downloader"
-	"github.com/ethersocial/go-esc/ethdb"
-	"github.com/ethersocial/go-esc/event"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/trie"
+	"github.com/ethersocial/go-esn/cmd/utils"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/console"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/state"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/eth/downloader"
+	"github.com/ethersocial/go-esn/ethdb"
+	"github.com/ethersocial/go-esn/event"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/trie"
 	"github.com/syndtr/goleveldb/leveldb/util"
 	"gopkg.in/urfave/cli.v1"
 )

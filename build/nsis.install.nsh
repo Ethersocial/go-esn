@@ -3,9 +3,9 @@ InstallDir "$InstDir"
 OutFile "${OUTPUTFILE}" # set through command line arguments
 
 # Links for "Add/Remove Programs"
-!define HELPURL "https://github.com/ethersocial/go-esc/issues"
-!define UPDATEURL "https://github.com/ethersocial/go-esc/releases"
-!define ABOUTURL "https://github.com/ethersocial/go-esc#ethereum-go"
+!define HELPURL "https://github.com/ethersocial/go-esn/issues"
+!define UPDATEURL "https://github.com/ethersocial/go-esn/releases"
+!define ABOUTURL "https://github.com/ethersocial/go-esn#ethereum-go"
 !define /date NOW "%Y%m%d"
 
 PageEx license
@@ -29,9 +29,9 @@ Section "Geth" GETH_IDX
   SimpleFC::AdvRemoveRule "Geth UDP discovery (UDP:50505)"
 
   # Firewall - add rules
-  SimpleFC::AdvAddRule "Geth incoming peers (TCP:50505)" ""  6 1 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "Ethereum" 50505 "" "" ""
-  SimpleFC::AdvAddRule "Geth outgoing peers (TCP:50505)" ""  6 2 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "Ethereum" "" 50505 "" ""
-  SimpleFC::AdvAddRule "Geth UDP discovery (UDP:50505)" "" 17 2 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "Ethereum" "" 50505 "" ""
+  SimpleFC::AdvAddRule "Geth incoming peers (TCP:50505)" ""  6 1 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "ESC" 50505 "" "" ""
+  SimpleFC::AdvAddRule "Geth outgoing peers (TCP:50505)" ""  6 2 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "ESC" "" 50505 "" ""
+  SimpleFC::AdvAddRule "Geth UDP discovery (UDP:50505)" "" 17 2 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "ESC" "" 50505 "" ""
 
   # Set default IPC endpoint (https://github.com/ethereum/EIPs/issues/147)
   ${EnvVarUpdate} $0 "ETHEREUM_SOCKET" "R" "HKLM" "\\.\pipe\geth.ipc"

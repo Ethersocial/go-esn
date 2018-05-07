@@ -1,18 +1,18 @@
-// Copyright 2017 The go-ethereum Authors
-// This file is part of go-ethereum.
+// Copyright 2017 The go-esn Authors
+// This file is part of go-esn.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-esn is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-esn is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-esn. If not, see <http://www.gnu.org/licenses/>.
 
 // This is a simple Whisper node. It could be used as a stand-alone bootstrap node.
 // Also, could be used for different test and diagnostics purposes.
@@ -34,16 +34,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethersocial/go-esc/cmd/utils"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/console"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/p2p/discover"
-	"github.com/ethersocial/go-esc/p2p/nat"
-	"github.com/ethersocial/go-esc/whisper/mailserver"
-	whisper "github.com/ethersocial/go-esc/whisper/whisperv5"
+	"github.com/ethersocial/go-esn/cmd/utils"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/console"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/nat"
+	"github.com/ethersocial/go-esn/whisper/mailserver"
+	whisper "github.com/ethersocial/go-esn/whisper/whisperv5"
 	"golang.org/x/crypto/pbkdf2"
 )
 

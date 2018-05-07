@@ -1,18 +1,18 @@
-// Copyright 2014 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// Copyright 2014 The go-esn Authors
+// This file is part of the go-esn library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-esn library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-esn library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-esn library. If not, see <http://www.gnu.org/licenses/>.
 
 package whisperv2
 
@@ -22,13 +22,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/crypto/ecies"
-	"github.com/ethersocial/go-esc/event/filter"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/crypto/ecies"
+	"github.com/ethersocial/go-esn/event/filter"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/rpc"
 
 	"gopkg.in/fatih/set.v0"
 )
@@ -58,7 +58,7 @@ type MessageEvent struct {
 	Message *Message
 }
 
-// Whisper represents a dark communication interface through the Ethereum
+// Whisper represents a dark communication interface through the ESC
 // network, using its very own P2P communication layer.
 type Whisper struct {
 	protocol p2p.Protocol
@@ -76,7 +76,7 @@ type Whisper struct {
 	quit chan struct{}
 }
 
-// New creates a Whisper client ready to communicate through the Ethereum P2P
+// New creates a Whisper client ready to communicate through the ESC P2P
 // network.
 func New() *Whisper {
 	whisper := &Whisper{

@@ -4,8 +4,8 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/params"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/params"
 )
 
 func TestByteOp(t *testing.T) {

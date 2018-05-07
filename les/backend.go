@@ -1,20 +1,20 @@
-// Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// Copyright 2016 The go-esn Authors
+// This file is part of the go-esn library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-esn library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-esn library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-esn library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package les implements the Light Ethereum Subprotocol.
+// Package les implements the Light ESC Subprotocol.
 package les
 
 import (
@@ -22,27 +22,27 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/accounts"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/hexutil"
-	"github.com/ethersocial/go-esc/consensus"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/core/bloombits"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/eth"
-	"github.com/ethersocial/go-esc/eth/downloader"
-	"github.com/ethersocial/go-esc/eth/filters"
-	"github.com/ethersocial/go-esc/eth/gasprice"
-	"github.com/ethersocial/go-esc/ethdb"
-	"github.com/ethersocial/go-esc/event"
-	"github.com/ethersocial/go-esc/internal/ethapi"
-	"github.com/ethersocial/go-esc/light"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/node"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/p2p/discv5"
-	"github.com/ethersocial/go-esc/params"
-	rpc "github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/accounts"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/hexutil"
+	"github.com/ethersocial/go-esn/consensus"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/bloombits"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/eth"
+	"github.com/ethersocial/go-esn/eth/downloader"
+	"github.com/ethersocial/go-esn/eth/filters"
+	"github.com/ethersocial/go-esn/eth/gasprice"
+	"github.com/ethersocial/go-esn/ethdb"
+	"github.com/ethersocial/go-esn/event"
+	"github.com/ethersocial/go-esn/internal/ethapi"
+	"github.com/ethersocial/go-esn/light"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/node"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/p2p/discv5"
+	"github.com/ethersocial/go-esn/params"
+	rpc "github.com/ethersocial/go-esn/rpc"
 )
 
 type LightEthereum struct {
@@ -216,7 +216,7 @@ func (s *LightEthereum) Protocols() []p2p.Protocol {
 }
 
 // Start implements node.Service, starting all internal goroutines needed by the
-// Ethereum protocol implementation.
+// ESC protocol implementation.
 func (s *LightEthereum) Start(srvr *p2p.Server) error {
 	s.startBloomHandlers()
 	log.Warn("Light client mode is an experimental feature")
@@ -230,7 +230,7 @@ func (s *LightEthereum) Start(srvr *p2p.Server) error {
 }
 
 // Stop implements node.Service, terminating all internal goroutines used by the
-// Ethereum protocol.
+// ESC protocol.
 func (s *LightEthereum) Stop() error {
 	s.odr.Stop()
 	if s.bloomIndexer != nil {

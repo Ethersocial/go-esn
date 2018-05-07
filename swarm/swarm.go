@@ -1,18 +1,18 @@
-// Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// Copyright 2016 The go-esn Authors
+// This file is part of the go-esn library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-esn library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-esn library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-esn library. If not, see <http://www.gnu.org/licenses/>.
 
 package swarm
 
@@ -23,22 +23,22 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ethersocial/go-esc/accounts/abi/bind"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/contracts/chequebook"
-	"github.com/ethersocial/go-esc/contracts/ens"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/ethclient"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/node"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/p2p/discover"
-	"github.com/ethersocial/go-esc/rpc"
-	"github.com/ethersocial/go-esc/swarm/api"
-	httpapi "github.com/ethersocial/go-esc/swarm/api/http"
-	"github.com/ethersocial/go-esc/swarm/fuse"
-	"github.com/ethersocial/go-esc/swarm/network"
-	"github.com/ethersocial/go-esc/swarm/storage"
+	"github.com/ethersocial/go-esn/accounts/abi/bind"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/contracts/chequebook"
+	"github.com/ethersocial/go-esn/contracts/ens"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/ethclient"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/node"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/rpc"
+	"github.com/ethersocial/go-esn/swarm/api"
+	httpapi "github.com/ethersocial/go-esn/swarm/api/http"
+	"github.com/ethersocial/go-esn/swarm/fuse"
+	"github.com/ethersocial/go-esn/swarm/network"
+	"github.com/ethersocial/go-esn/swarm/storage"
 )
 
 // the swarm stack

@@ -1,18 +1,18 @@
-// Copyright 2017 The go-ethereum Authors
-// This file is part of go-ethereum.
+// Copyright 2017 The go-esn Authors
+// This file is part of go-esn.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-esn is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-esn is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-esn. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ethersocial/go-esc/accounts/keystore"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/accounts/keystore"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/log"
 )
 
 // deployNode creates a new node configuration based on some user input.
@@ -146,7 +146,7 @@ func (w *wizard) deployNode(boot bool) {
 	}
 	// Try to deploy the full node on the host
 	if out, err := deployNode(client, w.network, w.conf.bootFull, w.conf.bootLight, infos); err != nil {
-		log.Error("Failed to deploy Ethereum node container", "err", err)
+		log.Error("Failed to deploy ESC node container", "err", err)
 		if len(out) > 0 {
 			fmt.Printf("%s\n", out)
 		}

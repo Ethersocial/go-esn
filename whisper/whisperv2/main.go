@@ -1,18 +1,18 @@
-// Copyright 2014 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// Copyright 2014 The go-esn Authors
+// This file is part of the go-esn library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-esn library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-esn library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-esn library. If not, see <http://www.gnu.org/licenses/>.
 
 // +build none
 
@@ -27,12 +27,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/logger"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/p2p/nat"
-	"github.com/ethersocial/go-esc/whisper"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/logger"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/p2p/nat"
+	"github.com/ethersocial/go-esn/whisper"
 )
 
 func main() {
@@ -47,7 +47,7 @@ func main() {
 	name := common.MakeName("whisper-go", "1.0")
 	shh := whisper.New()
 
-	// Create an Ethereum peer to communicate through
+	// Create an ESC peer to communicate through
 	server := p2p.Server{
 		PrivateKey: key,
 		MaxPeers:   10,
@@ -56,9 +56,9 @@ func main() {
 		ListenAddr: ":30300",
 		NAT:        nat.Any(),
 	}
-	fmt.Println("Starting Ethereum peer...")
+	fmt.Println("Starting ESC peer...")
 	if err := server.Start(); err != nil {
-		fmt.Printf("Failed to start Ethereum peer: %v.\n", err)
+		fmt.Printf("Failed to start ESC peer: %v.\n", err)
 		os.Exit(1)
 	}
 

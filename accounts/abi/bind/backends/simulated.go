@@ -1,18 +1,18 @@
-// Copyright 2015 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// Copyright 2015 The go-esn Authors
+// This file is part of the go-esn library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-esn library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-esn library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-esn library. If not, see <http://www.gnu.org/licenses/>.
 
 package backends
 
@@ -24,17 +24,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc"
-	"github.com/ethersocial/go-esc/accounts/abi/bind"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/math"
-	"github.com/ethersocial/go-esc/consensus/ethash"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/core/state"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/core/vm"
-	"github.com/ethersocial/go-esc/ethdb"
-	"github.com/ethersocial/go-esc/params"
+	"github.com/ethersocial/go-esn"
+	"github.com/ethersocial/go-esn/accounts/abi/bind"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/math"
+	"github.com/ethersocial/go-esn/consensus/ethash"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/state"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/core/vm"
+	"github.com/ethersocial/go-esn/ethdb"
+	"github.com/ethersocial/go-esn/params"
 )
 
 // This nil assignment ensures compile time that SimulatedBackend implements bind.ContractBackend.
@@ -47,7 +47,7 @@ var errGasEstimationFailed = errors.New("gas required exceeds allowance or alway
 // the background. Its main purpose is to allow easily testing contract bindings.
 type SimulatedBackend struct {
 	database   ethdb.Database   // In memory database to store our testing data
-	blockchain *core.BlockChain // Ethereum blockchain to handle the consensus
+	blockchain *core.BlockChain // ESC blockchain to handle the consensus
 
 	mu           sync.Mutex
 	pendingBlock *types.Block   // Currently pending block that will be imported on request
