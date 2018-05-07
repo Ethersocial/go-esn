@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/ethersocial/go-esn/common"
-	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/rawdb"
 	"github.com/ethersocial/go-esn/core/state"
 	"github.com/ethersocial/go-esn/crypto/sha3"
 	"github.com/ethersocial/go-esn/ethdb"
@@ -476,6 +476,6 @@ func (s *stateSync) updateStats(written, duplicate, unexpected int, duration tim
 		log.Info("Imported new state entries", "count", written, "elapsed", common.PrettyDuration(duration), "processed", s.d.syncStatsState.processed, "pending", s.d.syncStatsState.pending, "retry", len(s.tasks), "duplicate", s.d.syncStatsState.duplicate, "unexpected", s.d.syncStatsState.unexpected)
 	}
 	if written > 0 {
-		core.WriteTrieSyncProgress(s.d.stateDB, s.d.syncStatsState.processed)
+		rawdb.WriteFastTrieProgress(s.d.stateDB, s.d.syncStatsState.processed)
 	}
 }

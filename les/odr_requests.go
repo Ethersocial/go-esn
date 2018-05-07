@@ -24,7 +24,7 @@ import (
 	"fmt"
 
 	"github.com/ethersocial/go-esn/common"
-	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/rawdb"
 	"github.com/ethersocial/go-esn/core/types"
 	"github.com/ethersocial/go-esn/crypto"
 	"github.com/ethersocial/go-esn/ethdb"
@@ -110,7 +110,7 @@ func (r *BlockRequest) Validate(db ethdb.Database, msg *Msg) error {
 	body := bodies[0]
 
 	// Retrieve our stored header and validate block content against it
-	header := core.GetHeader(db, r.Hash, r.Number)
+	header := rawdb.ReadHeader(db, r.Hash, r.Number)
 	if header == nil {
 		return errHeaderUnavailable
 	}
@@ -166,7 +166,7 @@ func (r *ReceiptsRequest) Validate(db ethdb.Database, msg *Msg) error {
 	receipt := receipts[0]
 
 	// Retrieve our stored header and validate receipt content against it
-	header := core.GetHeader(db, r.Hash, r.Number)
+	header := rawdb.ReadHeader(db, r.Hash, r.Number)
 	if header == nil {
 		return errHeaderUnavailable
 	}

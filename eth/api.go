@@ -19,6 +19,7 @@ package eth
 import (
 	"compress/gzip"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"math/big"
@@ -28,6 +29,7 @@ import (
 	"github.com/ethersocial/go-esn/common"
 	"github.com/ethersocial/go-esn/common/hexutil"
 	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/rawdb"
 	"github.com/ethersocial/go-esn/core/state"
 	"github.com/ethersocial/go-esn/core/types"
 	"github.com/ethersocial/go-esn/log"
@@ -343,8 +345,10 @@ func NewPrivateDebugAPI(config *params.ChainConfig, eth *Ethereum) *PrivateDebug
 
 // Preimage is a debug API function that returns the preimage for a sha3 hash, if known.
 func (api *PrivateDebugAPI) Preimage(ctx context.Context, hash common.Hash) (hexutil.Bytes, error) {
-	db := core.PreimageTable(api.eth.ChainDb())
-	return db.Get(hash.Bytes())
+	if preimage := rawdb.ReadPreimage(api.eth.ChainDb(), hash); preimage != nil {
+		return preimage, nil
+	}
+	return nil, errors.New("unknown preimage")
 }
 
 // GetBadBLocks returns a list of the last 'bad blocks' that the client has seen on the network

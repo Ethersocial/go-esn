@@ -27,7 +27,7 @@ import (
 
 	ethereum "github.com/ethersocial/go-esn"
 	"github.com/ethersocial/go-esn/common"
-	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/rawdb"
 	"github.com/ethersocial/go-esn/core/types"
 	"github.com/ethersocial/go-esn/ethdb"
 	"github.com/ethersocial/go-esn/event"
@@ -224,7 +224,7 @@ func New(mode SyncMode, stateDb ethdb.Database, mux *event.TypeMux, chain BlockC
 		stateCh:        make(chan dataPack),
 		stateSyncStart: make(chan *stateSync),
 		syncStatsState: stateSyncStats{
-			processed: core.GetTrieSyncProgress(stateDb),
+			processed: rawdb.ReadFastTrieProgress(stateDb),
 		},
 		trackStateReq: make(chan *stateReq),
 	}

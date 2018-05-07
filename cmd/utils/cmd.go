@@ -29,6 +29,7 @@ import (
 
 	"github.com/ethersocial/go-esn/common"
 	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/rawdb"
 	"github.com/ethersocial/go-esn/core/types"
 	"github.com/ethersocial/go-esn/crypto"
 	"github.com/ethersocial/go-esn/ethdb"
@@ -271,15 +272,13 @@ func ImportPreimages(db *ethdb.LDBDatabase, fn string) error {
 		// Accumulate the preimages and flush when enough ws gathered
 		preimages[crypto.Keccak256Hash(blob)] = common.CopyBytes(blob)
 		if len(preimages) > 1024 {
-			if err := core.WritePreimages(db, 0, preimages); err != nil {
-				return err
-			}
+			rawdb.WritePreimages(db, 0, preimages)
 			preimages = make(map[common.Hash][]byte)
 		}
 	}
 	// Flush the last batch preimage data
 	if len(preimages) > 0 {
-		return core.WritePreimages(db, 0, preimages)
+		rawdb.WritePreimages(db, 0, preimages)
 	}
 	return nil
 }

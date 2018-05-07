@@ -28,6 +28,7 @@ import (
 	"github.com/ethersocial/go-esn/consensus"
 	"github.com/ethersocial/go-esn/core"
 	"github.com/ethersocial/go-esn/core/bloombits"
+	"github.com/ethersocial/go-esn/core/rawdb"
 	"github.com/ethersocial/go-esn/core/types"
 	"github.com/ethersocial/go-esn/eth"
 	"github.com/ethersocial/go-esn/eth/downloader"
@@ -122,7 +123,7 @@ func New(ctx *node.ServiceContext, config *eth.Config) (*LightEthereum, error) {
 	if compat, ok := genesisErr.(*params.ConfigCompatError); ok {
 		log.Warn("Rewinding chain to upgrade configuration", "err", compat)
 		leth.blockchain.SetHead(compat.RewindTo)
-		core.WriteChainConfig(chainDb, genesisHash, chainConfig)
+		rawdb.WriteChainConfig(chainDb, genesisHash, chainConfig)
 	}
 
 	leth.txPool = light.NewTxPool(leth.chainConfig, leth.blockchain, leth.relay)

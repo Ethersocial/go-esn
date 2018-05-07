@@ -28,6 +28,7 @@ import (
 
 	"github.com/ethersocial/go-esn/common"
 	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/rawdb"
 	"github.com/ethersocial/go-esn/crypto"
 	"github.com/ethersocial/go-esn/crypto/secp256k1"
 	"github.com/ethersocial/go-esn/rlp"
@@ -223,6 +224,6 @@ type proofsData [][]rlp.RawValue
 
 type txStatus struct {
 	Status core.TxStatus
-	Lookup *core.TxLookupEntry `rlp:"nil"`
+	Lookup *rawdb.TxLookupEntry `rlp:"nil"`
 	Error  string
 }
