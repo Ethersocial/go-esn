@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-esn library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package state provides a caching layer atop the ESC state trie.
+// Package state provides a caching layer atop the ESN state trie.
 package state
 
 import (

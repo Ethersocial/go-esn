@@ -135,7 +135,7 @@ func (h UnprefixedHash) MarshalText() ([]byte, error) {
 
 /////////// Address
 
-// Address represents the 20 byte address of an ESC account.
+// Address represents the 20 byte address of an ESN account.
 type Address [AddressLength]byte
 
 func BytesToAddress(b []byte) Address {
@@ -148,7 +148,7 @@ func BigToAddress(b *big.Int) Address  { return BytesToAddress(b.Bytes()) }
 func HexToAddress(s string) Address    { return BytesToAddress(FromHex(s)) }
 
 // IsHexAddress verifies whether a string can represent a valid hex-encoded
-// ESC address or not.
+// ESN address or not.
 func IsHexAddress(s string) bool {
 	if len(s) == 2+2*AddressLength && IsHex(s) {
 		return true

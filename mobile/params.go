@@ -26,13 +26,13 @@ import (
 	"github.com/ethersocial/go-esn/params"
 )
 
-// MainnetGenesis returns the JSON spec to use for the main ESC network. It
+// MainnetGenesis returns the JSON spec to use for the main ESN network. It
 // is actually empty since that defaults to the hard coded binary genesis block.
 func MainnetGenesis() string {
 	return ""
 }
 
-// TestnetGenesis returns the JSON spec to use for the ESC test network.
+// TestnetGenesis returns the JSON spec to use for the ESN test network.
 func TestnetGenesis() string {
 	enc, err := json.Marshal(core.DefaultTestnetGenesisBlock())
 	if err != nil {

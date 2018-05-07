@@ -49,7 +49,7 @@ type Config struct {
 	JumpTable [256]operation
 }
 
-// Interpreter is used to run ESC based contracts and will utilise the
+// Interpreter is used to run ESN based contracts and will utilise the
 // passed evmironment to query external sources for state information.
 // The Interpreter will run the byte code VM or JIT VM based on the passed
 // configuration.

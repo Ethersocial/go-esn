@@ -66,12 +66,12 @@ type blockChain interface {
 	SubscribeChainHeadEvent(ch chan<- core.ChainHeadEvent) event.Subscription
 }
 
-// Service implements an ESC netstats reporting daemon that pushes local
+// Service implements an ESN netstats reporting daemon that pushes local
 // chain statistics up to a monitoring server.
 type Service struct {
 	server *p2p.Server        // Peer-to-peer server to retrieve networking infos
-	eth    *eth.Ethereum      // Full ESC service if monitoring a full node
-	les    *les.LightEthereum // Light ESC service if monitoring a light node
+	eth    *eth.Ethereum      // Full ESN service if monitoring a full node
+	les    *les.LightEthereum // Light ESN service if monitoring a light node
 	engine consensus.Engine   // Consensus engine to retrieve variadic block fields
 
 	node string // Name of the node to display on the monitoring page

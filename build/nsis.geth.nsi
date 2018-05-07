@@ -31,7 +31,7 @@ CRCCheck on
 
 !define GROUPNAME "ESC"
 !define APPNAME "Geth"
-!define DESCRIPTION "Official Go implementation of the ESC protocol"
+!define DESCRIPTION "Official Go implementation of the ESN protocol"
 !addplugindir .\
 
 # Require admin rights on NT6+ (When UAC is turned on)

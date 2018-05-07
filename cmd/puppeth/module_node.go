@@ -28,7 +28,7 @@ import (
 	"github.com/ethersocial/go-esn/log"
 )
 
-// nodeDockerfile is the Dockerfile required to run an ESC node.
+// nodeDockerfile is the Dockerfile required to run an ESN node.
 var nodeDockerfile = `
 FROM ethereum/client-go:latest
 
@@ -46,7 +46,7 @@ ENTRYPOINT ["/bin/sh", "geth.sh"]
 `
 
 // nodeComposefile is the docker-compose.yml file required to deploy and maintain
-// an ESC node (bootnode or miner for now).
+// an ESN node (bootnode or miner for now).
 var nodeComposefile = `
 version: '2'
 services:
@@ -76,7 +76,7 @@ services:
     restart: always
 `
 
-// deployNode deploys a new ESC node container to a remote machine via SSH,
+// deployNode deploys a new ESN node container to a remote machine via SSH,
 // docker and docker-compose. If an instance with the specified network name
 // already exists there, it will be overwritten!
 func deployNode(client *sshClient, network string, bootv4, bootv5 []string, config *nodeInfos) ([]byte, error) {

@@ -76,7 +76,7 @@ type Whisper struct {
 	quit chan struct{}
 }
 
-// New creates a Whisper client ready to communicate through the ESC P2P
+// New creates a Whisper client ready to communicate through the ESN P2P
 // network.
 func New() *Whisper {
 	whisper := &Whisper{

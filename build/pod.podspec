@@ -6,7 +6,7 @@ Pod::Spec.new do |spec|
   spec.authors      = { {{range .Contributors}}
 		'{{.Name}}' => '{{.Email}}',{{end}}
 	}
-  spec.summary      = 'iOS ESC Client'
+  spec.summary      = 'iOS ESN Client'
   spec.source       = { :git => 'https://github.com/ethersocial/go-esn.git', :commit => '{{.Commit}}' }
 
 	spec.platform = :ios

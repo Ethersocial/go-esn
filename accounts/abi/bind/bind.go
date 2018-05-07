@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-esn library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package bind generates ESC contract Go bindings.
+// Package bind generates ESN contract Go bindings.
 //
 // Detailed usage document and tutorial available on the go-esn Wiki page:
 // https://github.com/ethersocial/go-esn/wiki/Native-DApps:-Go-bindings-to-ESC-contracts

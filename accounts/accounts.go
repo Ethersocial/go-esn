@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-esn library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package accounts implements high level ESC account management.
+// Package accounts implements high level ESN account management.
 package accounts
 
 import (
@@ -26,10 +26,10 @@ import (
 	"github.com/ethersocial/go-esn/event"
 )
 
-// Account represents an ESC account located at a specific location defined
+// Account represents an ESN account located at a specific location defined
 // by the optional URL field.
 type Account struct {
-	Address common.Address `json:"address"` // ESC account address derived from the key
+	Address common.Address `json:"address"` // ESN account address derived from the key
 	URL     URL            `json:"url"`     // Optional resource locator within a backend
 }
 

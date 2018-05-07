@@ -92,7 +92,7 @@ var (
 	debExecutables = []debExecutable{
 		{
 			Name:        "abigen",
-			Description: "Source code generator to convert ESC contract definitions into easy to use, compile-time type-safe Go packages.",
+			Description: "Source code generator to convert ESN contract definitions into easy to use, compile-time type-safe Go packages.",
 		},
 		{
 			Name:        "bootnode",

@@ -97,7 +97,7 @@ type ProtocolManager struct {
 	wg sync.WaitGroup
 }
 
-// NewProtocolManager returns a new ethereum sub protocol manager. The ESC sub protocol manages peers capable
+// NewProtocolManager returns a new ethereum sub protocol manager. The ESN sub protocol manages peers capable
 // with the ethereum network.
 func NewProtocolManager(config *params.ChainConfig, mode downloader.SyncMode, networkId uint64, mux *event.TypeMux, txpool txPool, engine consensus.Engine, blockchain *core.BlockChain, chaindb ethdb.Database) (*ProtocolManager, error) {
 	// Create the protocol manager with the base fields
@@ -189,9 +189,9 @@ func (pm *ProtocolManager) removePeer(id string) {
 	if peer == nil {
 		return
 	}
-	log.Debug("Removing ESC peer", "peer", id)
+	log.Debug("Removing ESN peer", "peer", id)
 
-	// Unregister the peer from the downloader and ESC peer set
+	// Unregister the peer from the downloader and ESN peer set
 	pm.downloader.UnregisterPeer(id)
 	if err := pm.peers.Unregister(id); err != nil {
 		log.Error("Peer removal failed", "peer", id, "err", err)
@@ -220,7 +220,7 @@ func (pm *ProtocolManager) Start(maxPeers int) {
 }
 
 func (pm *ProtocolManager) Stop() {
-	log.Info("Stopping ESC protocol")
+	log.Info("Stopping ESN protocol")
 
 	pm.txSub.Unsubscribe()         // quits txBroadcastLoop
 	pm.minedBlockSub.Unsubscribe() // quits blockBroadcastLoop
@@ -256,7 +256,7 @@ func (pm *ProtocolManager) handle(p *peer) error {
 	}
 	p.Log().Debug("ESC peer connected", "name", p.Name())
 
-	// Execute the ESC handshake
+	// Execute the ESN handshake
 	td, head, genesis := pm.blockchain.Status()
 	if err := p.Handshake(pm.networkId, td, head, genesis); err != nil {
 		p.Log().Debug("ESC handshake failed", "err", err)
@@ -744,10 +744,10 @@ func (self *ProtocolManager) txBroadcastLoop() {
 	}
 }
 
-// EthNodeInfo represents a short summary of the ESC sub-protocol metadata known
+// EthNodeInfo represents a short summary of the ESN sub-protocol metadata known
 // about the host peer.
 type EthNodeInfo struct {
-	Network    uint64      `json:"network"`    // ESC network ID (1=Frontier, 2=Morden, Ropsten=3)
+	Network    uint64      `json:"network"`    // ESN network ID (1=Frontier, 2=Morden, Ropsten=3)
 	Difficulty *big.Int    `json:"difficulty"` // Total difficulty of the host's blockchain
 	Genesis    common.Hash `json:"genesis"`    // SHA3 hash of the host's genesis block
 	Head       common.Hash `json:"head"`       // SHA3 hash of the host's best owned block

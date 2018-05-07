@@ -52,7 +52,7 @@ var DefaultLedgerBaseDerivationPath = DerivationPath{0x80000000 + 44, 0x80000000
 // SLIP-44 https://github.com/satoshilabs/slips/blob/master/slip-0044.md assigns
 // the `coin_type` 60' (or 0x8000003C) to ESC.
 //
-// The root path for ESC is m/44'/60'/0'/0 according to the specification
+// The root path for ESN is m/44'/60'/0'/0 according to the specification
 // from https://github.com/ethereum/EIPs/issues/84, albeit it's not set in stone
 // yet whether accounts should increment the last component or the children of
 // that. We will go with the simpler approach of incrementing the last component.

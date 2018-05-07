@@ -191,11 +191,11 @@ func Clear(fg, bg Attribute) error {
 
 // Sets termbox input mode. Termbox has two input modes:
 //
-// 1. Esc input mode. When ESC sequence is in the buffer and it doesn't match
-// any known sequence. ESC means KeyEsc. This is the default input mode.
+// 1. Esc input mode. When ESN sequence is in the buffer and it doesn't match
+// any known sequence. ESN means KeyEsc. This is the default input mode.
 //
-// 2. Alt input mode. When ESC sequence is in the buffer and it doesn't match
-// any known sequence. ESC enables ModAlt modifier for the next keyboard event.
+// 2. Alt input mode. When ESN sequence is in the buffer and it doesn't match
+// any known sequence. ESN enables ModAlt modifier for the next keyboard event.
 //
 // Both input modes can be OR'ed with Mouse mode. Setting Mouse mode bit up will
 // enable mouse button press/release and drag events.

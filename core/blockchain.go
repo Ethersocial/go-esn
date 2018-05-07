@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-esn library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package core implements the ESC consensus protocol.
+// Package core implements the ESN consensus protocol.
 package core
 
 import (
@@ -117,7 +117,7 @@ type BlockChain struct {
 }
 
 // NewBlockChain returns a fully initialised block chain using information
-// available in the database. It initialises the default ESC Validator and
+// available in the database. It initialises the default ESN Validator and
 // Processor.
 func NewBlockChain(chainDb ethdb.Database, config *params.ChainConfig, engine consensus.Engine, vmConfig vm.Config) (*BlockChain, error) {
 	bodyCache, _ := lru.New(bodyCacheLimit)

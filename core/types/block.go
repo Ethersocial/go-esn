@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-esn library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package types contains data types related to ESC consensus.
+// Package types contains data types related to ESN consensus.
 package types
 
 import (
@@ -66,7 +66,7 @@ func (n *BlockNonce) UnmarshalText(input []byte) error {
 
 //go:generate gencodec -type Header -field-override headerMarshaling -out gen_header_json.go
 
-// Header represents a block header in the ESC blockchain.
+// Header represents a block header in the ESN blockchain.
 type Header struct {
 	ParentHash  common.Hash    `json:"parentHash"       gencodec:"required"`
 	UncleHash   common.Hash    `json:"sha3Uncles"       gencodec:"required"`
@@ -135,7 +135,7 @@ type Body struct {
 	Uncles       []*Header
 }
 
-// Block represents an entire block in the ESC blockchain.
+// Block represents an entire block in the ESN blockchain.
 type Block struct {
 	header       *Header
 	uncles       []*Header
@@ -268,7 +268,7 @@ func (b *Block) DecodeRLP(s *rlp.Stream) error {
 	return nil
 }
 
-// EncodeRLP serializes b into the ESC RLP block format.
+// EncodeRLP serializes b into the ESN RLP block format.
 func (b *Block) EncodeRLP(w io.Writer) error {
 	return rlp.Encode(w, extblock{
 		Header: b.header,

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with go-esn. If not, see <http://www.gnu.org/licenses/>.
 
-// bootnode runs a bootstrap node for the ESC Discovery Protocol.
+// bootnode runs a bootstrap node for the ESN Discovery Protocol.
 package main
 
 import (

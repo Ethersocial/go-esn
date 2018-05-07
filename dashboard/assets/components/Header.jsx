@@ -70,7 +70,7 @@ class Header extends Component {
                         <MenuIcon />
                     </IconButton>
                     <Typography type="title" color="inherit" noWrap>
-                        Go ESC Dashboard
+                        Go ESN Dashboard
                     </Typography>
                 </Toolbar>
             </AppBar>

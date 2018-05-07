@@ -9,7 +9,7 @@
   <version>{{.Version}}</version>
   <packaging>aar</packaging>
 
-  <name>Android ESC Client</name>
+  <name>Android ESN Client</name>
   <description>Android port of the go-esn libraries and node</description>
   <url>https://github.com/ethersocial/go-esn</url>
   <inceptionYear>2015</inceptionYear>

@@ -15,7 +15,7 @@
 // along with the go-esn library. If not, see <http://www.gnu.org/licenses/>.
 
 // Package light implements on-demand retrieval capable state and chain objects
-// for the ESC Light Client.
+// for the ESN Light Client.
 package light
 
 import (

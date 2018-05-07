@@ -400,14 +400,14 @@ func NewFaker() *Ethash {
 
 // NewFakeFailer creates a ethash consensus engine with a fake PoW scheme that
 // accepts all blocks as valid apart from the single one specified, though they
-// still have to conform to the ESC consensus rules.
+// still have to conform to the ESN consensus rules.
 func NewFakeFailer(fail uint64) *Ethash {
 	return &Ethash{fakeMode: true, fakeFail: fail}
 }
 
 // NewFakeDelayer creates a ethash consensus engine with a fake PoW scheme that
 // accepts all blocks as valid, but delays verifications by some time, though
-// they still have to conform to the ESC consensus rules.
+// they still have to conform to the ESN consensus rules.
 func NewFakeDelayer(delay time.Duration) *Ethash {
 	return &Ethash{fakeMode: true, fakeDelay: delay}
 }

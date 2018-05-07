@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-esn library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package tests implements execution of ESC JSON tests.
+// Package tests implements execution of ESN JSON tests.
 package tests
 
 import (
