@@ -1,4 +1,4 @@
-// Copyright 2015 The go-esn Authors
+// Copyright 2016 The go-ethereum Authors
 // This file is part of go-esn.
 //
 // go-esn is free software: you can redistribute it and/or modify
