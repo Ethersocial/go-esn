@@ -31,7 +31,7 @@ var (
 var (
 	// MainnetChainConfig is the chain parameters to run a node on the main network.
 	MainnetChainConfig = &ChainConfig{
-		ChainId:        big.NewInt(0),
+		ChainId:        big.NewInt(0), // EIP155 31102
 		HomesteadBlock: big.NewInt(0),
 		DAOForkBlock:   big.NewInt(0),
 		DAOForkSupport: false,
@@ -46,14 +46,14 @@ var (
 
 	// TestnetChainConfig contains the chain parameters to run a node on the Ropsten test network.
 	TestnetChainConfig = &ChainConfig{
-		ChainId:             big.NewInt(12321), // genesis 12321, EIP155 131102
+		ChainId:             big.NewInt(131102), // genesis 12321, EIP155 131102
 		HomesteadBlock:      big.NewInt(0),
 		DAOForkBlock:        nil,
 		DAOForkSupport:      true,
 		EIP150Block:         big.NewInt(0),
 		EIP150Hash:          common.HexToHash("0xabcca8259adf43270310766fd545b8f58d65d6c5001f2f646e0fbc229aced20e"),
-		EIP155Block:         big.NewInt(9000000),
-		EIP158Block:         big.NewInt(9000000),
+		EIP155Block:         big.NewInt(204000),
+		EIP158Block:         big.NewInt(204000),
 		ByzantiumBlock:      big.NewInt(100),
 		ConstantinopleBlock: nil,
 		Ethash:              new(EthashConfig),
