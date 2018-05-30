@@ -36,7 +36,7 @@ import (
 	"github.com/ethersocial/go-esn/log"
 	"github.com/ethersocial/go-esn/metrics"
 	"github.com/ethersocial/go-esn/node"
-	cli "gopkg.in/urfave/cli.v1"
+	"gopkg.in/urfave/cli.v1"
 )
 
 const (

@@ -51,14 +51,11 @@ type ChequebookTransactor struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
-<<<<<<< HEAD
-=======
 // ChequebookFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
 type ChequebookFilterer struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
->>>>>>> develop
 // ChequebookSession is an auto generated Go binding around an Ethereum contract,
 // with pre-set call and transact options.
 type ChequebookSession struct {
@@ -247,86 +244,12 @@ func (_Chequebook *ChequebookTransactorSession) Kill() (*types.Transaction, erro
 	return _Chequebook.Contract.Kill(&_Chequebook.TransactOpts)
 }
 
-<<<<<<< HEAD
-// MortalABI is the input ABI used to generate the binding from.
-const MortalABI = `[{"constant":false,"inputs":[],"name":"kill","outputs":[],"type":"function"}]`
-
-// MortalBin is the compiled bytecode used for deploying new contracts.
-const MortalBin = `0x606060405260008054600160a060020a03191633179055605c8060226000396000f3606060405260e060020a600035046341c0e1b58114601a575b005b60186000543373ffffffffffffffffffffffffffffffffffffffff90811691161415605a5760005473ffffffffffffffffffffffffffffffffffffffff16ff5b56`
-
-// DeployMortal deploys a new Ethereum contract, binding an instance of Mortal to it.
-func DeployMortal(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *Mortal, error) {
-	parsed, err := abi.JSON(strings.NewReader(MortalABI))
-	if err != nil {
-		return common.Address{}, nil, nil, err
-	}
-	address, tx, contract, err := bind.DeployContract(auth, parsed, common.FromHex(MortalBin), backend)
-	if err != nil {
-		return common.Address{}, nil, nil, err
-	}
-	return address, tx, &Mortal{MortalCaller: MortalCaller{contract: contract}, MortalTransactor: MortalTransactor{contract: contract}}, nil
-}
-
-// Mortal is an auto generated Go binding around an Ethereum contract.
-type Mortal struct {
-	MortalCaller     // Read-only binding to the contract
-	MortalTransactor // Write-only binding to the contract
-}
-
-// MortalCaller is an auto generated read-only Go binding around an Ethereum contract.
-type MortalCaller struct {
-	contract *bind.BoundContract // Generic contract wrapper for the low level calls
-}
-
-// MortalTransactor is an auto generated write-only Go binding around an Ethereum contract.
-type MortalTransactor struct {
-	contract *bind.BoundContract // Generic contract wrapper for the low level calls
-}
-
-// MortalSession is an auto generated Go binding around an Ethereum contract,
-// with pre-set call and transact options.
-type MortalSession struct {
-	Contract     *Mortal           // Generic contract binding to set the session for
-	CallOpts     bind.CallOpts     // Call options to use throughout this session
-	TransactOpts bind.TransactOpts // Transaction auth options to use throughout this session
-}
-
-// MortalCallerSession is an auto generated read-only Go binding around an Ethereum contract,
-// with pre-set call options.
-type MortalCallerSession struct {
-	Contract *MortalCaller // Generic contract caller binding to set the session for
-	CallOpts bind.CallOpts // Call options to use throughout this session
-}
-
-// MortalTransactorSession is an auto generated write-only Go binding around an Ethereum contract,
-// with pre-set transact options.
-type MortalTransactorSession struct {
-	Contract     *MortalTransactor // Generic contract transactor binding to set the session for
-	TransactOpts bind.TransactOpts // Transaction auth options to use throughout this session
-}
-
-// MortalRaw is an auto generated low-level Go binding around an Ethereum contract.
-type MortalRaw struct {
-	Contract *Mortal // Generic contract binding to access the raw methods on
-}
-
-// MortalCallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
-type MortalCallerRaw struct {
-	Contract *MortalCaller // Generic read-only contract binding to access the raw methods on
-}
-
-// MortalTransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
-type MortalTransactorRaw struct {
-	Contract *MortalTransactor // Generic write-only contract binding to access the raw methods on
-}
-=======
 // ChequebookOverdraftIterator is returned from FilterOverdraft and is used to iterate over the raw logs and unpacked data for Overdraft events raised by the Chequebook contract.
 type ChequebookOverdraftIterator struct {
 	Event *ChequebookOverdraft // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
->>>>>>> develop
 
 	logs chan types.Log        // Log channel receiving the found contract events
 	sub  ethereum.Subscription // Subscription for errors, completion and termination
@@ -396,102 +319,10 @@ type ChequebookOverdraft struct {
 
 // FilterOverdraft is a free log retrieval operation binding the contract event 0x2250e2993c15843b32621c89447cc589ee7a9f049c026986e545d3c2c0c6f978.
 //
-<<<<<<< HEAD
-// Solidity: function kill() returns()
-func (_Mortal *MortalTransactorSession) Kill() (*types.Transaction, error) {
-	return _Mortal.Contract.Kill(&_Mortal.TransactOpts)
-}
-
-// OwnedABI is the input ABI used to generate the binding from.
-const OwnedABI = `[{"inputs":[],"type":"constructor"}]`
-
-// OwnedBin is the compiled bytecode used for deploying new contracts.
-const OwnedBin = `0x606060405260008054600160a060020a0319163317905560068060226000396000f3606060405200`
-
-// DeployOwned deploys a new Ethereum contract, binding an instance of Owned to it.
-func DeployOwned(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *Owned, error) {
-	parsed, err := abi.JSON(strings.NewReader(OwnedABI))
-	if err != nil {
-		return common.Address{}, nil, nil, err
-	}
-	address, tx, contract, err := bind.DeployContract(auth, parsed, common.FromHex(OwnedBin), backend)
-	if err != nil {
-		return common.Address{}, nil, nil, err
-	}
-	return address, tx, &Owned{OwnedCaller: OwnedCaller{contract: contract}, OwnedTransactor: OwnedTransactor{contract: contract}}, nil
-}
-
-// Owned is an auto generated Go binding around an Ethereum contract.
-type Owned struct {
-	OwnedCaller     // Read-only binding to the contract
-	OwnedTransactor // Write-only binding to the contract
-}
-
-// OwnedCaller is an auto generated read-only Go binding around an Ethereum contract.
-type OwnedCaller struct {
-	contract *bind.BoundContract // Generic contract wrapper for the low level calls
-}
-
-// OwnedTransactor is an auto generated write-only Go binding around an Ethereum contract.
-type OwnedTransactor struct {
-	contract *bind.BoundContract // Generic contract wrapper for the low level calls
-}
-
-// OwnedSession is an auto generated Go binding around an Ethereum contract,
-// with pre-set call and transact options.
-type OwnedSession struct {
-	Contract     *Owned            // Generic contract binding to set the session for
-	CallOpts     bind.CallOpts     // Call options to use throughout this session
-	TransactOpts bind.TransactOpts // Transaction auth options to use throughout this session
-}
-
-// OwnedCallerSession is an auto generated read-only Go binding around an Ethereum contract,
-// with pre-set call options.
-type OwnedCallerSession struct {
-	Contract *OwnedCaller  // Generic contract caller binding to set the session for
-	CallOpts bind.CallOpts // Call options to use throughout this session
-}
-
-// OwnedTransactorSession is an auto generated write-only Go binding around an Ethereum contract,
-// with pre-set transact options.
-type OwnedTransactorSession struct {
-	Contract     *OwnedTransactor  // Generic contract transactor binding to set the session for
-	TransactOpts bind.TransactOpts // Transaction auth options to use throughout this session
-}
-
-// OwnedRaw is an auto generated low-level Go binding around an Ethereum contract.
-type OwnedRaw struct {
-	Contract *Owned // Generic contract binding to access the raw methods on
-}
-
-// OwnedCallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
-type OwnedCallerRaw struct {
-	Contract *OwnedCaller // Generic read-only contract binding to access the raw methods on
-}
-
-// OwnedTransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
-type OwnedTransactorRaw struct {
-	Contract *OwnedTransactor // Generic write-only contract binding to access the raw methods on
-}
-
-// NewOwned creates a new instance of Owned, bound to a specific deployed contract.
-func NewOwned(address common.Address, backend bind.ContractBackend) (*Owned, error) {
-	contract, err := bindOwned(address, backend, backend)
-	if err != nil {
-		return nil, err
-	}
-	return &Owned{OwnedCaller: OwnedCaller{contract: contract}, OwnedTransactor: OwnedTransactor{contract: contract}}, nil
-}
-
-// NewOwnedCaller creates a new read-only instance of Owned, bound to a specific deployed contract.
-func NewOwnedCaller(address common.Address, caller bind.ContractCaller) (*OwnedCaller, error) {
-	contract, err := bindOwned(address, caller, nil)
-=======
 // Solidity: event Overdraft(deadbeat address)
 func (_Chequebook *ChequebookFilterer) FilterOverdraft(opts *bind.FilterOpts) (*ChequebookOverdraftIterator, error) {
 
 	logs, sub, err := _Chequebook.contract.FilterLogs(opts, "Overdraft")
->>>>>>> develop
 	if err != nil {
 		return nil, err
 	}

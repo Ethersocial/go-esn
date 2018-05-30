@@ -1,17 +1,6 @@
-<<<<<<< HEAD
-// Ethereum Name Service contracts by Nick Johnson <nick@ethereum.org>
-// 
-// To the extent possible under law, the person who associated CC0 with
-// ENS contracts has waived all copyright and related or neighboring rights
-// to ENS.
-// 
-// You should have received a copy of the CC0 legalcode along with this
-// work.  If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
-=======
 pragma solidity ^0.4.0;
 
 import './AbstractENS.sol';
->>>>>>> develop
 
 /**
  * The ENS registry contract.
