@@ -20,9 +20,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/eth/downloader"
-	"github.com/ethersocial/go-esc/light"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/eth/downloader"
+	"github.com/ethersocial/go-esn/light"
 )
 
 const (

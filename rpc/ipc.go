@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/log"
 )
 
 // CreateIPCListener creates an listener, on Unix platforms this is a unix socket, on

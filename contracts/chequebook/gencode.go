@@ -25,23 +25,22 @@ import (
 	"io/ioutil"
 	"math/big"
 
-	"github.com/ethersocial/go-esc/accounts/abi/bind"
-	"github.com/ethersocial/go-esc/accounts/abi/bind/backends"
-	"github.com/ethersocial/go-esc/contracts/chequebook/contract"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/crypto"
+	"github.com/ethersocial/go-esn/accounts/abi/bind"
+	"github.com/ethersocial/go-esn/accounts/abi/bind/backends"
+	"github.com/ethersocial/go-esn/contracts/chequebook/contract"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/crypto"
 )
 
 var (
-	testKey, _  = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
-	testAccount = core.GenesisAccount{
-		Address: crypto.PubkeyToAddress(testKey.PublicKey),
-		Balance: big.NewInt(500000000000),
+	testKey, _ = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
+	testAlloc  = core.GenesisAlloc{
+		crypto.PubkeyToAddress(testKey.PublicKey): {Balance: big.NewInt(500000000000)},
 	}
 )
 
 func main() {
-	backend := backends.NewSimulatedBackend(testAccount)
+	backend := backends.NewSimulatedBackend(testAlloc)
 	auth := bind.NewKeyedTransactor(testKey)
 
 	// Deploy the contract, get the code.

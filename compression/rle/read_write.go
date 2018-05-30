@@ -21,7 +21,7 @@ import (
 	"bytes"
 	"errors"
 
-	"github.com/ethersocial/go-esc/crypto"
+	"github.com/ethersocial/go-esn/crypto"
 )
 
 const (

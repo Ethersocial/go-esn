@@ -21,8 +21,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/mclock"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/mclock"
 )
 
 func TestTopicRadius(t *testing.T) {

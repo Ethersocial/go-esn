@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esn/common"
 )
 
 // Hash represents the 32 byte Keccak256 hash of arbitrary data.

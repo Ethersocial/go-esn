@@ -22,7 +22,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/log"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -38,7 +38,7 @@ func main() {
 		},
 		cli.IntFlag{
 			Name:  "loglevel",
-			Value: 4,
+			Value: 3,
 			Usage: "log level to emit to the screen",
 		},
 	}

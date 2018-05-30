@@ -19,7 +19,7 @@ package number
 import (
 	"math/big"
 
-	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esn/common"
 )
 
 var tt256 = new(big.Int).Lsh(big.NewInt(1), 256)

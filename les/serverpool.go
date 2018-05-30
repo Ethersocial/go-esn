@@ -27,13 +27,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/common/mclock"
-	"github.com/ethersocial/go-esc/ethdb"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/p2p/discover"
-	"github.com/ethersocial/go-esc/p2p/discv5"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/common/mclock"
+	"github.com/ethersocial/go-esn/ethdb"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/discv5"
+	"github.com/ethersocial/go-esn/rlp"
 )
 
 const (
@@ -618,7 +618,7 @@ func (e *knownEntry) Weight() int64 {
 	if e.state != psNotConnected || !e.known || e.delayedRetry {
 		return 0
 	}
-	return int64(1000000000 * e.connectStats.recentAvg() * math.Exp(-float64(e.lastConnected.fails)*failDropLn-e.responseStats.recentAvg()/float64(responseScoreTC)-e.delayStats.recentAvg()/float64(delayScoreTC)) * math.Pow((1-e.timeoutStats.recentAvg()), timeoutPow))
+	return int64(1000000000 * e.connectStats.recentAvg() * math.Exp(-float64(e.lastConnected.fails)*failDropLn-e.responseStats.recentAvg()/float64(responseScoreTC)-e.delayStats.recentAvg()/float64(delayScoreTC)) * math.Pow(1-e.timeoutStats.recentAvg(), timeoutPow))
 }
 
 // poolEntryAddress is a separate object because currently it is necessary to remember

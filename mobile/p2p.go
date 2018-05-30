@@ -21,7 +21,7 @@ package geth
 import (
 	"errors"
 
-	"github.com/ethersocial/go-esc/p2p"
+	"github.com/ethersocial/go-esn/p2p"
 )
 
 // NodeInfo represents pi short summary of the information known about the host.

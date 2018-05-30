@@ -17,12 +17,11 @@
 package core
 
 import (
-	"math/big"
 	"math/rand"
 	"testing"
 
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/crypto"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/crypto"
 )
 
 // Tests that transactions can be added to strict lists and list contents and
@@ -33,7 +32,7 @@ func TestStrictTxListAdd(t *testing.T) {
 
 	txs := make(types.Transactions, 1024)
 	for i := 0; i < len(txs); i++ {
-		txs[i] = transaction(uint64(i), new(big.Int), key)
+		txs[i] = transaction(uint64(i), 0, key)
 	}
 	// Insert the transactions in a random order
 	list := newTxList(true)

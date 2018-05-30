@@ -27,9 +27,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/swarm/storage"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/swarm/storage"
 )
 
 const (
@@ -436,6 +436,16 @@ func (self *manifestTrie) findPrefixOf(path string, quitC chan bool) (entry *man
 	if len(path) <= epl {
 		if entry.Path[:len(path)] == path {
 			if entry.ContentType == ManifestType {
+				err := self.loadSubTrie(entry, quitC)
+				if err == nil && entry.subtrie != nil {
+					subentries := entry.subtrie.entries
+					for i := 0; i < len(subentries); i++ {
+						sub := subentries[i]
+						if sub != nil && sub.Path == "" {
+							return sub, len(path)
+						}
+					}
+				}
 				entry.Status = http.StatusMultipleChoices
 			}
 			pos = len(path)

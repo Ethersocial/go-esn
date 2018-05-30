@@ -81,7 +81,7 @@ func Env() Environment {
 
 // LocalEnv returns build environment metadata gathered from git.
 func LocalEnv() Environment {
-	env := applyEnvFlags(Environment{Name: "local", Repo: "ethereum/go-esc"})
+	env := applyEnvFlags(Environment{Name: "local", Repo: "ethersocial/go-esn"})
 
 	head := readGitFile("HEAD")
 	if splits := strings.Split(head, " "); len(splits) == 2 {
@@ -94,7 +94,7 @@ func LocalEnv() Environment {
 	}
 	if env.Branch == "" {
 		if head != "HEAD" {
-			env.Branch = strings.TrimLeft(head, "refs/heads/")
+			env.Branch = strings.TrimPrefix(head, "refs/heads/")
 		}
 	}
 	if info, err := os.Stat(".git/objects"); err == nil && info.IsDir() && env.Tag == "" {

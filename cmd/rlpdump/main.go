@@ -26,7 +26,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/rlp"
 )
 
 var (

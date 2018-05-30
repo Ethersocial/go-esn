@@ -21,17 +21,17 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	"github.com/ethersocial/go-esc/accounts"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/consensus"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/core/state"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/eth/downloader"
-	"github.com/ethersocial/go-esc/ethdb"
-	"github.com/ethersocial/go-esc/event"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/params"
+	"github.com/ethersocial/go-esn/accounts"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/consensus"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/state"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/eth/downloader"
+	"github.com/ethersocial/go-esn/ethdb"
+	"github.com/ethersocial/go-esn/event"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/params"
 )
 
 // Backend wraps all methods required for mining.

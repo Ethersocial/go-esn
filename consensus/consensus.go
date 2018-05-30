@@ -18,11 +18,12 @@
 package consensus
 
 import (
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/state"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/params"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/state"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/params"
+	"github.com/ethersocial/go-esn/rpc"
+	"math/big"
 )
 
 // ChainReader defines a small collection of methods needed to access the local
@@ -87,6 +88,10 @@ type Engine interface {
 	// Seal generates a new block for the given input block with the local miner's
 	// seal place on top.
 	Seal(chain ChainReader, block *types.Block, stop <-chan struct{}) (*types.Block, error)
+
+	// CalcDifficulty is the difficulty adjustment algorithm. It returns the difficulty
+	// that a new block should have.
+	CalcDifficulty(chain ChainReader, time uint64, parent *types.Header) *big.Int
 
 	// APIs returns the RPC APIs this consensus engine provides.
 	APIs(chain ChainReader) []rpc.API

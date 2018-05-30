@@ -23,10 +23,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/rlp"
 	"gopkg.in/fatih/set.v0"
 )
 

@@ -16,7 +16,7 @@
 
 package ethclient
 
-import "github.com/ethersocial/go-esc"
+import "github.com/ethersocial/go-esn"
 
 // Verify that Client implements the ethereum interfaces.
 var (

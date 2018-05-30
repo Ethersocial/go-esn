@@ -24,8 +24,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ethersocial/go-esc/accounts/abi/bind"
-	"github.com/ethersocial/go-esc/common/compiler"
+	"github.com/ethersocial/go-esn/accounts/abi/bind"
+	"github.com/ethersocial/go-esn/common/compiler"
 )
 
 var (

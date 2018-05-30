@@ -23,8 +23,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ethersocial/go-esc/common/math"
-	"github.com/ethersocial/go-esc/core/vm"
+	"github.com/ethersocial/go-esn/common/math"
+	"github.com/ethersocial/go-esn/core/vm"
 )
 
 // Compiler contains information about the parsed source
@@ -237,10 +237,7 @@ func (c *Compiler) pushBin(v interface{}) {
 // isPush returns whether the string op is either any of
 // push(N).
 func isPush(op string) bool {
-	if op == "push" {
-		return true
-	}
-	return false
+	return op == "push"
 }
 
 // isJump returns whether the string op is jump(i)

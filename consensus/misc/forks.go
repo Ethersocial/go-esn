@@ -19,9 +19,9 @@ package misc
 import (
 	"fmt"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/params"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/params"
 )
 
 // VerifyForkHashes verifies that blocks conforming to network hard-forks do have

@@ -23,9 +23,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethersocial/go-esc/accounts/usbwallet"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/accounts/usbwallet"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/rpc"
 	"github.com/robertkrimen/otto"
 )
 

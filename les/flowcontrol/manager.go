@@ -21,7 +21,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/common/mclock"
+	"github.com/ethersocial/go-esn/common/mclock"
 )
 
 const rcConst = 1000000

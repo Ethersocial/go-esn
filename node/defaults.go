@@ -22,8 +22,8 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/p2p/nat"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/p2p/nat"
 )
 
 const (
@@ -35,16 +35,16 @@ const (
 
 // DefaultConfig contains reasonable default settings.
 var DefaultConfig = Config{
-	DataDir:     DefaultDataDir(),
-	HTTPPort:    DefaultHTTPPort,
-	HTTPModules: []string{"net", "web3"},
-	WSPort:      DefaultWSPort,
-	WSModules:   []string{"net", "web3"},
+	DataDir:          DefaultDataDir(),
+	HTTPPort:         DefaultHTTPPort,
+	HTTPModules:      []string{"net", "web3"},
+	HTTPVirtualHosts: []string{"localhost"},
+	WSPort:           DefaultWSPort,
+	WSModules:        []string{"net", "web3"},
 	P2P: p2p.Config{
-		ListenAddr:      ":50505",
-		DiscoveryV5Addr: ":50506",
-		MaxPeers:        50,
-		NAT:             nat.Any(),
+		ListenAddr: ":50505",
+		MaxPeers:   25,
+		NAT:        nat.Any(),
 	},
 }
 

@@ -23,9 +23,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ethersocial/go-esc/common/math"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/params"
+	"github.com/ethersocial/go-esn/common/math"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/params"
 )
 
 type diffTest struct {
@@ -71,6 +71,7 @@ func TestCalcDifficulty(t *testing.T) {
 	}
 
 	config := &params.ChainConfig{HomesteadBlock: big.NewInt(1150000)}
+
 	for name, test := range tests {
 		number := new(big.Int).Sub(test.CurrentBlocknumber, big.NewInt(1))
 		diff := CalcDifficulty(config, test.CurrentTimestamp, &types.Header{

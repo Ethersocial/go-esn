@@ -29,10 +29,11 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/crypto/secp256k1"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/crypto/secp256k1"
 )
 
 const NodeIDBits = 512
@@ -51,9 +52,8 @@ type Node struct {
 	// with ID.
 	sha common.Hash
 
-	// whether this node is currently being pinged in order to replace
-	// it in a bucket
-	contested bool
+	// Time when the node was added to the table.
+	addedAt time.Time
 }
 
 // NewNode creates a new node. It is mostly meant to be used for

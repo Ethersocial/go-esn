@@ -19,8 +19,8 @@ package runtime_test
 import (
 	"fmt"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/vm/runtime"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/vm/runtime"
 )
 
 func ExampleExecute() {

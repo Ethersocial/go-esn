@@ -28,7 +28,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esn/common"
 )
 
 // In this test, nodes try to randomly resolve each other.
@@ -282,7 +282,7 @@ func (s *simulation) launchNode(log bool) *Network {
 	addr := &net.UDPAddr{IP: ip, Port: 50505}
 
 	transport := &simTransport{joinTime: time.Now(), sender: id, senderAddr: addr, sim: s, priv: key}
-	net, err := newNetwork(transport, key.PublicKey, nil, "<no database>", nil)
+	net, err := newNetwork(transport, key.PublicKey, "<no database>", nil)
 	if err != nil {
 		panic("cannot launch new node: " + err.Error())
 	}

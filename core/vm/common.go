@@ -19,8 +19,8 @@ package vm
 import (
 	"math/big"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/math"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/math"
 )
 
 // calculates the memory size required for a step

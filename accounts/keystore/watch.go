@@ -21,7 +21,7 @@ package keystore
 import (
 	"time"
 
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/log"
 	"github.com/rjeczalik/notify"
 )
 

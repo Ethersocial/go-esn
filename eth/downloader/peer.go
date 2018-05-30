@@ -29,9 +29,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/event"
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/event"
+	"github.com/ethersocial/go-esn/log"
 )
 
 const (
@@ -548,7 +548,7 @@ func (ps *peerSet) idlePeers(minProtocol, maxProtocol int, idleCheck func(*peerC
 	return idle, total
 }
 
-// medianRTT returns the median RTT of te peerset, considering only the tuning
+// medianRTT returns the median RTT of the peerset, considering only the tuning
 // peers if there are more peers available.
 func (ps *peerSet) medianRTT() time.Duration {
 	// Gather all the currnetly measured round trip times

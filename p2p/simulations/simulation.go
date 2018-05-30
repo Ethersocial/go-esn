@@ -20,7 +20,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/ethersocial/go-esc/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/discover"
 )
 
 // Simulation provides a framework for running actions in a simulated network

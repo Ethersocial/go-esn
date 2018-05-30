@@ -24,13 +24,13 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/ethdb"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/metrics"
-	"github.com/ethersocial/go-esc/params"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/ethdb"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/metrics"
+	"github.com/ethersocial/go-esn/params"
+	"github.com/ethersocial/go-esn/rlp"
 )
 
 // DatabaseReader wraps the Get method of a backing data store.
@@ -47,6 +47,7 @@ var (
 	headHeaderKey = []byte("LastHeader")
 	headBlockKey  = []byte("LastBlock")
 	headFastKey   = []byte("LastFast")
+	trieSyncKey   = []byte("TrieSync")
 
 	// Data item prefixes (use single byte to avoid mixing data types, avoid `i`).
 	headerPrefix        = []byte("h") // headerPrefix + num (uint64 big endian) + hash -> header
@@ -70,8 +71,8 @@ var (
 
 	ErrChainConfigNotFound = errors.New("ChainConfig not found") // general config not found error
 
-	preimageCounter    = metrics.NewCounter("db/preimage/total")
-	preimageHitCounter = metrics.NewCounter("db/preimage/hits")
+	preimageCounter    = metrics.NewRegisteredCounter("db/preimage/total", nil)
+	preimageHitCounter = metrics.NewRegisteredCounter("db/preimage/hits", nil)
 )
 
 // TxLookupEntry is a positional metadata to help looking up the data content of
@@ -144,6 +145,16 @@ func GetHeadFastBlockHash(db DatabaseReader) common.Hash {
 		return common.Hash{}
 	}
 	return common.BytesToHash(data)
+}
+
+// GetTrieSyncProgress retrieves the number of tries nodes fast synced to allow
+// reportinc correct numbers across restarts.
+func GetTrieSyncProgress(db DatabaseReader) uint64 {
+	data, _ := db.Get(trieSyncKey)
+	if len(data) == 0 {
+		return 0
+	}
+	return new(big.Int).SetBytes(data).Uint64()
 }
 
 // GetHeaderRLP retrieves a block header in its raw RLP database encoding, or nil
@@ -370,6 +381,15 @@ func WriteHeadBlockHash(db ethdb.Putter, hash common.Hash) error {
 func WriteHeadFastBlockHash(db ethdb.Putter, hash common.Hash) error {
 	if err := db.Put(headFastKey, hash.Bytes()); err != nil {
 		log.Crit("Failed to store last fast block's hash", "err", err)
+	}
+	return nil
+}
+
+// WriteTrieSyncProgress stores the fast sync trie process counter to support
+// retrieving it across restarts.
+func WriteTrieSyncProgress(db ethdb.Putter, count uint64) error {
+	if err := db.Put(trieSyncKey, new(big.Int).SetUint64(count).Bytes()); err != nil {
+		log.Crit("Failed to store fast sync trie progress", "err", err)
 	}
 	return nil
 }

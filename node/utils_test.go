@@ -22,8 +22,8 @@ package node
 import (
 	"reflect"
 
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/rpc"
 )
 
 // NoopService is a trivial implementation of the Service interface.

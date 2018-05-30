@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/ethersocial/go-esc/event"
+	"github.com/ethersocial/go-esn/event"
 )
 
 // This example demonstrates how SubscriptionScope can be used to control the lifetime of

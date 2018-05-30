@@ -23,14 +23,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/bitutil"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/core/bloombits"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/ethdb"
-	"github.com/ethersocial/go-esc/event"
-	"github.com/ethersocial/go-esc/node"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/bitutil"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/bloombits"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/ethdb"
+	"github.com/ethersocial/go-esn/event"
+	"github.com/ethersocial/go-esn/node"
 )
 
 func BenchmarkBloomBits512(b *testing.B) {

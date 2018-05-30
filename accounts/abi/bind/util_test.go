@@ -22,30 +22,30 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethersocial/go-esc/accounts/abi/bind"
-	"github.com/ethersocial/go-esc/accounts/abi/bind/backends"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/crypto"
+	"github.com/ethersocial/go-esn/accounts/abi/bind"
+	"github.com/ethersocial/go-esn/accounts/abi/bind/backends"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/crypto"
 )
 
 var testKey, _ = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 
 var waitDeployedTests = map[string]struct {
 	code        string
-	gas         *big.Int
+	gas         uint64
 	wantAddress common.Address
 	wantErr     error
 }{
 	"successful deploy": {
 		code:        `6060604052600a8060106000396000f360606040526008565b00`,
-		gas:         big.NewInt(3000000),
+		gas:         3000000,
 		wantAddress: common.HexToAddress("0x3a220f351252089d385b29beca14e27f204c296a"),
 	},
 	"empty code": {
 		code:        ``,
-		gas:         big.NewInt(300000),
+		gas:         300000,
 		wantErr:     bind.ErrNoCodeAfterDeploy,
 		wantAddress: common.HexToAddress("0x3a220f351252089d385b29beca14e27f204c296a"),
 	},

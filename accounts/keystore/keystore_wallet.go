@@ -19,9 +19,9 @@ package keystore
 import (
 	"math/big"
 
-	ethereum "github.com/ethersocial/go-esc"
-	"github.com/ethersocial/go-esc/accounts"
-	"github.com/ethersocial/go-esc/core/types"
+	ethereum "github.com/ethersocial/go-esn"
+	"github.com/ethersocial/go-esn/accounts"
+	"github.com/ethersocial/go-esn/core/types"
 )
 
 // keystoreWallet implements the accounts.Wallet interface for the original

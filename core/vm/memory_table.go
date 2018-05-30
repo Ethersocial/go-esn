@@ -19,7 +19,7 @@ package vm
 import (
 	"math/big"
 
-	"github.com/ethersocial/go-esc/common/math"
+	"github.com/ethersocial/go-esn/common/math"
 )
 
 func memorySha3(stack *Stack) *big.Int {

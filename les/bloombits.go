@@ -19,8 +19,8 @@ package les
 import (
 	"time"
 
-	"github.com/ethersocial/go-esc/common/bitutil"
-	"github.com/ethersocial/go-esc/light"
+	"github.com/ethersocial/go-esn/common/bitutil"
+	"github.com/ethersocial/go-esn/light"
 )
 
 const (

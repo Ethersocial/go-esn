@@ -24,9 +24,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/rpc"
 )
 
 var (

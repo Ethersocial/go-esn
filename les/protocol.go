@@ -26,11 +26,11 @@ import (
 	"io"
 	"math/big"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/crypto/secp256k1"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/crypto/secp256k1"
+	"github.com/ethersocial/go-esn/rlp"
 )
 
 // Constants to match up protocol versions and messages
@@ -41,8 +41,9 @@ const (
 
 // Supported versions of the les protocol (first is primary)
 var (
-	ClientProtocolVersions = []uint{lpv2, lpv1}
-	ServerProtocolVersions = []uint{lpv2, lpv1}
+	ClientProtocolVersions    = []uint{lpv2, lpv1}
+	ServerProtocolVersions    = []uint{lpv2, lpv1}
+	AdvertiseProtocolVersions = []uint{lpv2} // clients are searching for the first advertised protocol in the list
 )
 
 // Number of implemented message corresponding to different protocol versions.
@@ -223,6 +224,6 @@ type proofsData [][]rlp.RawValue
 
 type txStatus struct {
 	Status core.TxStatus
-	Lookup *core.TxLookupEntry
-	Error  error
+	Lookup *core.TxLookupEntry `rlp:"nil"`
+	Error  string
 }

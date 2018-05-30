@@ -19,7 +19,7 @@ package vm
 import (
 	"math/big"
 
-	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esn/common"
 )
 
 // destinations stores one map per contract (keyed by hash of code).

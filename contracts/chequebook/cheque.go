@@ -21,7 +21,7 @@
 // as well as (auto)depositing ether to the chequebook contract.
 package chequebook
 
-//go:generate abigen --sol contract/chequebook.sol --pkg contract --out contract/chequebook.go
+//go:generate abigen --sol contract/chequebook.sol --exc contract/mortal.sol:mortal,contract/owned.sol:owned --pkg contract --out contract/chequebook.go
 //go:generate go run ./gencode.go
 
 import (
@@ -36,14 +36,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/accounts/abi/bind"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/hexutil"
-	"github.com/ethersocial/go-esc/contracts/chequebook/contract"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/swarm/services/swap/swap"
+	"github.com/ethersocial/go-esn/accounts/abi/bind"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/hexutil"
+	"github.com/ethersocial/go-esn/contracts/chequebook/contract"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/swarm/services/swap/swap"
 )
 
 // TODO(zelig): watch peer solvency and notify of bouncing cheques
@@ -56,8 +56,8 @@ import (
 // * watching incoming ether
 
 var (
-	gasToCash = big.NewInt(2000000) // gas cost of a cash transaction using chequebook
-	// gasToDeploy = big.NewInt(3000000)
+	gasToCash = uint64(2000000) // gas cost of a cash transaction using chequebook
+	// gasToDeploy = uint64(3000000)
 )
 
 // Backend wraps all methods required for chequebook operation.

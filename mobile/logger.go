@@ -19,7 +19,7 @@ package geth
 import (
 	"os"
 
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/log"
 )
 
 // SetVerbosity sets the global verbosity level (between 0 and 6 - see logger/verbosity.go).

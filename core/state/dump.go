@@ -20,9 +20,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/rlp"
-	"github.com/ethersocial/go-esc/trie"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/rlp"
+	"github.com/ethersocial/go-esn/trie"
 )
 
 type DumpAccount struct {

@@ -22,13 +22,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/crypto"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/crypto"
 )
 
 func TestNetwork_Lookup(t *testing.T) {
 	key, _ := crypto.GenerateKey()
-	network, err := newNetwork(lookupTestnet, key.PublicKey, nil, "", nil)
+	network, err := newNetwork(lookupTestnet, key.PublicKey, "", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

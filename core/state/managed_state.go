@@ -19,7 +19,7 @@ package state
 import (
 	"sync"
 
-	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esn/common"
 )
 
 type account struct {

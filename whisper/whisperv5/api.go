@@ -24,12 +24,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/hexutil"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/p2p/discover"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/hexutil"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/rpc"
 )
 
 const (
@@ -60,30 +60,7 @@ func NewPublicWhisperAPI(w *Whisper) *PublicWhisperAPI {
 		w:        w,
 		lastUsed: make(map[string]time.Time),
 	}
-
-	go api.run()
 	return api
-}
-
-// run the api event loop.
-// this loop deletes filter that have not been used within filterTimeout
-func (api *PublicWhisperAPI) run() {
-	timeout := time.NewTicker(2 * time.Minute)
-	for {
-		<-timeout.C
-
-		api.mu.Lock()
-		for id, lastUsed := range api.lastUsed {
-			if time.Since(lastUsed).Seconds() >= filterTimeout {
-				delete(api.lastUsed, id)
-				if err := api.w.Unsubscribe(id); err != nil {
-					log.Error("could not unsubscribe whisper filter", "error", err)
-				}
-				log.Debug("delete whisper filter (timeout)", "id", id)
-			}
-		}
-		api.mu.Unlock()
-	}
 }
 
 // Version returns the Whisper sub-protocol version.
@@ -562,7 +539,7 @@ func (api *PublicWhisperAPI) NewMessageFilter(req Criteria) (string, error) {
 	}
 
 	if len(req.Topics) > 0 {
-		topics = make([][]byte, 1)
+		topics = make([][]byte, 0, len(req.Topics))
 		for _, topic := range req.Topics {
 			topics = append(topics, topic[:])
 		}

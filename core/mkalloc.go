@@ -34,8 +34,8 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/rlp"
 )
 
 type allocItem struct{ Addr, Balance *big.Int }

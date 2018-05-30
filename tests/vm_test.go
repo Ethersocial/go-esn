@@ -19,7 +19,7 @@ package tests
 import (
 	"testing"
 
-	"github.com/ethersocial/go-esc/core/vm"
+	"github.com/ethersocial/go-esn/core/vm"
 )
 
 func TestVM(t *testing.T) {

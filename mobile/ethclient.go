@@ -21,8 +21,8 @@ package geth
 import (
 	"math/big"
 
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/ethclient"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/ethclient"
 )
 
 // EthereumClient provides access to the Ethereum APIs.
@@ -298,9 +298,9 @@ func (ec *EthereumClient) SuggestGasPrice(ctx *Context) (price *BigInt, _ error)
 // the current pending state of the backend blockchain. There is no guarantee that this is
 // the true gas limit requirement as other transactions may be added or removed by miners,
 // but it should provide a basis for setting a reasonable default.
-func (ec *EthereumClient) EstimateGas(ctx *Context, msg *CallMsg) (gas *BigInt, _ error) {
+func (ec *EthereumClient) EstimateGas(ctx *Context, msg *CallMsg) (gas int64, _ error) {
 	rawGas, err := ec.client.EstimateGas(ctx.context, msg.msg)
-	return &BigInt{rawGas}, err
+	return int64(rawGas), err
 }
 
 // SendTransaction injects a signed transaction into the pending pool for execution.

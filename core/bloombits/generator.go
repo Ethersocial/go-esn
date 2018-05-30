@@ -19,7 +19,7 @@ package bloombits
 import (
 	"errors"
 
-	"github.com/ethersocial/go-esc/core/types"
+	"github.com/ethersocial/go-esn/core/types"
 )
 
 // errSectionOutOfBounds is returned if the user tried to add more bloom filters

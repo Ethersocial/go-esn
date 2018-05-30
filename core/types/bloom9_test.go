@@ -54,7 +54,7 @@ func TestBloom(t *testing.T) {
 import (
 	"testing"
 
-	"github.com/ethersocial/go-esc/core/state"
+	"github.com/ethersocial/go-esn/core/state"
 )
 
 func TestBloom9(t *testing.T) {

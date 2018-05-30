@@ -19,8 +19,8 @@ package les
 import (
 	"sync"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/types"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/types"
 )
 
 type ltrInfo struct {

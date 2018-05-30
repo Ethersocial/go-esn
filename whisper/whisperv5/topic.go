@@ -19,8 +19,8 @@
 package whisperv5
 
 import (
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/common/hexutil"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/hexutil"
 )
 
 // Topic represents a cryptographically secure, probabilistic partial

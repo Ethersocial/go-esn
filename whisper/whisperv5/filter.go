@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/crypto"
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/log"
 )
 
 type Filter struct {
@@ -216,8 +216,12 @@ func (f *Filter) MatchTopic(topic TopicType) bool {
 }
 
 func matchSingleTopic(topic TopicType, bt []byte) bool {
-	if len(bt) > 4 {
-		bt = bt[:4]
+	if len(bt) > TopicLength {
+		bt = bt[:TopicLength]
+	}
+
+	if len(bt) < TopicLength {
+		return false
 	}
 
 	for j, b := range bt {

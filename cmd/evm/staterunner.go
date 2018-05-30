@@ -23,10 +23,10 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/ethersocial/go-esc/core/state"
-	"github.com/ethersocial/go-esc/core/vm"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/tests"
+	"github.com/ethersocial/go-esn/core/state"
+	"github.com/ethersocial/go-esn/core/vm"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/tests"
 
 	cli "gopkg.in/urfave/cli.v1"
 )

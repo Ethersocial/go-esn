@@ -27,12 +27,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethersocial/go-esc/event"
-	"github.com/ethersocial/go-esc/node"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/p2p/discover"
-	"github.com/ethersocial/go-esc/p2p/simulations/adapters"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/event"
+	"github.com/ethersocial/go-esn/node"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/simulations/adapters"
+	"github.com/ethersocial/go-esn/rpc"
 )
 
 // testService implements the node.Service interface and provides protocols

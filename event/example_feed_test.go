@@ -19,7 +19,7 @@ package event_test
 import (
 	"fmt"
 
-	"github.com/ethersocial/go-esc/event"
+	"github.com/ethersocial/go-esn/event"
 )
 
 func ExampleFeed_acknowledgedEvents() {

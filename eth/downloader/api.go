@@ -20,9 +20,9 @@ import (
 	"context"
 	"sync"
 
-	ethereum "github.com/ethersocial/go-esc"
-	"github.com/ethersocial/go-esc/event"
-	"github.com/ethersocial/go-esc/rpc"
+	ethereum "github.com/ethersocial/go-esn"
+	"github.com/ethersocial/go-esn/event"
+	"github.com/ethersocial/go-esn/rpc"
 )
 
 // PublicDownloaderAPI provides an API which gives information about the current synchronisation status.

@@ -22,7 +22,7 @@ package storage
 import (
 	"fmt"
 
-	"github.com/ethersocial/go-esc/compression/rle"
+	"github.com/ethersocial/go-esn/compression/rle"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/iterator"
 	"github.com/syndtr/goleveldb/leveldb/opt"

@@ -22,9 +22,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/accounts"
-	"github.com/ethersocial/go-esc/event"
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/accounts"
+	"github.com/ethersocial/go-esn/event"
+	"github.com/ethersocial/go-esn/log"
 	"github.com/karalabe/hid"
 )
 

@@ -36,11 +36,11 @@ import (
 	"time"
 
 	"github.com/docker/docker/pkg/reexec"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/node"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/p2p/discover"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/node"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/rpc"
 	"golang.org/x/net/websocket"
 )
 
@@ -359,6 +359,7 @@ func execP2PNode() {
 		log.Crit("error decoding _P2P_NODE_CONFIG", "err", err)
 	}
 	conf.Stack.P2P.PrivateKey = conf.Node.PrivateKey
+	conf.Stack.Logger = log.New("node.id", conf.Node.ID.String())
 
 	// use explicit IP address in ListenAddr so that Enode URL is usable
 	externalIP := func() string {

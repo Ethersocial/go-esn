@@ -17,7 +17,7 @@
 package fuse
 
 import (
-	"github.com/ethersocial/go-esc/swarm/api"
+	"github.com/ethersocial/go-esn/swarm/api"
 	"sync"
 	"time"
 )

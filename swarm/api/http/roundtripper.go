@@ -20,23 +20,23 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/log"
 )
 
 /*
 http roundtripper to register for bzz url scheme
-see https://github.com/ethersocial/go-esc/issues/2040
+see https://github.com/ethersocial/go-esn/issues/2040
 Usage:
 
 import (
- "github.com/ethersocial/go-esc/common/httpclient"
- "github.com/ethersocial/go-esc/swarm/api/http"
+ "github.com/ethersocial/go-esn/common/httpclient"
+ "github.com/ethersocial/go-esn/swarm/api/http"
 )
 client := httpclient.New()
 // for (private) swarm proxy running locally
 client.RegisterScheme("bzz", &http.RoundTripper{Port: port})
-client.RegisterScheme("bzzi", &http.RoundTripper{Port: port})
-client.RegisterScheme("bzzr", &http.RoundTripper{Port: port})
+client.RegisterScheme("bzz-immutable", &http.RoundTripper{Port: port})
+client.RegisterScheme("bzz-raw", &http.RoundTripper{Port: port})
 
 The port you give the Roundtripper is the port the swarm proxy is listening on.
 If Host is left empty, localhost is assumed.

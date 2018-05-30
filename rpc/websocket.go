@@ -27,7 +27,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/log"
 	"golang.org/x/net/websocket"
 	"gopkg.in/fatih/set.v0"
 )

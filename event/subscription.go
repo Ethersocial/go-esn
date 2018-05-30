@@ -21,7 +21,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/common/mclock"
+	"github.com/ethersocial/go-esn/common/mclock"
 )
 
 // Subscription represents a stream of events. The carrier of the events is typically a

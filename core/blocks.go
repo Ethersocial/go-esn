@@ -16,7 +16,7 @@
 
 package core
 
-import "github.com/ethersocial/go-esc/common"
+import "github.com/ethersocial/go-esn/common"
 
 // BadHashes represent a set of manually tracked bad hashes (usually hard forks)
 var BadHashes = map[common.Hash]bool{

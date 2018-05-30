@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethersocial/go-esc/params"
+	"github.com/ethersocial/go-esn/params"
 )
 
 // This table defines supported forks and their chain config.

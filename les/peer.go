@@ -26,13 +26,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/eth"
-	"github.com/ethersocial/go-esc/les/flowcontrol"
-	"github.com/ethersocial/go-esc/light"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/eth"
+	"github.com/ethersocial/go-esn/les/flowcontrol"
+	"github.com/ethersocial/go-esn/light"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/rlp"
 )
 
 var (
@@ -281,7 +281,6 @@ func (p *peer) RequestProofs(reqID, cost uint64, reqs []ProofReq) error {
 	default:
 		panic(nil)
 	}
-
 }
 
 // RequestHelperTrieProofs fetches a batch of HelperTrie merkle proofs from a remote node.
@@ -291,12 +290,12 @@ func (p *peer) RequestHelperTrieProofs(reqID, cost uint64, reqs []HelperTrieReq)
 	case lpv1:
 		reqsV1 := make([]ChtReq, len(reqs))
 		for i, req := range reqs {
-			if req.HelperTrieType != htCanonical || req.AuxReq != auxHeader || len(req.Key) != 8 {
+			if req.Type != htCanonical || req.AuxReq != auxHeader || len(req.Key) != 8 {
 				return fmt.Errorf("Request invalid in LES/1 mode")
 			}
 			blockNum := binary.BigEndian.Uint64(req.Key)
 			// convert HelperTrie request to old CHT request
-			reqsV1[i] = ChtReq{ChtNum: (req.TrieIdx+1)*(light.ChtFrequency/light.ChtV1Frequency) - 1, BlockNum: blockNum, FromLevel: req.FromLevel}
+			reqsV1[i] = ChtReq{ChtNum: (req.TrieIdx + 1) * (light.CHTFrequencyClient / light.CHTFrequencyServer), BlockNum: blockNum, FromLevel: req.FromLevel}
 		}
 		return sendRequest(p.rw, GetHeaderProofsMsg, reqID, cost, reqsV1)
 	case lpv2:

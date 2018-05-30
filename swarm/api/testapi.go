@@ -17,7 +17,7 @@
 package api
 
 import (
-	"github.com/ethersocial/go-esc/swarm/network"
+	"github.com/ethersocial/go-esn/swarm/network"
 )
 
 type Control struct {

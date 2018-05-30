@@ -21,11 +21,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ethersocial/go-esc/accounts/abi"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core/state"
-	"github.com/ethersocial/go-esc/core/vm"
-	"github.com/ethersocial/go-esc/ethdb"
+	"github.com/ethersocial/go-esn/accounts/abi"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core/state"
+	"github.com/ethersocial/go-esn/core/vm"
+	"github.com/ethersocial/go-esn/ethdb"
 )
 
 func TestDefaults(t *testing.T) {

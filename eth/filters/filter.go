@@ -20,13 +20,13 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/core/bloombits"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/ethdb"
-	"github.com/ethersocial/go-esc/event"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/bloombits"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/ethdb"
+	"github.com/ethersocial/go-esn/event"
+	"github.com/ethersocial/go-esn/rpc"
 )
 
 type Backend interface {
@@ -34,6 +34,7 @@ type Backend interface {
 	EventMux() *event.TypeMux
 	HeaderByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*types.Header, error)
 	GetReceipts(ctx context.Context, blockHash common.Hash) (types.Receipts, error)
+	GetLogs(ctx context.Context, blockHash common.Hash) ([][]*types.Log, error)
 
 	SubscribeTxPreEvent(chan<- core.TxPreEvent) event.Subscription
 	SubscribeChainEvent(ch chan<- core.ChainEvent) event.Subscription
@@ -201,16 +202,28 @@ func (f *Filter) unindexedLogs(ctx context.Context, end uint64) ([]*types.Log, e
 // match the filter criteria. This function is called when the bloom filter signals a potential match.
 func (f *Filter) checkMatches(ctx context.Context, header *types.Header) (logs []*types.Log, err error) {
 	// Get the logs of the block
-	receipts, err := f.backend.GetReceipts(ctx, header.Hash())
+	logsList, err := f.backend.GetLogs(ctx, header.Hash())
 	if err != nil {
 		return nil, err
 	}
 	var unfiltered []*types.Log
-	for _, receipt := range receipts {
-		unfiltered = append(unfiltered, receipt.Logs...)
+	for _, logs := range logsList {
+		unfiltered = append(unfiltered, logs...)
 	}
 	logs = filterLogs(unfiltered, nil, nil, f.addresses, f.topics)
 	if len(logs) > 0 {
+		// We have matching logs, check if we need to resolve full logs via the light client
+		if logs[0].TxHash == (common.Hash{}) {
+			receipts, err := f.backend.GetReceipts(ctx, header.Hash())
+			if err != nil {
+				return nil, err
+			}
+			unfiltered = unfiltered[:0]
+			for _, receipt := range receipts {
+				unfiltered = append(unfiltered, receipt.Logs...)
+			}
+			logs = filterLogs(unfiltered, nil, nil, f.addresses, f.topics)
+		}
 		return logs, nil
 	}
 	return nil, nil

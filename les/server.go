@@ -20,24 +20,24 @@ package les
 import (
 	"crypto/ecdsa"
 	"encoding/binary"
-	"fmt"
 	"math"
 	"sync"
 
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/eth"
-	"github.com/ethersocial/go-esc/ethdb"
-	"github.com/ethersocial/go-esc/les/flowcontrol"
-	"github.com/ethersocial/go-esc/light"
-	"github.com/ethersocial/go-esc/log"
-	"github.com/ethersocial/go-esc/p2p"
-	"github.com/ethersocial/go-esc/p2p/discv5"
-	"github.com/ethersocial/go-esc/rlp"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/eth"
+	"github.com/ethersocial/go-esn/ethdb"
+	"github.com/ethersocial/go-esn/les/flowcontrol"
+	"github.com/ethersocial/go-esn/light"
+	"github.com/ethersocial/go-esn/log"
+	"github.com/ethersocial/go-esn/p2p"
+	"github.com/ethersocial/go-esn/p2p/discv5"
+	"github.com/ethersocial/go-esn/rlp"
 )
 
 type LesServer struct {
+	config          *eth.Config
 	protocolManager *ProtocolManager
 	fcManager       *flowcontrol.ClientManager // nil if our node is client only
 	fcCostStats     *requestCostStats
@@ -56,12 +56,13 @@ func NewLesServer(eth *eth.Ethereum, config *eth.Config) (*LesServer, error) {
 		return nil, err
 	}
 
-	lesTopics := make([]discv5.Topic, len(ServerProtocolVersions))
-	for i, pv := range ServerProtocolVersions {
+	lesTopics := make([]discv5.Topic, len(AdvertiseProtocolVersions))
+	for i, pv := range AdvertiseProtocolVersions {
 		lesTopics[i] = lesTopic(eth.BlockChain().Genesis().Hash(), pv)
 	}
 
 	srv := &LesServer{
+		config:           config,
 		protocolManager:  pm,
 		quitSync:         quitSync,
 		lesTopics:        lesTopics,
@@ -71,23 +72,22 @@ func NewLesServer(eth *eth.Ethereum, config *eth.Config) (*LesServer, error) {
 	logger := log.New()
 
 	chtV1SectionCount, _, _ := srv.chtIndexer.Sections() // indexer still uses LES/1 4k section size for backwards server compatibility
-	chtV2SectionCount := chtV1SectionCount / (light.ChtFrequency / light.ChtV1Frequency)
+	chtV2SectionCount := chtV1SectionCount / (light.CHTFrequencyClient / light.CHTFrequencyServer)
 	if chtV2SectionCount != 0 {
 		// convert to LES/2 section
 		chtLastSection := chtV2SectionCount - 1
 		// convert last LES/2 section index back to LES/1 index for chtIndexer.SectionHead
-		chtLastSectionV1 := (chtLastSection+1)*(light.ChtFrequency/light.ChtV1Frequency) - 1
+		chtLastSectionV1 := (chtLastSection+1)*(light.CHTFrequencyClient/light.CHTFrequencyServer) - 1
 		chtSectionHead := srv.chtIndexer.SectionHead(chtLastSectionV1)
 		chtRoot := light.GetChtV2Root(pm.chainDb, chtLastSection, chtSectionHead)
-		logger.Info("CHT", "section", chtLastSection, "sectionHead", fmt.Sprintf("%064x", chtSectionHead), "root", fmt.Sprintf("%064x", chtRoot))
+		logger.Info("Loaded CHT", "section", chtLastSection, "head", chtSectionHead, "root", chtRoot)
 	}
-
 	bloomTrieSectionCount, _, _ := srv.bloomTrieIndexer.Sections()
 	if bloomTrieSectionCount != 0 {
 		bloomTrieLastSection := bloomTrieSectionCount - 1
 		bloomTrieSectionHead := srv.bloomTrieIndexer.SectionHead(bloomTrieLastSection)
 		bloomTrieRoot := light.GetBloomTrieRoot(pm.chainDb, bloomTrieLastSection, bloomTrieSectionHead)
-		logger.Info("BloomTrie", "section", bloomTrieLastSection, "sectionHead", fmt.Sprintf("%064x", bloomTrieSectionHead), "root", fmt.Sprintf("%064x", bloomTrieRoot))
+		logger.Info("Loaded bloom trie", "section", bloomTrieLastSection, "head", bloomTrieSectionHead, "root", bloomTrieRoot)
 	}
 
 	srv.chtIndexer.Start(eth.BlockChain())
@@ -108,16 +108,18 @@ func (s *LesServer) Protocols() []p2p.Protocol {
 
 // Start starts the LES server
 func (s *LesServer) Start(srvr *p2p.Server) {
-	s.protocolManager.Start()
-	for _, topic := range s.lesTopics {
-		topic := topic
-		go func() {
-			logger := log.New("topic", topic)
-			logger.Info("Starting topic registration")
-			defer logger.Info("Terminated topic registration")
+	s.protocolManager.Start(s.config.LightPeers)
+	if srvr.DiscV5 != nil {
+		for _, topic := range s.lesTopics {
+			topic := topic
+			go func() {
+				logger := log.New("topic", topic)
+				logger.Info("Starting topic registration")
+				defer logger.Info("Terminated topic registration")
 
-			srvr.DiscV5.RegisterTopic(topic, s.quitSync)
-		}()
+				srvr.DiscV5.RegisterTopic(topic, s.quitSync)
+			}()
+		}
 	}
 	s.privateKey = srvr.PrivateKey
 	s.protocolManager.blockLoop()

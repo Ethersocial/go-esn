@@ -23,7 +23,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esn/log"
 )
 
 /*

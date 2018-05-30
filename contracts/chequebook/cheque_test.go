@@ -24,12 +24,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethersocial/go-esc/accounts/abi/bind"
-	"github.com/ethersocial/go-esc/accounts/abi/bind/backends"
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/contracts/chequebook/contract"
-	"github.com/ethersocial/go-esc/core"
-	"github.com/ethersocial/go-esc/crypto"
+	"github.com/ethersocial/go-esn/accounts/abi/bind"
+	"github.com/ethersocial/go-esn/accounts/abi/bind/backends"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/contracts/chequebook/contract"
+	"github.com/ethersocial/go-esn/core"
+	"github.com/ethersocial/go-esn/crypto"
 )
 
 var (
@@ -281,8 +281,8 @@ func TestDeposit(t *testing.T) {
 		t.Fatalf("expected balance %v, got %v", exp, chbook.Balance())
 	}
 
-	// autodeposit every 30ms if new cheque issued
-	interval := 30 * time.Millisecond
+	// autodeposit every 200ms if new cheque issued
+	interval := 200 * time.Millisecond
 	chbook.AutoDeposit(interval, common.Big1, balance)
 	_, err = chbook.Issue(addr1, amount)
 	if err != nil {

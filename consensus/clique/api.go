@@ -17,10 +17,10 @@
 package clique
 
 import (
-	"github.com/ethersocial/go-esc/common"
-	"github.com/ethersocial/go-esc/consensus"
-	"github.com/ethersocial/go-esc/core/types"
-	"github.com/ethersocial/go-esc/rpc"
+	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/consensus"
+	"github.com/ethersocial/go-esn/core/types"
+	"github.com/ethersocial/go-esn/rpc"
 )
 
 // API is a user facing RPC API to allow controlling the signer and voting

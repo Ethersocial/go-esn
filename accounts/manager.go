@@ -21,7 +21,7 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/ethersocial/go-esc/event"
+	"github.com/ethersocial/go-esn/event"
 )
 
 // Manager is an overarching account manager that can communicate with various
