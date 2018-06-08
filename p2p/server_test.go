@@ -170,6 +170,29 @@ func TestServerDial(t *testing.T) {
 			if !reflect.DeepEqual(peers, []*Peer{peer}) {
 				t.Errorf("Peers mismatch: got %v, want %v", peers, []*Peer{peer})
 			}
+
+			// Test AddTrustedPeer/RemoveTrustedPeer and changing Trusted flags
+			// Particularly for race conditions on changing the flag state.
+			if peer := srv.Peers()[0]; peer.Info().Network.Trusted {
+				t.Errorf("peer is trusted prematurely: %v", peer)
+			}
+			done := make(chan bool)
+			go func() {
+				srv.AddTrustedPeer(node)
+				if peer := srv.Peers()[0]; !peer.Info().Network.Trusted {
+					t.Errorf("peer is not trusted after AddTrustedPeer: %v", peer)
+				}
+				srv.RemoveTrustedPeer(node)
+				if peer := srv.Peers()[0]; peer.Info().Network.Trusted {
+					t.Errorf("peer is trusted after RemoveTrustedPeer: %v", peer)
+				}
+				done <- true
+			}()
+			// Trigger potential race conditions
+			peer = srv.Peers()[0]
+			_ = peer.Inbound()
+			_ = peer.Info()
+			<-done
 		case <-time.After(1 * time.Second):
 			t.Error("server did not launch peer within one second")
 		}
