@@ -29,6 +29,7 @@ import (
 	"github.com/ethersocial/go-esn/crypto/sha3"
 )
 
+// Lengths of hashes and addresses in bytes.
 const (
 	HashLength    = 32
 	AddressLength = 20
