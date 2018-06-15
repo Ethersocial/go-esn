@@ -24,10 +24,10 @@ import (
 
 	"github.com/ethersocial/go-esn/common/hexutil"
 	"github.com/ethersocial/go-esn/crypto"
+	"github.com/ethersocial/go-esn/metrics"
 	"github.com/ethersocial/go-esn/p2p"
 	"github.com/ethersocial/go-esn/p2p/discover"
 	"github.com/ethersocial/go-esn/rpc"
-	"github.com/rcrowley/go-metrics"
 )
 
 // PrivateAdminAPI is the collection of administrative API methods exposed only

@@ -28,7 +28,7 @@ import (
 	"github.com/ethersocial/go-esn/common"
 	"github.com/ethersocial/go-esn/core/types"
 	"github.com/ethersocial/go-esn/log"
-	"github.com/rcrowley/go-metrics"
+	"github.com/ethersocial/go-esn/metrics"
 	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
 )
 
