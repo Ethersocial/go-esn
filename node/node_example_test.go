@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/ethereum/go-ethereum/node"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/ethersocial/go-esc/node"
+	"github.com/ethersocial/go-esc/p2p"
+	"github.com/ethersocial/go-esc/rpc"
 )
 
 // SampleService is a trivial network service that can be attached to a node for

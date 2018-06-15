@@ -23,8 +23,8 @@ import (
 	"math/rand"
 	"reflect"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/crypto/sha3"
+	"github.com/ethersocial/go-esc/common/hexutil"
+	"github.com/ethersocial/go-esc/crypto/sha3"
 )
 
 const (

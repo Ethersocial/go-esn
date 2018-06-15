@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethersocial/go-esc/accounts/keystore"
+	"github.com/ethersocial/go-esc/log"
 )
 
 // deployFaucet queries the user for various input on deploying a faucet, after
@@ -39,7 +39,7 @@ func (w *wizard) deployFaucet() {
 	infos, err := checkFaucet(client, w.network)
 	if err != nil {
 		infos = &faucetInfos{
-			node:    &nodeInfos{portFull: 30303, peersTotal: 25},
+			node:    &nodeInfos{portFull: 50505, peersTotal: 25},
 			port:    80,
 			host:    client.server,
 			amount:  1,

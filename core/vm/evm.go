@@ -20,9 +20,9 @@ import (
 	"math/big"
 	"sync/atomic"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esc/crypto"
+	"github.com/ethersocial/go-esc/params"
 )
 
 // emptyCodeHash is used by create to ensure deployment is disallowed to already

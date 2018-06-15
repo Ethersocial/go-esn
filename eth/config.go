@@ -23,12 +23,12 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/eth/downloader"
-	"github.com/ethereum/go-ethereum/eth/gasprice"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esc/common/hexutil"
+	"github.com/ethersocial/go-esc/core"
+	"github.com/ethersocial/go-esc/eth/downloader"
+	"github.com/ethersocial/go-esc/eth/gasprice"
+	"github.com/ethersocial/go-esc/params"
 )
 
 // DefaultConfig contains default settings for use on the Ethereum main net.

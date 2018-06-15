@@ -32,9 +32,9 @@ import (
 	"unsafe"
 
 	mmap "github.com/edsrzf/mmap-go"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/ethersocial/go-esc/consensus"
+	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esc/rpc"
 	metrics "github.com/rcrowley/go-metrics"
 )
 

@@ -36,14 +36,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/contracts/chequebook/contract"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/swarm/services/swap/swap"
+	"github.com/ethersocial/go-esc/accounts/abi/bind"
+	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esc/common/hexutil"
+	"github.com/ethersocial/go-esc/contracts/chequebook/contract"
+	"github.com/ethersocial/go-esc/core/types"
+	"github.com/ethersocial/go-esc/crypto"
+	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esc/swarm/services/swap/swap"
 )
 
 // TODO(zelig): watch peer solvency and notify of bouncing cheques

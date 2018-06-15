@@ -29,9 +29,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esc/core"
+	"github.com/ethersocial/go-esc/log"
 	"golang.org/x/crypto/ssh/terminal"
 )
 

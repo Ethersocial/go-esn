@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethersocial/go-esc/accounts/keystore"
+	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esc/log"
 )
 
 // deployNode creates a new node configuration based on some user input.
@@ -48,9 +48,9 @@ func (w *wizard) deployNode(boot bool) {
 	infos, err := checkNode(client, w.network, boot)
 	if err != nil {
 		if boot {
-			infos = &nodeInfos{portFull: 30303, peersTotal: 512, peersLight: 256}
+			infos = &nodeInfos{portFull: 50505, peersTotal: 512, peersLight: 256}
 		} else {
-			infos = &nodeInfos{portFull: 30303, peersTotal: 50, peersLight: 0, gasTarget: 4.7, gasPrice: 18}
+			infos = &nodeInfos{portFull: 50505, peersTotal: 50, peersLight: 0, gasTarget: 4.7, gasPrice: 18}
 		}
 	}
 	infos.genesis, _ = json.MarshalIndent(w.conf.genesis, "", "  ")

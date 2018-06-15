@@ -23,10 +23,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esc/core"
+	"github.com/ethersocial/go-esc/ethdb"
+	"github.com/ethersocial/go-esc/params"
 )
 
 // Genesis block for nodes which don't care about the DAO fork (i.e. not configured)
@@ -127,7 +127,7 @@ func testDAOForkBlockNewChain(t *testing.T, test int, genesis string, expectBloc
 	}
 	defer db.Close()
 
-	genesisHash := common.HexToHash("0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3")
+	genesisHash := common.HexToHash("0xc710d573a490c06cd2ce68d2b5fe3bd63f4eddfe4e4154953ddc6173b1230fb8")
 	if genesis != "" {
 		genesisHash = daoGenesisHash
 	}

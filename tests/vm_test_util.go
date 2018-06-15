@@ -22,15 +22,15 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esc/common/hexutil"
+	"github.com/ethersocial/go-esc/common/math"
+	"github.com/ethersocial/go-esc/core"
+	"github.com/ethersocial/go-esc/core/state"
+	"github.com/ethersocial/go-esc/core/vm"
+	"github.com/ethersocial/go-esc/crypto"
+	"github.com/ethersocial/go-esc/ethdb"
+	"github.com/ethersocial/go-esc/params"
 )
 
 // VMTest checks EVM execution without block or transaction context.

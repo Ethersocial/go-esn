@@ -58,7 +58,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/internal/build"
+	"github.com/ethersocial/go-esc/internal/build"
 )
 
 var (
@@ -68,12 +68,19 @@ var (
 		executablePath("geth"),
 	}
 
+	// Files that end up in the geth*.zip archive.
+	gescArchiveFiles = []string{
+		"COPYING",
+		executablePath("gesc"),
+	}
+
 	// Files that end up in the geth-alltools*.zip archive.
 	allToolsArchiveFiles = []string{
 		"COPYING",
 		executablePath("abigen"),
 		executablePath("bootnode"),
 		executablePath("evm"),
+		executablePath("gesc"),
 		executablePath("geth"),
 		executablePath("puppeth"),
 		executablePath("rlpdump"),
@@ -94,6 +101,10 @@ var (
 		{
 			Name:        "evm",
 			Description: "Developer utility version of the EVM (Ethereum Virtual Machine) that is capable of running bytecode snippets within a configurable environment and execution mode.",
+		},
+		{
+			Name:        "gesc",
+			Description: "Ethersocial CLI client.",
 		},
 		{
 			Name:        "geth",
@@ -181,7 +192,7 @@ func doInstall(cmdline []string) {
 	// failure with outdated Go. This should save them the trouble.
 	if runtime.Version() < "go1.7" && !strings.Contains(runtime.Version(), "devel") {
 		log.Println("You have Go version", runtime.Version())
-		log.Println("go-ethereum requires at least Go version 1.7 and cannot")
+		log.Println("go-esc requires at least Go version 1.7 and cannot")
 		log.Println("be compiled with an earlier version. Please upgrade your Go installation.")
 		os.Exit(1)
 	}
@@ -716,7 +727,7 @@ func doAndroidArchive(cmdline []string) {
 	// Build the Android archive and Maven resources
 	build.MustRun(goTool("get", "golang.org/x/mobile/cmd/gomobile"))
 	build.MustRun(gomobileTool("init", "--ndk", os.Getenv("ANDROID_NDK")))
-	build.MustRun(gomobileTool("bind", "--target", "android", "--javapkg", "org.ethereum", "-v", "github.com/ethereum/go-ethereum/mobile"))
+	build.MustRun(gomobileTool("bind", "--target", "android", "--javapkg", "org.ethereum", "-v", "github.com/ethersocial/go-esc/mobile"))
 
 	if *local {
 		// If we're building locally, copy bundle to build dir and skip Maven
@@ -836,7 +847,7 @@ func doXCodeFramework(cmdline []string) {
 	// Build the iOS XCode framework
 	build.MustRun(goTool("get", "golang.org/x/mobile/cmd/gomobile"))
 	build.MustRun(gomobileTool("init"))
-	bind := gomobileTool("bind", "--target", "ios", "--tags", "ios", "-v", "github.com/ethereum/go-ethereum/mobile")
+	bind := gomobileTool("bind", "--target", "ios", "--tags", "ios", "-v", "github.com/ethersocial/go-esc/mobile")
 
 	if *local {
 		// If we're building locally, use the build folder and stop afterwards

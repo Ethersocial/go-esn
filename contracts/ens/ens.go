@@ -22,11 +22,11 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/contracts/ens/contract"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethersocial/go-esc/accounts/abi/bind"
+	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esc/contracts/ens/contract"
+	"github.com/ethersocial/go-esc/core/types"
+	"github.com/ethersocial/go-esc/crypto"
 )
 
 var (

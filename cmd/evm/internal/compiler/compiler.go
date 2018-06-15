@@ -20,7 +20,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/core/asm"
+	"github.com/ethersocial/go-esc/core/asm"
 )
 
 func Compile(fn string, src []byte, debug bool) (string, error) {

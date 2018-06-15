@@ -34,16 +34,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/cmd/utils"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/console"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/p2p/discover"
-	"github.com/ethereum/go-ethereum/p2p/nat"
-	"github.com/ethereum/go-ethereum/whisper/mailserver"
-	whisper "github.com/ethereum/go-ethereum/whisper/whisperv5"
+	"github.com/ethersocial/go-esc/cmd/utils"
+	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esc/console"
+	"github.com/ethersocial/go-esc/crypto"
+	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esc/p2p"
+	"github.com/ethersocial/go-esc/p2p/discover"
+	"github.com/ethersocial/go-esc/p2p/nat"
+	"github.com/ethersocial/go-esc/whisper/mailserver"
+	whisper "github.com/ethersocial/go-esc/whisper/whisperv5"
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -91,7 +91,7 @@ var (
 	argPoW       = flag.Float64("pow", whisper.DefaultMinimumPoW, "PoW for normal messages in float format (e.g. 2.7)")
 	argServerPoW = flag.Float64("mspow", whisper.DefaultMinimumPoW, "PoW requirement for Mail Server request")
 
-	argIP      = flag.String("ip", "", "IP address and port of this node (e.g. 127.0.0.1:30303)")
+	argIP      = flag.String("ip", "", "IP address and port of this node (e.g. 127.0.0.1:50505)")
 	argPub     = flag.String("pub", "", "public key for asymmetric encryption")
 	argDBPath  = flag.String("dbpath", "", "path to the server's DB directory")
 	argIDFile  = flag.String("idfile", "", "file name with node id (private key)")

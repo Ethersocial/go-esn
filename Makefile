@@ -11,6 +11,12 @@
 GOBIN = $(shell pwd)/build/bin
 GO ?= latest
 
+gesc:
+	build/env.sh go run build/ci.go install ./cmd/gesc
+	@echo "Done building."
+	@echo "Run \"$(GOBIN)/gesc\" to launch gesc."
+
+
 geth:
 	build/env.sh go run build/ci.go install ./cmd/geth
 	@echo "Done building."
@@ -140,3 +146,14 @@ geth-windows-amd64:
 	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=windows/amd64 -v ./cmd/geth
 	@echo "Windows amd64 cross compilation done:"
 	@ls -ld $(GOBIN)/geth-windows-* | grep amd64
+
+gesc-windows-386:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=windows/386 -v ./cmd/gesc
+	@echo "Windows 386 cross compilation done:"
+	@ls -ld $(GOBIN)/gesc-windows-* | grep 386
+
+
+gesc-windows-amd64:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=windows/amd64 -v ./cmd/gesc
+	@echo "Windows amd64 cross compilation done:"
+	@ls -ld $(GOBIN)/gesc-windows-* | grep amd64

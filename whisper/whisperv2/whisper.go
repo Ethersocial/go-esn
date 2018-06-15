@@ -22,13 +22,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/crypto/ecies"
-	"github.com/ethereum/go-ethereum/event/filter"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esc/crypto"
+	"github.com/ethersocial/go-esc/crypto/ecies"
+	"github.com/ethersocial/go-esc/event/filter"
+	"github.com/ethersocial/go-esc/log"
+	"github.com/ethersocial/go-esc/p2p"
+	"github.com/ethersocial/go-esc/rpc"
 
 	"gopkg.in/fatih/set.v0"
 )

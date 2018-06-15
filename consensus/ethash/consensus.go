@@ -24,20 +24,20 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/consensus/misc"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethersocial/go-esc/common"
+	"github.com/ethersocial/go-esc/common/math"
+	"github.com/ethersocial/go-esc/consensus"
+	"github.com/ethersocial/go-esc/consensus/misc"
+	"github.com/ethersocial/go-esc/core/state"
+	"github.com/ethersocial/go-esc/core/types"
+	"github.com/ethersocial/go-esc/params"
 	set "gopkg.in/fatih/set.v0"
 )
 
 // Ethash proof-of-work protocol constants.
 var (
-	frontierBlockReward  *big.Int = big.NewInt(5e+18) // Block reward in wei for successfully mining a block
-	byzantiumBlockReward *big.Int = big.NewInt(3e+18) // Block reward in wei for successfully mining a block upward from Byzantium
+	frontierBlockReward  *big.Int = big.NewInt(9e+18) // Block reward in wei for successfully mining a block
+	byzantiumBlockReward *big.Int = big.NewInt(5e+18) // Block reward in wei for successfully mining a block upward from Byzantium
 	maxUncles                     = 2                 // Maximum number of uncles allowed in a single block
 )
 
