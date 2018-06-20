@@ -17,6 +17,7 @@
 package p2p
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -29,6 +30,10 @@ import (
 	"github.com/ethersocial/go-esn/log"
 	"github.com/ethersocial/go-esn/p2p/discover"
 	"github.com/ethersocial/go-esn/rlp"
+)
+
+var (
+	ErrShuttingDown = errors.New("shutting down")
 )
 
 const (
@@ -393,7 +398,7 @@ func (rw *protoRW) WriteMsg(msg Msg) (err error) {
 		// as well but we don't want to rely on that.
 		rw.werr <- err
 	case <-rw.closed:
-		err = fmt.Errorf("shutting down")
+		err = ErrShuttingDown
 	}
 	return err
 }

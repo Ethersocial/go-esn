@@ -20,9 +20,9 @@ import (
 	"time"
 
 	"github.com/ethersocial/go-esn/cmd/utils"
-	"github.com/ethersocial/go-esn/log"
 	gethmetrics "github.com/ethersocial/go-esn/metrics"
 	"github.com/ethersocial/go-esn/metrics/influxdb"
+	"github.com/ethersocial/go-esn/swarm/log"
 	"gopkg.in/urfave/cli.v1"
 )
 
