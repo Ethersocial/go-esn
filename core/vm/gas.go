@@ -22,6 +22,7 @@ import (
 	"github.com/ethersocial/go-esn/params"
 )
 
+// Gas costs
 const (
 	GasQuickStep   uint64 = 2
 	GasFastestStep uint64 = 3
