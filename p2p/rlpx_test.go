@@ -386,7 +386,7 @@ type handshakeAuthTest struct {
 }
 
 var eip8HandshakeAuthTests = []handshakeAuthTest{
-	// (Auth?? RLPx v4 plain encoding
+	// (Auth₁) RLPx v4 plain encoding
 	{
 		input: `
 			048ca79ad18e4b0659fab4853fe5bc58eb83992980f4c9cc147d2aa31532efd29a3d3dc6a3d89eaf
@@ -401,7 +401,7 @@ var eip8HandshakeAuthTests = []handshakeAuthTest{
 		isPlain:     true,
 		wantVersion: 4,
 	},
-	// (Auth?? EIP-8 encoding
+	// (Auth₂) EIP-8 encoding
 	{
 		input: `
 			01b304ab7578555167be8154d5cc456f567d5ba302662433674222360f08d5f1534499d3678b513b
@@ -419,7 +419,7 @@ var eip8HandshakeAuthTests = []handshakeAuthTest{
 		wantVersion: 4,
 		wantRest:    []rlp.RawValue{},
 	},
-	// (Auth?? RLPx v4 EIP-8 encoding with version 56, additional list elements
+	// (Auth₃) RLPx v4 EIP-8 encoding with version 56, additional list elements
 	{
 		input: `
 			01b8044c6c312173685d1edd268aa95e1d495474c6959bcdd10067ba4c9013df9e40ff45f5bfd6f7
@@ -447,7 +447,7 @@ type handshakeAckTest struct {
 }
 
 var eip8HandshakeRespTests = []handshakeAckTest{
-	// (Ack?? RLPx v4 plain encoding
+	// (Ack₁) RLPx v4 plain encoding
 	{
 		input: `
 			049f8abcfa9c0dc65b982e98af921bc0ba6e4243169348a236abe9df5f93aa69d99cadddaa387662
@@ -459,7 +459,7 @@ var eip8HandshakeRespTests = []handshakeAckTest{
 		`,
 		wantVersion: 4,
 	},
-	// (Ack?? EIP-8 encoding
+	// (Ack₂) EIP-8 encoding
 	{
 		input: `
 			01ea0451958701280a56482929d3b0757da8f7fbe5286784beead59d95089c217c9b917788989470
@@ -479,7 +479,7 @@ var eip8HandshakeRespTests = []handshakeAckTest{
 		wantVersion: 4,
 		wantRest:    []rlp.RawValue{},
 	},
-	// (Ack?? EIP-8 encoding with version 57, additional list elements
+	// (Ack₃) EIP-8 encoding with version 57, additional list elements
 	{
 		input: `
 			01f004076e58aae772bb101ab1a8e64e01ee96e64857ce82b1113817c6cdd52c09d26f7b90981cd7
@@ -568,7 +568,7 @@ func TestHandshakeForwardCompatibility(t *testing.T) {
 		}
 	}
 
-	// check derivation for (Auth?? Ack?? on recipient side
+	// check derivation for (Auth₂, Ack₂) on recipient side
 	var (
 		hs = &encHandshake{
 			initiator:     false,

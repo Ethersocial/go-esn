@@ -403,7 +403,7 @@ func (self *Kademlia) String() string {
 
 	var rows []string
 	rows = append(rows, "=========================================================================")
-	rows = append(rows, fmt.Sprintf("%v K?Ð?MLI? hive: queen's address: %v", time.Now().UTC().Format(time.UnixDate), self.addr.String()[:6]))
+	rows = append(rows, fmt.Sprintf("%v KΛÐΞMLIΛ hive: queen's address: %v", time.Now().UTC().Format(time.UnixDate), self.addr.String()[:6]))
 	rows = append(rows, fmt.Sprintf("population: %d (%d), proxLimit: %d, proxSize: %d", self.count, len(self.db.index), self.proxLimit, self.proxSize))
 	rows = append(rows, fmt.Sprintf("MaxProx: %d, ProxBinSize: %d, BucketSize: %d", self.MaxProx, self.ProxBinSize, self.BucketSize))
 

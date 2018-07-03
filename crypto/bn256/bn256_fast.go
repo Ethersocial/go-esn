@@ -20,6 +20,7 @@
 package bn256
 
 import "github.com/ethereum/go-ethereum/crypto/bn256/cloudflare"
+
 // G1 is an abstract cyclic group. The zero value is suitable for use as the
 // output of an operation, but cannot be used as an input.
 type G1 = bn256.G1
