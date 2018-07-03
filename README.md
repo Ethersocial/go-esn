@@ -58,8 +58,9 @@ $ gesn --fast --cache=512 console
 
 This command will:
 
- * Start gesn in fast sync mode (`--fast`), causing it to download more data in exchange for avoiding
-   processing the entire history of the EtherSocial network, which is very CPU intensive.
+ * Start gesn in fast sync mode (default, can be changed with the `--syncmode` flag), causing it to
+   download more data in exchange for avoiding processing the entire history of the EtherSocial network,
+   which is very CPU intensive.
  * Bump the memory allowance of the database to 512MB (`--cache=512`), which can help significantly in
    sync times especially for HDD users. This flag is optional and you can set it as high or as low as
    you'd like, though we'd recommend the 512MB - 2GB range.
@@ -86,8 +87,8 @@ here.
 
 Specifying the `--testnet` flag however will reconfigure your Gesn instance a bit:
 
- * Instead of using the default data directory (`~/.esn` on Linux for example), Gesn will nest
-   itself one level deeper into a `testnet` subfolder (`~/.esn/testnet` on Linux). Note, on OSX
+ * Instead of using the default data directory (`~/.ethersocial` on Linux for example), Gesn will nest
+   itself one level deeper into a `testnet` subfolder (`~/.ethersocial/testnet` on Linux). Note, on OSX
    and Linux this also means that attaching to a running testnet node requires the use of a custom
    endpoint since `gesn attach` will try to attach to a production node endpoint by default. E.g.
    `gesn attach <datadir>/testnet/gesn.ipc`. Windows users are not affected by this.
@@ -125,7 +126,7 @@ docker run -d --name ethersocial-node -v /Users/alice/ethersocial:/root \
            ethereum/client-go --fast --cache=512
 ```
 
-This will start gesn in fast sync mode with a DB memory allowance of 512MB just as the above command does.  It will also create a persistent volume in your home directory for saving your blockchain as well as map the default ports. There is also an `alpine` tag available for a slim version of the image.
+This will start gesn in fast sync mode with a DB memory allowance of 1GB just as the above command does.  It will also create a persistent volume in your home directory for saving your blockchain as well as map the default ports. There is also an `alpine` tag available for a slim version of the image.
 
 Do not forget `--rpcaddr 0.0.0.0`, if you want to access RPC from other containers and/or hosts. By default, `gesn` binds to the local interface and RPC endpoints is not accessible from the outside.
 
@@ -133,8 +134,8 @@ Do not forget `--rpcaddr 0.0.0.0`, if you want to access RPC from other containe
 
 As a developer, sooner rather than later you'll want to start interacting with Gesn and the EtherSocial
 network via your own programs and not manually through the console. To aid this, Geth has built-in
-support for a JSON-RPC based APIs ([standard APIs](https://github.com/ethersocial/wiki/wiki/JSON-RPC) and
-[Gesn specific APIs](https://github.com/ethersocial/go-esn/wiki/Management-APIs)). These can be
+support for a JSON-RPC based APIs ([standard APIs](https://github.com/ethereum/wiki/wiki/JSON-RPC) and
+[Gesn specific APIs](https://github.com/ethereum/go-ethereum/wiki/Management-APIs)). These can be
 exposed via HTTP, WebSockets and IPC (unix sockets on unix based platforms, and named pipes on Windows).
 
 The IPC interface is enabled by default and exposes all the APIs supported by Gesn, whereas the HTTP
@@ -226,7 +227,7 @@ $ bootnode --genkey=boot.key
 $ bootnode --nodekey=boot.key
 ```
 
-With the bootnode online, it will display an [`enode` URL](https://github.com/ethersocial/wiki/wiki/enode-url-format)
+With the bootnode online, it will display an [`enode` URL](https://github.com/ethereum/wiki/wiki/enode-url-format)
 that other nodes can use to connect to it and exchange peer information. Make sure to replace the
 displayed IP address information (most probably `[::]`) with your externally accessible IP to get the
 actual `enode` URL.
@@ -274,7 +275,7 @@ anyone on the internet, and are grateful for even the smallest of fixes!
 
 If you'd like to contribute to go-esn, please fork, fix, commit and send a pull request
 for the maintainers to review and merge into the main code base. If you wish to submit more
-complex changes though, please check up with the core devs first on [our gitter channel](https://gitter.im/ethersocial/go-esn)
+complex changes though, please check up with the core devs first on [our gitter channel](https://gitter.im/ethereum/go-ethereum)
 to ensure those changes are in line with the general philosophy of the project and/or get some
 early feedback which can make both your efforts much lighter as well as our review and merge
 procedures quick and simple.
@@ -287,15 +288,15 @@ Please make sure your contributions adhere to our coding guidelines:
  * Commit messages should be prefixed with the package(s) they modify.
    * E.g. "eth, rpc: make trace configs optional"
 
-Please see the [Developers' Guide](https://github.com/ethersocial/go-esn/wiki/Developers'-Guide)
+Please see the [Developers' Guide](https://github.com/ethereum/go-ethereum/wiki/Developers'-Guide)
 for more details on configuring your environment, managing project dependencies and testing procedures.
 
 ## License
 
-The go-esn library (i.e. all code outside of the `cmd` directory) is licensed under the
+The go-ethereum library (i.e. all code outside of the `cmd` directory) is licensed under the
 [GNU Lesser General Public License v3.0](https://www.gnu.org/licenses/lgpl-3.0.en.html), also
 included in our repository in the `COPYING.LESSER` file.
 
-The go-esn binaries (i.e. all code inside of the `cmd` directory) is licensed under the
+The go-ethereum binaries (i.e. all code inside of the `cmd` directory) is licensed under the
 [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html), also included
 in our repository in the `COPYING` file.
