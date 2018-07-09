@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethersocial/go-esn/common"
 	set "gopkg.in/fatih/set.v0"
 )
 
