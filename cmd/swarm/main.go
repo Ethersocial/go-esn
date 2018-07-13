@@ -43,6 +43,7 @@ import (
 	"github.com/ethersocial/go-esn/swarm"
 	bzzapi "github.com/ethersocial/go-esn/swarm/api"
 	swarmmetrics "github.com/ethersocial/go-esn/swarm/metrics"
+	"github.com/ethersocial/go-esn/swarm/tracing"
 
 	"gopkg.in/urfave/cli.v1"
 )
@@ -430,12 +431,14 @@ pv(1) tool to get a progress bar:
 	app.Flags = append(app.Flags, rpcFlags...)
 	app.Flags = append(app.Flags, debug.Flags...)
 	app.Flags = append(app.Flags, swarmmetrics.Flags...)
+	app.Flags = append(app.Flags, tracing.Flags...)
 	app.Before = func(ctx *cli.Context) error {
 		runtime.GOMAXPROCS(runtime.NumCPU())
 		if err := debug.Setup(ctx, ""); err != nil {
 			return err
 		}
 		swarmmetrics.Setup(ctx)
+		tracing.Setup(ctx)
 		return nil
 	}
 	app.After = func(ctx *cli.Context) error {
