@@ -50,7 +50,7 @@ func TestConsoleWelcome(t *testing.T) {
 	gesn.SetTemplateFunc("goos", func() string { return runtime.GOOS })
 	gesn.SetTemplateFunc("goarch", func() string { return runtime.GOARCH })
 	gesn.SetTemplateFunc("gover", runtime.Version)
-	gesn.SetTemplateFunc("gesnver", func() string { return params.Version })
+	gesn.SetTemplateFunc("gethver", func() string { return params.VersionWithMeta })
 	gesn.SetTemplateFunc("niltime", func() string { return time.Unix(0, 0).Format(time.RFC1123) })
 	gesn.SetTemplateFunc("apis", func() string { return ipcAPIs })
 
@@ -133,7 +133,7 @@ func testAttachWelcome(t *testing.T, gesn *testgesn, endpoint, apis string) {
 	attach.SetTemplateFunc("goos", func() string { return runtime.GOOS })
 	attach.SetTemplateFunc("goarch", func() string { return runtime.GOARCH })
 	attach.SetTemplateFunc("gover", runtime.Version)
-	attach.SetTemplateFunc("gesnver", func() string { return params.Version })
+	attach.SetTemplateFunc("gesnver", func() string { return params.VersionWithMeta })
 	attach.SetTemplateFunc("etherbase", func() string { return gesn.Etherbase })
 	attach.SetTemplateFunc("niltime", func() string { return time.Unix(0, 0).Format(time.RFC1123) })
 	attach.SetTemplateFunc("ipc", func() bool { return strings.HasPrefix(endpoint, "ipc") })

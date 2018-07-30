@@ -39,11 +39,11 @@ import (
 	"github.com/ethersocial/go-esn/node"
 	"github.com/ethersocial/go-esn/p2p"
 	"github.com/ethersocial/go-esn/p2p/discover"
-	"github.com/ethersocial/go-esn/params"
 	"github.com/ethersocial/go-esn/swarm"
 	bzzapi "github.com/ethersocial/go-esn/swarm/api"
 	swarmmetrics "github.com/ethersocial/go-esn/swarm/metrics"
 	"github.com/ethersocial/go-esn/swarm/tracing"
+	sv "github.com/ethersocial/go-esn/swarm/version"
 
 	"gopkg.in/urfave/cli.v1"
 )
@@ -216,7 +216,7 @@ var defaultNodeConfig = node.DefaultConfig
 // This init function sets defaults so cmd/swarm can run alongside geth.
 func init() {
 	defaultNodeConfig.Name = clientIdentifier
-	defaultNodeConfig.Version = params.VersionWithCommit(gitCommit)
+	defaultNodeConfig.Version = sv.VersionWithCommit(gitCommit)
 	defaultNodeConfig.P2P.ListenAddr = ":30399"
 	defaultNodeConfig.IPCPath = "bzzd.ipc"
 	// Set flag defaults for --help display.
@@ -516,7 +516,8 @@ func main() {
 }
 
 func version(ctx *cli.Context) error {
-	fmt.Println("Version:", SWARM_VERSION)
+	fmt.Println(strings.Title(clientIdentifier))
+	fmt.Println("Version:", sv.VersionWithMeta)
 	if gitCommit != "" {
 		fmt.Println("Git Commit:", gitCommit)
 	}
