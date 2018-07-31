@@ -20,9 +20,9 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/swarm/storage/encryption"
+	"github.com/ethersocial/go-esn/swarm/storage/encryption"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethersocial/go-esn/common"
 )
 
 func TestHasherStore(t *testing.T) {

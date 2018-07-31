@@ -23,7 +23,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/swarm/network"
+	"github.com/ethersocial/go-esn/swarm/network"
 )
 
 var (
