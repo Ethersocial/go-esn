@@ -27,25 +27,11 @@ import (
 	"testing"
 	"time"
 
-<<<<<<< HEAD
-	"github.com/ethersocial/go-esn/accounts/abi/bind"
-	"github.com/ethersocial/go-esn/accounts/abi/bind/backends"
-	"github.com/ethersocial/go-esn/common"
 	"github.com/ethersocial/go-esn/contracts/ens"
-	"github.com/ethersocial/go-esn/contracts/ens/contract"
-	"github.com/ethersocial/go-esn/core"
-	"github.com/ethersocial/go-esn/core/types"
 	"github.com/ethersocial/go-esn/crypto"
 	"github.com/ethersocial/go-esn/log"
 	"github.com/ethersocial/go-esn/swarm/multihash"
 	"github.com/ethersocial/go-esn/swarm/storage"
-=======
-	"github.com/ethereum/go-ethereum/contracts/ens"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/swarm/multihash"
-	"github.com/ethereum/go-ethereum/swarm/storage"
->>>>>>> 427316a70... swarm/storage/mru: Client-side MRU signatures (#784)
 )
 
 var (

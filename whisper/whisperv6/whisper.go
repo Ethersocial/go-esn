@@ -26,22 +26,13 @@ import (
 	"sync"
 	"time"
 
-<<<<<<< HEAD
+	mapset "github.com/deckarep/golang-set"
 	"github.com/ethersocial/go-esn/common"
 	"github.com/ethersocial/go-esn/crypto"
 	"github.com/ethersocial/go-esn/log"
 	"github.com/ethersocial/go-esn/p2p"
 	"github.com/ethersocial/go-esn/rlp"
 	"github.com/ethersocial/go-esn/rpc"
-=======
-	mapset "github.com/deckarep/golang-set"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/ethereum/go-ethereum/rpc"
->>>>>>> 5d30be412... all: switch out defunct set library to different one (#16873)
 	"github.com/syndtr/goleveldb/leveldb/errors"
 	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/sync/syncmap"
