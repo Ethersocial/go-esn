@@ -67,7 +67,7 @@ This command will:
  * Start up Gesn's built-in interactive [JavaScript console](https://github.com/ethersocial/go-esn/wiki/JavaScript-Console),
    (via the trailing `console` subcommand) through which you can invoke all official [`web3` methods](https://github.com/ethersocial/wiki/wiki/JavaScript-API)
    as well as Gesn's own [management APIs](https://github.com/ethersocial/go-esn/wiki/Management-APIs).
-   This too is optional and if you leave it out you can always attach to an already running Gesn instance
+   This tool is optional and if you leave it out you can always attach to an already running Gesn instance
    with `gesn attach`.
 
 ### Full node on the EtherSocial test network
