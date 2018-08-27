@@ -135,7 +135,7 @@ Do not forget `--rpcaddr 0.0.0.0`, if you want to access RPC from other containe
 As a developer, sooner rather than later you'll want to start interacting with Gesn and the EtherSocial
 network via your own programs and not manually through the console. To aid this, Geth has built-in
 support for a JSON-RPC based APIs ([standard APIs](https://github.com/ethereum/wiki/wiki/JSON-RPC) and
-[Gesn specific APIs](https://github.com/ethereum/go-ethereum/wiki/Management-APIs)). These can be
+[Geth specific APIs](https://github.com/ethereum/go-ethereum/wiki/Management-APIs)). These can be
 exposed via HTTP, WebSockets and IPC (unix sockets on unix based platforms, and named pipes on Windows).
 
 The IPC interface is enabled by default and exposes all the APIs supported by Gesn, whereas the HTTP
