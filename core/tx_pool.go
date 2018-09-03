@@ -26,13 +26,13 @@ import (
 	"time"
 
 	"github.com/ethersocial/go-esn/common"
+	"github.com/ethersocial/go-esn/common/prque"
 	"github.com/ethersocial/go-esn/core/state"
 	"github.com/ethersocial/go-esn/core/types"
 	"github.com/ethersocial/go-esn/event"
 	"github.com/ethersocial/go-esn/log"
 	"github.com/ethersocial/go-esn/metrics"
 	"github.com/ethersocial/go-esn/params"
-	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
 )
 
 const (
@@ -987,11 +987,11 @@ func (pool *TxPool) promoteExecutables(accounts []common.Address) {
 	if pending > pool.config.GlobalSlots {
 		pendingBeforeCap := pending
 		// Assemble a spam order to penalize large transactors first
-		spammers := prque.New()
+		spammers := prque.New(nil)
 		for addr, list := range pool.pending {
 			// Only evict transactions from high rollers
 			if !pool.locals.contains(addr) && uint64(list.Len()) > pool.config.AccountSlots {
-				spammers.Push(addr, float32(list.Len()))
+				spammers.Push(addr, int64(list.Len()))
 			}
 		}
 		// Gradually drop transactions from offenders
