@@ -34,7 +34,6 @@ import (
 	"github.com/ethersocial/go-esn/p2p/discover"
 	"github.com/ethersocial/go-esn/p2p/simulations/adapters"
 	"github.com/ethersocial/go-esn/swarm/api"
-	"github.com/ethersocial/go-esn/swarm/network"
 	"github.com/ethersocial/go-esn/swarm/network/simulation"
 	"github.com/ethersocial/go-esn/swarm/storage"
 	colorable "github.com/mattn/go-colorable"
@@ -293,7 +292,7 @@ func testSwarmNetwork(t *testing.T, o *testSwarmNetworkOptions, steps ...testSwa
 			if err != nil {
 				return nil, cleanup, err
 			}
-			bucket.Store(simulation.BucketKeyKademlia, swarm.bzz.Hive.Overlay.(*network.Kademlia))
+			bucket.Store(simulation.BucketKeyKademlia, swarm.bzz.Hive.Kademlia)
 			log.Info("new swarm", "bzzKey", config.BzzKey, "baseAddr", fmt.Sprintf("%x", swarm.bzz.BaseAddr()))
 			return swarm, cleanup, nil
 		},
