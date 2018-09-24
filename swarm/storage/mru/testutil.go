@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/ethereum/go-ethereum/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/discover"
 
 	"github.com/ethersocial/go-esn/swarm/storage"
 )
