@@ -29,6 +29,7 @@ import (
 	"github.com/ethersocial/go-esn/log"
 	"github.com/ethersocial/go-esn/p2p/discover"
 	"github.com/ethersocial/go-esn/p2p/discv5"
+	"github.com/ethersocial/go-esn/p2p/enode"
 	"github.com/ethersocial/go-esn/p2p/nat"
 	"github.com/ethersocial/go-esn/p2p/netutil"
 )
@@ -85,7 +86,7 @@ func main() {
 	}
 
 	if *writeAddr {
-		fmt.Printf("%v\n", discover.PubkeyID(&nodeKey.PublicKey))
+		fmt.Printf("%v\n", enode.PubkeyToIDV4(&nodeKey.PublicKey))
 		os.Exit(0)
 	}
 

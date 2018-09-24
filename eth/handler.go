@@ -37,7 +37,7 @@ import (
 	"github.com/ethersocial/go-esn/event"
 	"github.com/ethersocial/go-esn/log"
 	"github.com/ethersocial/go-esn/p2p"
-	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/enode"
 	"github.com/ethersocial/go-esn/params"
 	"github.com/ethersocial/go-esn/rlp"
 )
@@ -147,7 +147,7 @@ func NewProtocolManager(config *params.ChainConfig, mode downloader.SyncMode, ne
 			NodeInfo: func() interface{} {
 				return manager.NodeInfo()
 			},
-			PeerInfo: func(id discover.NodeID) interface{} {
+			PeerInfo: func(id enode.ID) interface{} {
 				if p := manager.peers.Peer(fmt.Sprintf("%x", id[:8])); p != nil {
 					return p.Info()
 				}

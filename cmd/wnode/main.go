@@ -41,7 +41,7 @@ import (
 	"github.com/ethersocial/go-esn/crypto"
 	"github.com/ethersocial/go-esn/log"
 	"github.com/ethersocial/go-esn/p2p"
-	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/enode"
 	"github.com/ethersocial/go-esn/p2p/nat"
 	"github.com/ethersocial/go-esn/whisper/mailserver"
 	whisper "github.com/ethersocial/go-esn/whisper/whisperv6"
@@ -175,7 +175,7 @@ func initialize() {
 	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(*argVerbosity), log.StreamHandler(os.Stderr, log.TerminalFormat(false))))
 
 	done = make(chan struct{})
-	var peers []*discover.Node
+	var peers []*enode.Node
 	var err error
 
 	if *generateKey {
@@ -203,7 +203,7 @@ func initialize() {
 		if len(*argEnode) == 0 {
 			argEnode = scanLineA("Please enter the peer's enode: ")
 		}
-		peer := discover.MustParseNode(*argEnode)
+		peer := enode.MustParseV4(*argEnode)
 		peers = append(peers, peer)
 	}
 
@@ -747,11 +747,11 @@ func requestExpiredMessagesLoop() {
 }
 
 func extractIDFromEnode(s string) []byte {
-	n, err := discover.ParseNode(s)
+	n, err := enode.ParseV4(s)
 	if err != nil {
 		utils.Fatalf("Failed to parse enode: %s", err)
 	}
-	return n.ID[:]
+	return n.ID().Bytes()
 }
 
 // obfuscateBloom adds 16 random bits to the bloom

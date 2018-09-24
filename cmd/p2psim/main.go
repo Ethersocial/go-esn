@@ -47,7 +47,7 @@ import (
 
 	"github.com/ethersocial/go-esn/crypto"
 	"github.com/ethersocial/go-esn/p2p"
-	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/enode"
 	"github.com/ethersocial/go-esn/p2p/simulations"
 	"github.com/ethersocial/go-esn/p2p/simulations/adapters"
 	"github.com/ethersocial/go-esn/rpc"
@@ -285,7 +285,7 @@ func createNode(ctx *cli.Context) error {
 		if err != nil {
 			return err
 		}
-		config.ID = discover.PubkeyID(&privKey.PublicKey)
+		config.ID = enode.PubkeyToIDV4(&privKey.PublicKey)
 		config.PrivateKey = privKey
 	}
 	if services := ctx.String("services"); services != "" {

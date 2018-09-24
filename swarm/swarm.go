@@ -36,7 +36,7 @@ import (
 	"github.com/ethersocial/go-esn/ethclient"
 	"github.com/ethersocial/go-esn/metrics"
 	"github.com/ethersocial/go-esn/p2p"
-	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/enode"
 	"github.com/ethersocial/go-esn/p2p/protocols"
 	"github.com/ethersocial/go-esn/params"
 	"github.com/ethersocial/go-esn/rpc"
@@ -125,21 +125,11 @@ func NewSwarm(config *api.Config, mockStore *mock.NodeStore) (self *Swarm, err e
 
 	config.HiveParams.Discovery = true
 
-	nodeID, err := discover.HexID(config.NodeID)
-	if err != nil {
-		return nil, err
-	}
-	addr := &network.BzzAddr{
-		OAddr: common.FromHex(config.BzzKey),
-		UAddr: []byte(discover.NewNode(nodeID, net.IP{127, 0, 0, 1}, 50505, 50505).String()),
-	}
-
 	bzzconfig := &network.BzzConfig{
-		NetworkID:    config.NetworkID,
-		OverlayAddr:  addr.OAddr,
-		UnderlayAddr: addr.UAddr,
-		HiveParams:   config.HiveParams,
-		LightNode:    config.LightNodeEnabled,
+		NetworkID:   config.NetworkID,
+		OverlayAddr: common.FromHex(config.BzzKey),
+		HiveParams:  config.HiveParams,
+		LightNode:   config.LightNodeEnabled,
 	}
 
 	stateStore, err := state.NewDBStore(filepath.Join(config.Path, "state-store.db"))
@@ -181,8 +171,12 @@ func NewSwarm(config *api.Config, mockStore *mock.NodeStore) (self *Swarm, err e
 	delivery := stream.NewDelivery(to, self.netStore)
 	self.netStore.NewNetFetcherFunc = network.NewFetcherFactory(delivery.RequestFromPeers, config.DeliverySkipCheck).New
 
-	self.streamer = stream.NewRegistry(addr, delivery, self.netStore, stateStore, &stream.RegistryOptions{
-		SkipCheck:       config.SyncingSkipCheck,
+	var nodeID enode.ID
+	if err := nodeID.UnmarshalText([]byte(config.NodeID)); err != nil {
+		return nil, err
+	}
+	self.streamer = stream.NewRegistry(nodeID, delivery, self.netStore, stateStore, &stream.RegistryOptions{
+		SkipCheck:       config.DeliverySkipCheck,
 		DoSync:          config.SyncEnabled,
 		DoRetrieve:      true,
 		SyncUpdateDelay: config.SyncUpdateDelay,

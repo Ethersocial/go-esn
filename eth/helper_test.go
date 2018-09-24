@@ -37,7 +37,7 @@ import (
 	"github.com/ethersocial/go-esn/ethdb"
 	"github.com/ethersocial/go-esn/event"
 	"github.com/ethersocial/go-esn/p2p"
-	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/enode"
 	"github.com/ethersocial/go-esn/params"
 )
 
@@ -148,7 +148,7 @@ func newTestPeer(name string, version int, pm *ProtocolManager, shake bool) (*te
 	app, net := p2p.MsgPipe()
 
 	// Generate a random id and create the peer
-	var id discover.NodeID
+	var id enode.ID
 	rand.Read(id[:])
 
 	peer := pm.newPeer(version, p2p.NewPeer(id, name, nil), net)

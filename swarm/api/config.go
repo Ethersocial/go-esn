@@ -27,7 +27,7 @@ import (
 	"github.com/ethersocial/go-esn/contracts/ens"
 	"github.com/ethersocial/go-esn/crypto"
 	"github.com/ethersocial/go-esn/node"
-	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/enode"
 	"github.com/ethersocial/go-esn/swarm/log"
 	"github.com/ethersocial/go-esn/swarm/network"
 	"github.com/ethersocial/go-esn/swarm/pss"
@@ -118,7 +118,7 @@ func (c *Config) Init(prvKey *ecdsa.PrivateKey) {
 
 	c.PublicKey = pubkeyhex
 	c.BzzKey = keyhex
-	c.NodeID = discover.PubkeyID(&prvKey.PublicKey).String()
+	c.NodeID = enode.PubkeyToIDV4(&prvKey.PublicKey).String()
 
 	if c.SwapEnabled {
 		c.Swap.Init(c.Contract, prvKey)

@@ -27,7 +27,7 @@ import (
 	"github.com/ethersocial/go-esn/common"
 	"github.com/ethersocial/go-esn/crypto"
 	"github.com/ethersocial/go-esn/p2p"
-	"github.com/ethersocial/go-esn/p2p/discover"
+	"github.com/ethersocial/go-esn/p2p/enode"
 	"github.com/ethersocial/go-esn/p2p/nat"
 )
 
@@ -146,8 +146,7 @@ func initialize(t *testing.T) {
 			peerNodeId := nodes[j].id
 			address, _ := net.ResolveTCPAddr("tcp", nodes[j].server.ListenAddr)
 			peerPort := uint16(address.Port)
-			peerNode := discover.PubkeyID(&peerNodeId.PublicKey)
-			peer := discover.NewNode(peerNode, address.IP, peerPort, peerPort)
+			peer := enode.NewV4(&peerNodeId.PublicKey, address.IP, int(peerPort), int(peerPort))
 			node.server.AddPeer(peer)
 		}
 
