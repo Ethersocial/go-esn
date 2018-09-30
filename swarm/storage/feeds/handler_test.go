@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-package mru
+package feeds
 
 import (
 	"bytes"
@@ -31,7 +31,7 @@ import (
 	"github.com/ethersocial/go-esn/log"
 	"github.com/ethersocial/go-esn/swarm/chunk"
 	"github.com/ethersocial/go-esn/swarm/storage"
-	"github.com/ethersocial/go-esn/swarm/storage/mru/lookup"
+	"github.com/ethersocial/go-esn/swarm/storage/feeds/lookup"
 )
 
 var (

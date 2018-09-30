@@ -50,7 +50,7 @@ import (
 	"github.com/ethersocial/go-esn/swarm/state"
 	"github.com/ethersocial/go-esn/swarm/storage"
 	"github.com/ethersocial/go-esn/swarm/storage/mock"
-	"github.com/ethersocial/go-esn/swarm/storage/mru"
+	"github.com/ethersocial/go-esn/swarm/storage/feeds"
 	"github.com/ethersocial/go-esn/swarm/tracing"
 )
 
@@ -186,10 +186,10 @@ func NewSwarm(config *api.Config, mockStore *mock.NodeStore) (self *Swarm, err e
 	// Swarm Hash Merklised Chunking for Arbitrary-length Document/File storage
 	self.fileStore = storage.NewFileStore(self.netStore, self.config.FileStoreParams)
 
-	var feedsHandler *mru.Handler
-	fhParams := &mru.HandlerParams{}
+	var feedsHandler *feeds.Handler
+	fhParams := &feeds.HandlerParams{}
 
-	feedsHandler = mru.NewHandler(fhParams)
+	feedsHandler = feeds.NewHandler(fhParams)
 	feedsHandler.SetStore(self.netStore)
 
 	lstore.Validators = []storage.ChunkValidator{
