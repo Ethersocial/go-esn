@@ -32,7 +32,7 @@ import (
 
 	"github.com/ethersocial/go-esn/log"
 	swarm "github.com/ethersocial/go-esn/swarm/api/client"
-	colorable "github.com/mattn/go-colorable"
+	"github.com/mattn/go-colorable"
 )
 
 var loglevel = flag.Int("loglevel", 3, "verbosity of logs")
