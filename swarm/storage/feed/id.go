@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-package feeds
+package feed
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ import (
 	"strconv"
 
 	"github.com/ethersocial/go-esn/common"
-	"github.com/ethersocial/go-esn/swarm/storage/feeds/lookup"
+	"github.com/ethersocial/go-esn/swarm/storage/feed/lookup"
 
 	"github.com/ethersocial/go-esn/swarm/storage"
 )

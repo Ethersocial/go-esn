@@ -14,35 +14,25 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-package feeds
+package feed
 
 import (
-	"bytes"
-	"context"
-	"time"
-
-	"github.com/ethersocial/go-esn/swarm/storage"
+	"testing"
 )
 
-const (
-	hasherCount            = 8
-	feedsHashAlgorithm     = storage.SHA3Hash
-	defaultRetrieveTimeout = 100 * time.Millisecond
-)
-
-// cacheEntry caches the last known update of a specific Swarm feed.
-type cacheEntry struct {
-	Update
-	*bytes.Reader
-	lastKey storage.Address
+func getTestQuery() *Query {
+	id := getTestID()
+	return &Query{
+		TimeLimit: 5000,
+		Feed:      id.Feed,
+		Hint:      id.Epoch,
+	}
 }
 
-// implements storage.LazySectionReader
-func (r *cacheEntry) Size(ctx context.Context, _ chan bool) (int64, error) {
-	return int64(len(r.Update.data)), nil
-}
+func TestQueryValues(t *testing.T) {
+	var expected = KV{"hint.level": "25", "hint.time": "1000", "time": "5000", "topic": "0x776f726c64206e657773207265706f72742c20657665727920686f7572000000", "user": "0x876A8936A7Cd0b79Ef0735AD0896c1AFe278781c"}
 
-//returns the feed's topic
-func (r *cacheEntry) Topic() Topic {
-	return r.Feed.Topic
+	query := getTestQuery()
+	testValueSerializer(t, query, expected)
+
 }

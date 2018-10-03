@@ -1,9 +1,9 @@
-package feeds
+package feed
 
 import (
 	"testing"
 
-	"github.com/ethersocial/go-esn/swarm/storage/feeds/lookup"
+	"github.com/ethersocial/go-esn/swarm/storage/feed/lookup"
 )
 
 func getTestID() *ID {

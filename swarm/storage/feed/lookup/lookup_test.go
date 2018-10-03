@@ -22,7 +22,7 @@ import (
 	"testing"
 
 	"github.com/ethersocial/go-esn/swarm/log"
-	"github.com/ethersocial/go-esn/swarm/storage/feeds/lookup"
+	"github.com/ethersocial/go-esn/swarm/storage/feed/lookup"
 )
 
 type Data struct {
