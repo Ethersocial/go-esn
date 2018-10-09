@@ -215,8 +215,8 @@ var nodeDBSeedQueryNodes = []struct {
 		node: NewV4(
 			hexPubkey("c013a50b4d1ebce5c377d8af8cb7114fd933ffc9627f96ad56d90fef5b7253ec736fd07ef9a81dc2955a997e54b7bf50afd0aa9f110595e2bec5bb7ce1657004"),
 			net.IP{127, 0, 0, 3},
-			30303,
-			30303,
+			50505,
+			50505,
 		),
 		pong: time.Now().Add(-2 * time.Second),
 	},
@@ -224,8 +224,8 @@ var nodeDBSeedQueryNodes = []struct {
 		node: NewV4(
 			hexPubkey("f141087e3e08af1aeec261ff75f48b5b1637f594ea9ad670e50051646b0416daa3b134c28788cbe98af26992a47652889cd8577ccc108ac02c6a664db2dc1283"),
 			net.IP{127, 0, 0, 3},
-			30303,
-			30303,
+			50505,
+			50505,
 		),
 		pong: time.Now().Add(-2 * time.Second),
 	},

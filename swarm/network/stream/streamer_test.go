@@ -19,6 +19,7 @@ package stream
 import (
 	"bytes"
 	"context"
+	"errors"
 	"strconv"
 	"testing"
 	"time"
@@ -56,11 +57,12 @@ func TestStreamerRequestSubscription(t *testing.T) {
 }
 
 var (
-	hash0     = sha3.Sum256([]byte{0})
-	hash1     = sha3.Sum256([]byte{1})
-	hash2     = sha3.Sum256([]byte{2})
-	hashesTmp = append(hash0[:], hash1[:]...)
-	hashes    = append(hashesTmp, hash2[:]...)
+	hash0         = sha3.Sum256([]byte{0})
+	hash1         = sha3.Sum256([]byte{1})
+	hash2         = sha3.Sum256([]byte{2})
+	hashesTmp     = append(hash0[:], hash1[:]...)
+	hashes        = append(hashesTmp, hash2[:]...)
+	corruptHashes = append(hashes[:40])
 )
 
 type testClient struct {
@@ -461,7 +463,7 @@ func TestStreamerUpstreamSubscribeLiveAndHistory(t *testing.T) {
 }
 
 func TestStreamerDownstreamCorruptHashesMsgExchange(t *testing.T) {
-	tester, streamer, _, teardown, err := newStreamerTester(t)
+	tester, streamer, _, teardown, err := newStreamerTester(t, nil)
 	defer teardown()
 	if err != nil {
 		t.Fatal(err)
@@ -770,7 +772,7 @@ func TestMaxPeerServersWithUnsubscribe(t *testing.T) {
 		return newTestServer(t), nil
 	})
 
-	peerID := tester.IDs[0]
+	node := tester.Nodes[0]
 
 	for i := 0; i < maxPeerServers+10; i++ {
 		stream := NewStream("foo", strconv.Itoa(i), true)
@@ -784,7 +786,7 @@ func TestMaxPeerServersWithUnsubscribe(t *testing.T) {
 						Stream:   stream,
 						Priority: Top,
 					},
-					Peer: peerID,
+					Peer: node.ID(),
 				},
 			},
 			Expects: []p2ptest.Expect{
@@ -799,7 +801,7 @@ func TestMaxPeerServersWithUnsubscribe(t *testing.T) {
 						From:   1,
 						To:     1,
 					},
-					Peer: peerID,
+					Peer: node.ID(),
 				},
 			},
 		})
@@ -816,7 +818,7 @@ func TestMaxPeerServersWithUnsubscribe(t *testing.T) {
 					Msg: &UnsubscribeMsg{
 						Stream: stream,
 					},
-					Peer: peerID,
+					Peer: node.ID(),
 				},
 			},
 		})
@@ -844,7 +846,7 @@ func TestMaxPeerServersWithoutUnsubscribe(t *testing.T) {
 		return newTestServer(t), nil
 	})
 
-	peerID := tester.IDs[0]
+	node := tester.Nodes[0]
 
 	for i := 0; i < maxPeerServers+10; i++ {
 		stream := NewStream("foo", strconv.Itoa(i), true)
@@ -859,7 +861,7 @@ func TestMaxPeerServersWithoutUnsubscribe(t *testing.T) {
 							Stream:   stream,
 							Priority: Top,
 						},
-						Peer: peerID,
+						Peer: node.ID(),
 					},
 				},
 				Expects: []p2ptest.Expect{
@@ -868,7 +870,7 @@ func TestMaxPeerServersWithoutUnsubscribe(t *testing.T) {
 						Msg: &SubscribeErrorMsg{
 							Error: ErrMaxPeerServers.Error(),
 						},
-						Peer: peerID,
+						Peer: node.ID(),
 					},
 				},
 			})
@@ -888,7 +890,7 @@ func TestMaxPeerServersWithoutUnsubscribe(t *testing.T) {
 						Stream:   stream,
 						Priority: Top,
 					},
-					Peer: peerID,
+					Peer: node.ID(),
 				},
 			},
 			Expects: []p2ptest.Expect{
@@ -903,7 +905,7 @@ func TestMaxPeerServersWithoutUnsubscribe(t *testing.T) {
 						From:   1,
 						To:     1,
 					},
-					Peer: peerID,
+					Peer: node.ID(),
 				},
 			},
 		})
